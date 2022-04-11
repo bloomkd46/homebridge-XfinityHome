@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "XfinityHomePlatform",
   "pluginType": "platform",
   "singular": true,
   "schema": {
