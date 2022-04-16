@@ -1,8 +1,11 @@
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
+import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, APIEvent } from 'homebridge';
 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
-import { ExamplePlatformAccessory } from './platformAccessory';
-import XHome from 'xhome';
+import PanelAccessory from './accessories/PanelAccessory';
+import MotionAccessory from './accessories/MotionAccessory';
+import XHome, { Panel, Motion, DryContact, Light } from 'xhome';
+import DryContactAccessory from './accessories/DryContactAccessory';
+import LightAccessory from './accessories/LightAccessory';
 
 /**
  * HomebridgePlatform
@@ -24,12 +27,12 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
     public readonly api: API,
   ) {
     this.log.debug('Finished initializing platform:', this.config.name);
-  
+
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
     // in order to ensure they weren't added to homebridge already. This event can also be used
     // to start discovery of new accessories.
-    this.api.on('didFinishLaunching', () => {
+    this.api.on(APIEvent.DID_FINISH_LAUNCHING, () => {
       log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your devices as accessories
       this.discoverDevices();
@@ -45,10 +48,10 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
-    if(!this.refreshToken){
+    if (!this.refreshToken) {
       this.log.info('Loading Refresh Token From Cache');
-      this.refreshToken = accessory.context.refreshToken;
-      this.log.debug(this.refreshToken || 'ERROR LOADING TOKEN');
+      this.refreshToken = accessory.context.device.xhome.refreshToken;
+      this.log.info(this.refreshToken || 'ERROR LOADING TOKEN');
     }
   }
 
@@ -59,62 +62,60 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
    */
   async discoverDevices() {
     const xhome = await XHome.init(this.refreshToken || this.config.refreshToken);
-    // EXAMPLE ONLY
-    // A real plugin you would discover accessories from the local network, cloud services
-    // or a user-defined array in the platform config.
-    const exampleDevices = [
-      {
-        exampleUniqueId: 'ABCD',
-        exampleDisplayName: 'Bedroom',
-      },
-      {
-        exampleUniqueId: 'EFGH',
-        exampleDisplayName: 'Kitchen',
-      },
-    ];
-
-    // loop over the discovered devices and register each one if it has not already been registered
-    for (const device of exampleDevices) {
-
-      // generate a unique id for the accessory this should be generated from
-      // something globally unique, but constant, for example, the device serial
-      // number or MAC address
-      const uuid = this.api.hap.uuid.generate(device.exampleUniqueId);
-
-      // see if an accessory with the same uuid has already been registered and restored from
-      // the cached devices we stored in the `configureAccessory` method above
+    for (const device of [...xhome.Panel, ...xhome.MotionSensors, ...xhome.DryContactSensors, ...xhome.Lights]) {
+      const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
       const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
-
       if (existingAccessory) {
-        // the accessory already exists
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-
-        // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        // existingAccessory.context.device = device;
-        // this.api.updatePlatformAccessories([existingAccessory]);
-
-        // create the accessory handler for the restored accessory
-        // this is imported from `platformAccessory.ts`
-        new ExamplePlatformAccessory(this, existingAccessory);
-
-        // it is possible to remove platform accessories at any time using `api.unregisterPlatformAccessories`, eg.:
-        // remove platform accessories when no longer present
-        // this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-        // this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
+        switch (device.device.deviceType) {
+          case 'panel':
+            new PanelAccessory(this, existingAccessory, device as Panel);
+            break;
+          case 'lightDimmer':
+            continue;
+          case 'lightSwitch':
+            new LightAccessory(this, existingAccessory, device as Light);
+            break;
+          case 'sensor':
+            if ((device as Motion | DryContact).device.properties.sensorType === 'dryContact') {
+              new DryContactAccessory(this, existingAccessory, device as DryContact);
+            } else if ((device as Motion | DryContact).device.properties.sensorType === 'motion') {
+              new MotionAccessory(this, existingAccessory, device as Motion);
+            } else {
+              this.log.error('Unknown Device Detected: ', device.device);
+            }
+            break;
+        }
       } else {
         // the accessory does not yet exist, so we need to create it
-        this.log.info('Adding new accessory:', device.exampleDisplayName);
+        this.log.info('Adding new accessory:', device.device.name || 'Panel');
 
         // create a new accessory
-        const accessory = new this.api.platformAccessory(device.exampleDisplayName, uuid);
+        const accessory = new this.api.platformAccessory(device.device.name, uuid);
 
         // store a copy of the device object in the `accessory.context`
         // the `context` property can be used to store any data about the accessory you may need
         accessory.context.device = device;
 
-        // create the accessory handler for the newly create accessory
-        // this is imported from `platformAccessory.ts`
-        new ExamplePlatformAccessory(this, accessory);
+        switch (device.device.deviceType) {
+          case 'panel':
+            new PanelAccessory(this, accessory, device as Panel);
+            break;
+          case 'lightDimmer':
+            continue;
+          case 'lightSwitch':
+            new LightAccessory(this, accessory, device as Light);
+            break;
+          case 'sensor':
+            if ((device as Motion | DryContact).device.properties.sensorType === 'dryContact') {
+              new DryContactAccessory(this, accessory, device as DryContact);
+            } else if ((device as Motion | DryContact).device.properties.sensorType === 'motion') {
+              new MotionAccessory(this, accessory, device as Motion);
+            } else {
+              this.log.error('Unknown Device Detected: ', device.device);
+            }
+            break;
+        }
 
         // link the accessory to your platform
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
