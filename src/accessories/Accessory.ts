@@ -1,13 +1,14 @@
-import { CharacteristicChange, HapStatusError, PlatformAccessory, PrimitiveTypes, Service } from 'homebridge';
+import { CharacteristicChange, HapStatusError, PlatformAccessory, Service } from 'homebridge';
 import { Panel, DryContact, Motion, Light } from 'xhome';
 import { XfinityHomePlatform } from '../platform';
 import fs from 'fs/promises';
 
 export default class Accessory {
   protected temperatureService?: Service;
-  protected name: string | number | boolean | PrimitiveTypes[] | { [key: string]: PrimitiveTypes };
+  protected name: string;
   protected log: (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => void;
   protected StatusError: typeof HapStatusError;
+  protected projectDir: string;
   protected logPath: string;
 
   constructor(
@@ -18,13 +19,17 @@ export default class Accessory {
     this.name = device.device.name || 'Panel';
     this.log = (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => {
       if (typeof type === 'number') {
+        const date = new Date();
         if (type < 4) {
-          const date = new Date();
-          fs.appendFile(this.logPath,
+          fs.appendFile(this.projectDir + 'General.log',
             `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
             `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
             `${this.name}: ${message}`);
         }
+        fs.appendFile(this.logPath,
+          `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
+          `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
+          `${this.name}: ${message}`);
         if (type <= (platform.config.logLevel ?? 3)) {
           platform.log.info(`${this.name}: ${message}`);
         } else {
@@ -35,10 +40,12 @@ export default class Accessory {
       }
     };
     this.StatusError = platform.api.hap.HapStatusError;
-    this.logPath = platform.api.user.storagePath().endsWith('/') ?
-      platform.api.user.storagePath() + 'XfinityHome.log' : platform.api.user.storagePath + '/XfinityHome.log';
+    this.projectDir = platform.api.user.storagePath().endsWith('/') ?
+      platform.api.user.storagePath() + 'XfinityHome/' : platform.api.user.storagePath + '/XfinityHome/';
+    this.logPath = this.projectDir + this.name + '.log';
 
     platform.api.on('shutdown', () => {
+      accessory.context.logPath = this.logPath;
       accessory.context.device = device;
       platform.api.updatePlatformAccessories([accessory]);
     });
@@ -80,7 +87,7 @@ export default class Accessory {
 
       this.temperatureService.getCharacteristic(platform.Characteristic.CurrentTemperature)
         .onGet((): number => {
-          return (device as DryContact | Motion).device.properties.temperature;
+          return (device as DryContact | Motion).device.properties.temperature / 100;
           /*return new Promise((resolve, reject) => {
             device.get().then(device => resolve(device.properties.temperature / 100)).catch(err => {
               this.log('error', 'Failed To Fetch Temperature With Error:\n', err.response.data);

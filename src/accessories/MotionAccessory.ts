@@ -26,7 +26,8 @@ export default class MotionAccessory extends Accessory {
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, await this.getMotionDetected());
       this.service.updateCharacteristic(this.platform.Characteristic.Active, this.getActive());
-      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, device.device.properties.temperature);
+      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
+        device.device.properties.temperature / 100);
     };
   }
 
@@ -35,7 +36,7 @@ export default class MotionAccessory extends Accessory {
       this.device.get().then(device => {
         this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
         this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
-          this.device.device.properties.temperature);
+          this.device.device.properties.temperature / 100);
 
         resolve(device.properties.isFaulted);
       }).catch(err => {
@@ -61,7 +62,7 @@ export default class MotionAccessory extends Accessory {
 
   async notifyActiveChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
-      this.log(3, value.newValue ? 'Activated' : 'Bypassed');
+      this.log(2, value.newValue ? 'Activated' : 'Bypassed');
     }
   }
 }
