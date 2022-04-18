@@ -1,0 +1,309 @@
+<p class="text-center">
+  <img src="https://user-images.githubusercontent.com/75853497/143301930-e2f3bc9a-9f0d-4e03-95f8-c69769712ca5.png"
+    alt="homebridge-XfinityHome logo" style="width: 60%;" />
+</p>
+<div id="pageIntro" class="text-center" style="display: none;">
+  <p class="lead">Thank you for installing <strong>homebridge-XfinityHome</strong></p>
+  <p>
+    You can configure your refresh token on the next page
+  </p>
+  <button type="button" class="btn btn-primary" id="introContinue">
+    Continue &rarr;
+  </button>
+</div>
+<div id="menuWrapper" class="btn-group w-100 mb-0" role="group" aria-label="UI Menu" style="display: none;">
+  <button type="button" class="btn btn-primary ml-0" id="menuSettings">
+    Settings
+  </button>
+  <button type="button" class="btn btn-primary" id="menuConfigTool">
+    Configuration Tool
+  </button>
+  <button type="button" class="btn btn-primary mr-0" id="menuLogs">
+    Logs
+  </button>
+</div>
+<div id="pageConfigTool" class="mt-4" style="display: none;">
+  <div id="part1" style="display: none;">
+    <h4>Part 1: Profile & Proxy Configuration</h4>
+    <dl>
+      <dt>1. Scan The QR Code To Download The Profile</dt>
+      <dd><span id="qrCode">Loading...</span><br>or go to <span class="btn btn-link">http://<span id="ip">Loading...</span>:<span
+            id="port">Loading...</span>/cert</span>
+      </dd>
+      <dt>2. Install & Trust The Profile</dt>
+      <dd>
+        <ol>
+          <li>Launch the <strong>Settings</strong> app on your phone. Just below your name, you will find
+            <strong>Profile Downloaded</strong>; tap it.
+            <br>
+            <small>If you are using an older iOS, you won't see that. Go to <strong>General</strong>, scroll down, and
+              tap on <strong>Profiles &
+                Device Management</strong>; then tap on <strong>NodeMITMProxyCA</strong>.</small>
+          </li>
+          <li>
+            Hit <strong>Install</strong> on the top-right of the screen. If your phone has a passcode, you would be
+            asked to enter it. A
+            confirmation dialog will pop up; hit <strong>Install</strong> again. Finally hit <strong>Done</strong> to
+
+          </li>
+          <li>On your iPhone, go to <strong>Settings</strong>, open <strong>General</strong>, and tap on
+            <strong>About.</strong> Towards the bottom, locate and open
+            <strong>Certificate Trust
+              Settings</strong>.
+          </li>
+          <li>Enable full trust for <strong>NodeMITMProxyCA</strong> by flicking its switch. You will be prompted with a
+            warning; just
+            hit <strong>Continue</strong>.
+          </li>
+        </ol>
+      </dd>
+      <dt>3. Configure The Proxy</dt>
+      <dd>
+        <ol>
+          <li>
+            On your iPhone, go to <strong>Settings</strong> and open <strong>Wi-Fi</strong>. Hit the info button <strong
+              class="btn btn-link">(i)</strong>, for the WiFi connection you are using. This will open the configuration
+            for your connection.
+          </li>
+          <li>On your WiFi connection screen, scroll to the bottom and hit <strong>Configure Proxy</strong>. This will
+            open the proxy
+            configuration
+            screen.
+          </li>
+          <li>On the proxy configuration screen, tap on <strong>Manual</strong> to reveal additional settings. Then set
+            the server to
+            <strong id="ip" class="text-info">Loading...</strong> and the port to <strong id="port" class="text-info">Loading...</strong>
+            <br>
+            <small>Leave the Authentication switch off.</small>
+          </li>
+        </ol>
+      </dd>
+    </dl>
+    </dl>
+  </div>
+  <div id="part2" style="display: none;">
+    <h4>Part 2: Token Configuration</h4>
+    <dl>
+      <dt>1. Open <strong>Xfinity Home</strong></dt>
+      <dt>If You Still See This Page Then Follow The Steps Below</dt>
+      <dd>
+        <ol>
+          <li>Go to the <strong>more</strong> tab in the app</li>
+          <li>Scroll To The Bottom</li>
+          <li>Click <strong>Sign Out</strong></li>
+          <li>Re-Login</li>
+          <li>If nothing happens open an <a href="https://www.github.com/bloomkd46/homebridge-XfinityHome/issues/new/choose">Issue</a> to
+            recieve
+            further
+            assistance</li>
+        </ol>
+      </dd>
+    </dl>
+  </div>
+  <div id="part3" style="display: none;">
+    <h4>Part 3: Cleanup</h4>
+    <dl>
+      <dt>1. Uninstall Xfinity Home</dt>
+      <dd><strong class="text-danger">Do Not Click <strong>Logout</strong>, It Will Void Your Refresh-Token</strong>
+      </dd>
+      <dt>2. Disable The Proxy</dt>
+      <dd>
+        <ol>
+          <li>
+            On your iPhone, go to Settings and open Wi-Fi. Hit the info button <strong class="btn btn-link">(i)</strong>,
+            for
+            the
+            WiFi connection you are using. This will open the configuration for your connection.
+          </li>
+          <li>On your WiFi connection screen, scroll to the bottom and hit <strong>Configure Proxy</strong>. This will
+            open the proxy
+            configuration
+            screen.
+          </li>
+          <li>On the proxy configuration screen, tap on <strong>Off</strong>.
+          </li>
+        </ol>
+      </dd>
+      <dt>Uninstall The Profile</dt>
+      <dd>
+        <ol>
+          <li>
+            On your iPhone, go to <strong>Settings > General > About > Certificate Trust Settings</strong> and switch
+            off full trust for
+            <strong>NodeMITMProxyCA</strong>.
+          </li>
+          <li>
+            On your iPhone, go to <strong>Settings > General > Profiles & Device Management > NodeMITMProxyCA</strong>
+            and tap <strong>Remove
+              Profile</strong>. If oneis set, you will be asked to enter your passcode. You would also be asked to
+            confirm that you want to remove the profile; hit Remove.
+          </li>
+        </ol>
+      </dd>
+      <dt> Click <strong>Exit Setup</strong> Below When You Are Done</dt>
+      <dd>The Config Will Automatically Update</dd>
+    </dl>
+  </div>
+  <button id="exitSetup" type="button" class="btn btn-outline-warning ml-0">Exit Setup</button>
+</div>
+<div id="pageLogs" class="mt-4" style="display: none;">
+  <form>
+    <div class="form-group">
+      <select class="form-control" id="deviceSelect"></select>
+    </div>
+  </form>
+  <p id="logZone" class="text-nowrap">Loading...</p>
+</div>
+<!--<script type="text/javascript" src="js/index.js"></script>-->
+<script>
+  (async () => {
+    try {
+      let currentConfig = await homebridge.getPluginConfig();
+      let configToolActive = false;
+      showIntro = () => {
+        const introContinue = document.getElementById('introContinue');
+        introContinue.addEventListener('click', () => {
+          homebridge.showSpinner();
+          document.getElementById('pageIntro').style.display = 'none';
+          document.getElementById('menuWrapper').style.display = 'inline-flex';
+          showConfigTool();
+          homebridge.hideSpinner();
+        });
+        document.getElementById('pageIntro').style.display = 'block';
+      };
+      showLogs = async () => {
+        homebridge.showSpinner();
+        if (configToolActive) await homebridge.request('/stopProxy');
+        homebridge.hideSchemaForm();
+        document.getElementById('menuHome').classList.remove('btn-elegant');
+        document.getElementById('menuHome').classList.add('btn-primary');
+        document.getElementById('menuLogs').classList.add('btn-elegant');
+        document.getElementById('menuLogs').classList.remove('btn-primary');
+        document.getElementById('menuSettings').classList.remove('btn-elegant');
+        document.getElementById('menuSettings').classList.add('btn-primary');
+        document.getElementById('pageSupport').style.display = 'none';
+        document.getElementById('pageLogs').style.display = 'block';
+        const cachedAccessories =
+          typeof homebridge.getCachedAccessories === 'function'
+            ? await homebridge.getCachedAccessories()
+            : await homebridge.request('/getCachedAccessories');
+        if (cachedAccessories.length > 0) {
+          cachedAccessories.sort((a, b) => {
+            return a.displayName.toLowerCase() > b.displayName.toLowerCase()
+              ? 1
+              : b.displayName.toLowerCase() > a.displayName.toLowerCase()
+                ? -1
+                : 0;
+          });
+        }
+        const deviceSelect = document.getElementById('deviceSelect');
+        deviceSelect.innerHTML = '';
+        cachedAccessories.forEach(a => {
+          const option = document.createElement('option');
+          option.text = a.displayName;
+          option.value = a.UUID;
+          deviceSelect.add(option);
+        });
+        showDeviceLog = async UUID => {
+          homebridge.showSpinner();
+          const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
+          const context = thisAcc.context;
+          document.getElementById('logZone').innerHTML = await homebridge.request('/getLogs', { logPath: context.logPath });
+          homebridge.hideSpinner();
+        };
+        deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
+        if (cachedAccessories.length > 0) {
+          showDeviceLog(cachedAccessories[0].UUID);
+        } else {
+          const option = document.createElement('option');
+          option.text = 'No Devices';
+          deviceSelect.add(option);
+          deviceSelect.disabled = true;
+        }
+        homebridge.hideSpinner();
+      };
+      showConfigTool = () => {
+        homebridge.showSpinner();
+        configToolActive = true;
+        homebridge.hideSchemaForm();
+        document.getElementById('menuConfigTool').classList.add('btn-elegant');
+        document.getElementById('menuConfigTool').classList.remove('btn-primary');
+        document.getElementById('menuLogs').classList.remove('btn-elegant');
+        document.getElementById('menuLogs').classList.add('btn-primary');
+        document.getElementById('menuSettings').classList.remove('btn-elegant');
+        document.getElementById('menuSettings').classList.add('btn-primary');
+        document.getElementById('pageConfigTool').style.display = 'block';
+        document.getElementById('pageLogs').style.display = 'none';
+
+        document.getElementById('part1').style.display = 'block';
+        document.getElementById('part2').style.display = 'none';
+        document.getElementById('part3').style.display = 'none';
+
+        const proxy = await homebridge.request('/startProxy');
+        document.getElementById('ip').innerText = proxy.ip;
+        document.getElementById('port').innerText = proxy.port;
+        document.getElementById('qrCode').innerText = proxy.qrcode;
+        document.getElementById('part1').style.display = 'block';
+
+        homebridge.addEventListener('proxy', async () => {
+          homebridge.showSpinner();
+          document.getElementById('part1').style.display = 'none';
+          document.getElementById('part2').style.display = 'block';
+          homebridge.hideSpinner();
+        });
+
+        homebridge.addEventListener('token', async (token) => {
+          homebridge.showSpinner();
+          document.getElementById('part2').style.display = 'none';
+          document.getElementById('part3').style.display = 'block';
+          currentConfig[0].refreshToken = token;
+          await homebridge.updatePluginConfig(currentConfig);
+          await homebridge.savePluginConfig();
+        });
+        homebridge.hideSpinner();
+      };
+      showSettings = () => {
+        homebridge.showSpinner();
+        if (configToolActive) await homebridge.request('/stopProxy');
+        document.getElementById('menuConfigTool').classList.remove('btn-elegant');
+        document.getElementById('menuConfigTool').classList.add('btn-primary');
+        document.getElementById('menuLogs').classList.remove('btn-elegant');
+        document.getElementById('menuLogs').classList.add('btn-primary');
+        document.getElementById('menuSettings').classList.add('btn-elegant');
+        document.getElementById('menuSettings').classList.remove('btn-primary');
+        document.getElementById('pageConfigTool').style.display = 'none';
+        document.getElementById('pageLogs').style.display = 'none';
+        homebridge.showSchemaForm();
+        homebridge.hideSpinner();
+      };/*
+      enablePlugin = async () => {
+        homebridge.showSpinner()
+        document.getElementById('disabledBanner').style.display = 'none'
+        currentConfig[0].disablePlugin = false
+        await homebridge.updatePluginConfig(currentConfig)
+        await homebridge.savePluginConfig()
+        homebridge.hideSpinner()
+      }*/
+      //menuHome.addEventListener('click', () => showSupport())
+      //menuDevices.addEventListener('click', () => showDevices())
+      menuSettings.addEventListener('click', () => showSettings());
+      menuLogs.addEventListener('click', () => showLogs());
+      menuConfigTool.addEventListener('click', () => showConfigTool());
+      document.getElementById('exitSetup').addEventListener('click', () => { await homebridge.request('/stopProxy'); showSettings(); });
+      //disabledEnable.addEventListener('click', () => enablePlugin())
+      if (currentConfig.length) {
+        document.getElementById('menuWrapper').style.display = 'inline-flex';
+        showSettings();
+      } else {
+        currentConfig.push({ name: 'iRobot' });
+        await homebridge.updatePluginConfig(currentConfig);
+        showIntro();
+      }
+    } catch (err) {
+      homebridge.toast.error(err.message, 'Error');
+      console.log(err);
+    } finally {
+      homebridge.hideSpinner();
+    }
+  })();
+</script>

@@ -2,6 +2,7 @@
   "pluginAlias": "XfinityHomePlatform",
   "pluginType": "platform",
   "singular": true,
+  "customUi": true,
   "schema": {
     "type": "object",
     "properties": {
@@ -9,7 +10,28 @@
         "title": "Name",
         "type": "string",
         "required": true,
-        "default": "Example Dynamic Platform"
+        "default": "Xfinity Home"
+      },
+      "refreshToken": {
+        "title": "Refresh Token",
+        "type": "string",
+        "required": true,
+        "description": "The Refresh Token You Got Using The Configuration Tool"
+      },
+      "temperatureSensors": {
+        "title": "Include Temperature Sensors",
+        "type": "boolean",
+        "required": false,
+        "placeholder": true,
+        "description": "Whether Or Not To Include Temperature Sensors When Possible"
+      },
+      "logLevel": {
+        "title": "Log Level",
+        "type": "number",
+        "minimum": 0,
+        "maximum": 4,
+        "default": 3,
+        "description": "0: None, 1: Arm/Disarm Events, 2: On/Off/Bypass Events, 3: Open/Close/Motion, 4: Temperature Updates"
       }
     }
   }
