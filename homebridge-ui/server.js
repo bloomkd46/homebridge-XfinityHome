@@ -150,7 +150,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
         }
       });*/
       this.onRequest("/stopProxy", () => {
-        proxy.close();
+        if (proxy)
+          proxy.close();
       });
       return new Promise((resolve) => {
         proxy.listen({ port: program.port, sslCaDir: ROOT }, err => {
@@ -160,7 +161,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
           let { address, port } = proxy.httpServer.address();
           if (address === '::' || address === '0.0.0.0') address = localIPs[0];
 
-          resolve({ qrcode: await QRCode.toString(`http://${address}:${port}/cert`, { type: 'terminal' }), ip: address, port: port });;
+          resolve({ qrcode: await QRCode.toString(`http://${address}:${port}/cert`), ip: address, port: port });;
         });
       });
 
