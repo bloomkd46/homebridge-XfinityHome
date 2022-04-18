@@ -29,7 +29,7 @@ export default class Accessory {
         fs.appendFile(this.logPath,
           `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
           `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
-          `${this.name}: ${message}`);
+          message);
         if (type <= (platform.config.logLevel ?? 3)) {
           platform.log.info(`${this.name}: ${message}`);
         } else {
@@ -51,7 +51,7 @@ export default class Accessory {
     });
 
     // set accessory information
-    if ((device.device as { serialNumber?: string }).serialNumber) {
+    if ((device.device as { serialNumber?: string; }).serialNumber) {
       accessory.getService(platform.Service.AccessoryInformation)!
         .setCharacteristic(platform.Characteristic.SerialNumber, (device as Motion | DryContact | Panel).device.serialNumber);
     }
@@ -80,7 +80,7 @@ export default class Accessory {
         }
       });
 
-    if ((device.device.properties as { temperature?: number }).temperature && (platform.config.temperatureSensors ?? true)) {
+    if ((device.device.properties as { temperature?: number; }).temperature && (platform.config.temperatureSensors ?? true)) {
       this.log('info', 'Enabling Temperature Support');
       this.temperatureService = accessory.getService(platform.Service.TemperatureSensor) ||
         accessory.addService(platform.Service.TemperatureSensor);
