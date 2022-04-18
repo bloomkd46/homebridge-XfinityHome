@@ -53,12 +53,9 @@ export default class Accessory {
     });
 
     // set accessory information
-    if ((device.device as { serialNumber?: string; }).serialNumber) {
-      accessory.getService(platform.Service.AccessoryInformation)!
-        .setCharacteristic(platform.Characteristic.SerialNumber, (device as Motion | DryContact | Panel).device.serialNumber);
-    }
     accessory.getService(platform.Service.AccessoryInformation)!
       .setCharacteristic(platform.Characteristic.Manufacturer, device.device.manufacturer)
+      .setCharacteristic(platform.Characteristic.SerialNumber, (device as Motion).device.serialNumber ?? accessory.UUID)
       .setCharacteristic(platform.Characteristic.Model, device.device.model)
       .setCharacteristic(platform.Characteristic.Name, this.name)
       .setCharacteristic(platform.Characteristic.FirmwareRevision, device.device.firmwareVersion)
