@@ -15,7 +15,7 @@ import LightAccessory from './accessories/LightAccessory';
 export class XfinityHomePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
-
+  public xhome!: XHome;
   private refreshToken?: string;
 
   // this is used to track restored cached accessories
@@ -61,64 +61,73 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
    * must not be registered again to prevent "duplicate UUID" errors.
    */
   async discoverDevices() {
-    const xhome = await XHome.init(this.refreshToken || this.config.refreshToken);
-    for (const device of [...xhome.Panel, ...xhome.MotionSensors, ...xhome.DryContactSensors, ...xhome.Lights]) {
-      const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
-      const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
-      if (existingAccessory) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-        switch (device.device.deviceType) {
-          case 'panel':
-            new PanelAccessory(this, existingAccessory, device as Panel);
-            break;
-          case 'lightDimmer':
-            continue;
-          case 'lightSwitch':
-            new LightAccessory(this, existingAccessory, device as Light);
-            break;
-          case 'sensor':
-            if ((device as Motion | DryContact).device.properties.sensorType === 'dryContact') {
-              new DryContactAccessory(this, existingAccessory, device as DryContact);
-            } else if ((device as Motion | DryContact).device.properties.sensorType === 'motion') {
-              new MotionAccessory(this, existingAccessory, device as Motion);
-            } else {
-              this.log.error('Unknown Device Detected: ', device.device);
-            }
-            break;
+    try {
+      this.xhome = await XHome.init(this.refreshToken || this.config.refreshToken);
+      for (const device of [...this.xhome.Panel, ...this.xhome.MotionSensors, ...this.xhome.DryContactSensors, ...this.xhome.Lights]) {
+        const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
+        const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+        if (existingAccessory) {
+          this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+          switch (device.device.deviceType) {
+            case 'panel':
+              new PanelAccessory(this, existingAccessory, device as Panel);
+              break;
+            case 'lightDimmer':
+              continue;
+            case 'lightSwitch':
+              new LightAccessory(this, existingAccessory, device as Light);
+              break;
+            case 'sensor':
+              if ((device as Motion | DryContact).device.properties.sensorType === 'dryContact') {
+                new DryContactAccessory(this, existingAccessory, device as DryContact);
+              } else if ((device as Motion | DryContact).device.properties.sensorType === 'motion') {
+                new MotionAccessory(this, existingAccessory, device as Motion);
+              } else {
+                this.log.error('Unknown Device Detected: ', device.device);
+              }
+              break;
+          }
+        } else {
+          // the accessory does not yet exist, so we need to create it
+          this.log.info('Adding new accessory:', device.device.name || 'Panel');
+
+          // create a new accessory
+          const accessory = new this.api.platformAccessory(device.device.name, uuid);
+
+          // store a copy of the device object in the `accessory.context`
+          // the `context` property can be used to store any data about the accessory you may need
+          accessory.context.device = device;
+
+          switch (device.device.deviceType) {
+            case 'panel':
+              new PanelAccessory(this, accessory, device as Panel);
+              break;
+            case 'lightDimmer':
+              continue;
+            case 'lightSwitch':
+              new LightAccessory(this, accessory, device as Light);
+              break;
+            case 'sensor':
+              if ((device as Motion | DryContact).device.properties.sensorType === 'dryContact') {
+                new DryContactAccessory(this, accessory, device as DryContact);
+              } else if ((device as Motion | DryContact).device.properties.sensorType === 'motion') {
+                new MotionAccessory(this, accessory, device as Motion);
+              } else {
+                this.log.error('Unknown Device Detected: ', device.device);
+              }
+              break;
+          }
+
+          // link the accessory to your platform
+          this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
         }
-      } else {
-        // the accessory does not yet exist, so we need to create it
-        this.log.info('Adding new accessory:', device.device.name || 'Panel');
-
-        // create a new accessory
-        const accessory = new this.api.platformAccessory(device.device.name, uuid);
-
-        // store a copy of the device object in the `accessory.context`
-        // the `context` property can be used to store any data about the accessory you may need
-        accessory.context.device = device;
-
-        switch (device.device.deviceType) {
-          case 'panel':
-            new PanelAccessory(this, accessory, device as Panel);
-            break;
-          case 'lightDimmer':
-            continue;
-          case 'lightSwitch':
-            new LightAccessory(this, accessory, device as Light);
-            break;
-          case 'sensor':
-            if ((device as Motion | DryContact).device.properties.sensorType === 'dryContact') {
-              new DryContactAccessory(this, accessory, device as DryContact);
-            } else if ((device as Motion | DryContact).device.properties.sensorType === 'motion') {
-              new MotionAccessory(this, accessory, device as Motion);
-            } else {
-              this.log.error('Unknown Device Detected: ', device.device);
-            }
-            break;
-        }
-
-        // link the accessory to your platform
-        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      }
+    } catch (e) {
+      this.log.error('Failed To Login With Error', e);
+      if (this.refreshToken) {
+        this.log.info('Attempting To Login With Config Refresh Token');
+        this.refreshToken = undefined;
+        this.discoverDevices();
       }
     }
   }
