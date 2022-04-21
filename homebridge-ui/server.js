@@ -6,7 +6,7 @@ import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 import { existsSync, promises, readFileSync } from 'fs';
 
 class PluginUiServer extends HomebridgePluginUiServer {
-  constructor() {
+  constructor () {
     super();
 
     /*
@@ -135,6 +135,12 @@ class PluginUiServer extends HomebridgePluginUiServer {
             this.pushEvent('token', { refreshToken: JSON.parse(Buffer.concat(chunks).toString()).refresh_token });
             //emitter.emit('tuya-config', Buffer.concat(chunks).toString());
             callback();
+          });
+        } else {
+          ctx.onRequestData(function (ctx, chunk, callback) {
+            ctx.onResponseData(function (ctx, chunk, callback) {
+              this.pushEvent('sslProxy');
+            });
           });
         }
         return callback();
