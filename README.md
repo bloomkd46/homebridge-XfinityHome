@@ -7,7 +7,7 @@
 
 Homebridge plugin to integrate Xfinity Home Devices into HomeKit
   
- [[verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+ [[unverified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![downloads](https://img.shields.io/npm/dt/homebridge-xfinityhome)](https://npmcharts.com/compare/homebridge-xfinityhome?log=true&interval=1&minimal=true)
 
 [![npm](https://img.shields.io/npm/v/homebridge-xfinityhome/latest?label=latest)](https://www.npmjs.com/package/homebridge-xfinityhome)
@@ -35,6 +35,7 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 ## TODO:
   - [ ] Add Camera Support
   - [ ] Add Email/Password Option
+  - [ ] Verify Plugin
 
 ### Prerequisites
 
