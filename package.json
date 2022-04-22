@@ -22,7 +22,7 @@
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run lint && npm run build",
-    "postinstall": "cd node_modules && git clone https://github.com/bloomkd46/XHome xhome && cd XHome && npm install && npm run build"
+    "postinstall": "cd node_modules && git clone https://github.com/bloomkd46/XHome xhome && cd xhome && npm install && npm run build"
   },
   "keywords": [
     "homebridge",
