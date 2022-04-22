@@ -1,5 +1,5 @@
 {
-  "private": true,
+  "private": false,
   "displayName": "Homebridge Xfinity Home",
   "name": "homebridge-xfinityhome",
   "version": "1.0.0",
