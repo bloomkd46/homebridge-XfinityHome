@@ -87,7 +87,7 @@ export default class PanelAccessory extends Accessory {
 
   getCurrentState(): CharacteristicValue {
     return this.device.device.properties.status === 'arming' ?
-      this.armModes.indexOf('disarmed') : this.armModes.indexOf(this.device.device.properties.armType);
+      this.armModes.indexOf('disarmed') : this.armModes.indexOf(this.device.device.properties.armType || 'disarmed');
     /*return new Promise((resolve, reject) => {
 this.device.get()
   .then(device => resolve(device.properties.status === 'arming' ?
