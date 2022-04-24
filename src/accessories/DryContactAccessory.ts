@@ -48,7 +48,7 @@ export default class DryContactAccessory extends Accessory {
 
   async notifyContactChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
-      this.log(3, `Contact ${value.newValue === 0 ? 'Detected' : 'Not Detected'}`);
+      this.log(3, value.newValue === 0 ? 'Closed' : 'Opened');
     }
   }
 
