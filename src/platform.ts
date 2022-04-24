@@ -96,7 +96,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
 
           // store a copy of the device object in the `accessory.context`
           // the `context` property can be used to store any data about the accessory you may need
-          accessory.context.device = device;
+          accessory.context.device = device.device;
 
           switch (device.device.deviceType) {
             case 'panel':

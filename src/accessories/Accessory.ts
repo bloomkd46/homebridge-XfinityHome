@@ -17,6 +17,9 @@ export default class Accessory {
     device: Panel | DryContact | Motion | Light,
   ) {
     this.name = device.device.name || 'Panel';
+    this.projectDir = platform.api.user.storagePath().endsWith('/') ?
+      platform.api.user.storagePath() + 'XfinityHome/' : platform.api.user.storagePath + '/XfinityHome/';
+    this.logPath = this.projectDir + this.name + '.log';
     this.log = (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => {
       if (typeof type === 'number') {
         const date = new Date();
@@ -41,14 +44,11 @@ export default class Accessory {
     };
     this.log(4, 'Server Started');
     this.StatusError = platform.api.hap.HapStatusError;
-    this.projectDir = platform.api.user.storagePath().endsWith('/') ?
-      platform.api.user.storagePath() + 'XfinityHome/' : platform.api.user.storagePath + '/XfinityHome/';
-    this.logPath = this.projectDir + this.name + '.log';
 
     platform.api.on('shutdown', () => {
       this.log(4, 'Server Stopped');
       accessory.context.logPath = this.logPath;
-      accessory.context.device = device;
+      accessory.context.device = device.device;
       platform.api.updatePlatformAccessories([accessory]);
     });
 
