@@ -122,7 +122,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
           this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
         }
       }
-      this.xhome.watchForEvents(this.config.activeInterval || 500, this.config.activerDuration || 5000,
+      this.xhome.watchForEvents(this.config.activeInterval || 1000, this.config.activerDuration || 5000,
         this.config.inactiveInterval || 5000);
     } catch (e) {
       this.log.error('Failed To Login With Error', e);
