@@ -55,6 +55,7 @@ export default class Accessory {
       this.log(4, 'Server Stopped');
       accessory.context.logPath = this.logPath;
       accessory.context.device = device.device;
+      accessory.context.refreshToken = device.xhome.refreshToken;
       platform.api.updatePlatformAccessories([accessory]);
     });
 

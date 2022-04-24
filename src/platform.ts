@@ -50,7 +50,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
     this.accessories.push(accessory);
     if (!this.refreshToken) {
       this.log.info('Loading Refresh Token From Cache');
-      this.refreshToken = accessory.context.device.xhome.refreshToken;
+      this.refreshToken = accessory.context.refreshToken;
       this.log.info(this.refreshToken || 'ERROR LOADING TOKEN');
     }
   }
