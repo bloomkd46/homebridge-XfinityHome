@@ -15,8 +15,10 @@ export default class LightAccessory extends Accessory {
     this.service = this.accessory.getService(this.platform.Service.Lightbulb) ||
       this.accessory.addService(this.platform.Service.Lightbulb);
 
+    this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
+
     this.service.getCharacteristic(this.platform.Characteristic.On)
-      .onGet(this.getIsOn.bind(this))
+
       .onSet(this.set.bind(this))
       .on('change', this.notifyIsOnChange.bind(this));
 

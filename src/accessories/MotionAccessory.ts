@@ -15,6 +15,8 @@ export default class MotionAccessory extends Accessory {
     this.service = this.accessory.getService(this.platform.Service.MotionSensor) ||
       this.accessory.addService(this.platform.Service.MotionSensor);
 
+    this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
+
     this.service.getCharacteristic(this.platform.Characteristic.MotionDetected)
       .onGet(this.getMotionDetected.bind(this))
       .on('change', this.notifyMotionChange.bind(this));

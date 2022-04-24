@@ -15,6 +15,8 @@ export default class DryContactAccessory extends Accessory {
     this.service = this.accessory.getService(this.platform.Service.ContactSensor) ||
       this.accessory.addService(this.platform.Service.ContactSensor);
 
+    this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
+
     this.service.getCharacteristic(this.platform.Characteristic.ContactSensorState)
       .onGet(this.getContactDetected.bind(this))
       .on('change', this.notifyContactChange.bind(this));
