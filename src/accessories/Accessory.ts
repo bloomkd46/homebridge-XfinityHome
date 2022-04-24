@@ -18,7 +18,7 @@ export default class Accessory {
   ) {
     this.name = device.device.name || 'Panel';
     this.projectDir = platform.api.user.storagePath().endsWith('/') ?
-      platform.api.user.storagePath() + 'XfinityHome/' : platform.api.user.storagePath + '/XfinityHome/';
+      platform.api.user.storagePath() + 'XfinityHome/' : platform.api.user.storagePath() + '/XfinityHome/';
     this.logPath = this.projectDir + this.name + '.log';
     try {
       fs.readFileSync(this.logPath);
