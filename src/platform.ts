@@ -92,7 +92,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
           this.log.info('Adding new accessory:', device.device.name || 'Panel');
 
           // create a new accessory
-          const accessory = new this.api.platformAccessory(device.device.name, uuid);
+          const accessory = new this.api.platformAccessory(device.device.name || 'Panel', uuid);
 
           // store a copy of the device object in the `accessory.context`
           // the `context` property can be used to store any data about the accessory you may need
