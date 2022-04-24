@@ -48,10 +48,9 @@ export default class LightAccessory extends Accessory {
   }
 
   async set(value: CharacteristicValue): Promise<void> {
-    this.service.updateCharacteristic(this.platform.Characteristic.On, value);
     return new Promise((resolve, reject) => {
       this.device.set(value as number | boolean).then(() => {
-        //this.service.updateCharacteristic(this.platform.Characteristic.On, value);
+        this.service.updateCharacteristic(this.platform.Characteristic[typeof value === 'boolean' ? 'On' : 'Brightness'], value);
         resolve();
       }).catch(err => {
         this.log('error', `Failed To Set ${typeof value === 'number' ? 'Brightness' : 'IsOn'} With Error:\n`, err.response.data);
