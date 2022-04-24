@@ -18,14 +18,14 @@ export default class DryContactAccessory extends Accessory {
     this.service.getCharacteristic(this.platform.Characteristic.ContactSensorState)
       .onGet(this.getContactDetected.bind(this))
       .on('change', this.notifyContactChange.bind(this));
-    this.service.getCharacteristic(this.platform.Characteristic.Active)
+    this.service.getCharacteristic(this.platform.Characteristic.StatusActive)
       .onGet(this.getActive.bind(this))
       .on('change', this.notifyActiveChange.bind(this))
-      ?.onSet(this.setActive.bind(this));
+      .onSet(this.setActive.bind(this));
 
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, await this.getContactDetected());
-      this.service.updateCharacteristic(this.platform.Characteristic.Active, this.getActive());
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
         device.device.properties.temperature / 100);
     };
