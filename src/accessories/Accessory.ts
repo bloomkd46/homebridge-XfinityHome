@@ -20,12 +20,6 @@ export default class Accessory {
     this.projectDir = platform.api.user.storagePath().endsWith('/') ?
       platform.api.user.storagePath() + 'XfinityHome/' : platform.api.user.storagePath() + '/XfinityHome/';
     this.logPath = this.projectDir + this.name + '.log';
-    try {
-      fs.readFileSync(this.logPath);
-    } catch {
-      fs.mkdirSync(this.projectDir);
-      fs.writeFileSync(this.logPath, '');
-    }
     this.log = (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => {
       if (typeof type === 'number') {
         const date = new Date();
