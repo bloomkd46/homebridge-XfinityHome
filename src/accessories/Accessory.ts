@@ -27,12 +27,12 @@ export default class Accessory {
           fs.appendFileSync(this.projectDir + 'General.log',
             `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
             `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
-            `${this.name}: ${message}`);
+            `${this.name}: ${message}\n`);
         }
         fs.appendFileSync(this.logPath,
           `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
           `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
-          message);
+          message + '\n');
         if (type <= (platform.config.logLevel ?? 3)) {
           platform.log.info(`${this.name}: ${message}`);
         } else {
