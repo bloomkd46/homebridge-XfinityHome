@@ -123,7 +123,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
         }
       }
       this.xhome.watchForEvents(this.config.activeInterval || 1000, this.config.activerDuration || 5000,
-        this.config.inactiveInterval || 5000);
+        this.config.inactiveInterval || 5000, err => this.log.warn('Failed To Auto-Update State With Error:', err));
     } catch (e) {
       this.log.error('Failed To Login With Error', e);
       if (this.refreshToken) {
