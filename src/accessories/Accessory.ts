@@ -1,7 +1,7 @@
 import { CharacteristicChange, HapStatusError, PlatformAccessory, Service } from 'homebridge';
 import { Panel, DryContact, Motion, Light } from 'xhome';
 import { XfinityHomePlatform } from '../platform';
-import fs from 'fs/promises';
+import fs from 'fs';
 
 export default class Accessory {
   protected temperatureService?: Service;
@@ -20,16 +20,22 @@ export default class Accessory {
     this.projectDir = platform.api.user.storagePath().endsWith('/') ?
       platform.api.user.storagePath() + 'XfinityHome/' : platform.api.user.storagePath + '/XfinityHome/';
     this.logPath = this.projectDir + this.name + '.log';
+    try {
+      fs.readFileSync(this.logPath);
+    } catch {
+      fs.mkdirSync(this.projectDir);
+      fs.writeFileSync(this.logPath, '');
+    }
     this.log = (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => {
       if (typeof type === 'number') {
         const date = new Date();
         if (type < 4) {
-          fs.appendFile(this.projectDir + 'General.log',
+          fs.appendFileSync(this.projectDir + 'General.log',
             `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
             `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
             `${this.name}: ${message}`);
         }
-        fs.appendFile(this.logPath,
+        fs.appendFileSync(this.logPath,
           `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
           `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
           message);
