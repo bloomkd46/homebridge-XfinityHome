@@ -88,7 +88,7 @@ export default class Accessory {
       this.temperatureService = accessory.getService(platform.Service.TemperatureSensor) ||
         accessory.addService(platform.Service.TemperatureSensor);
 
-      this.temperatureService.setCharacteristic(platform.Characteristic.Name, device.device.name + 'Temperature');
+      this.temperatureService.setCharacteristic(platform.Characteristic.Name, device.device.name + ' Temperature');
 
       this.temperatureService.getCharacteristic(platform.Characteristic.CurrentTemperature)
         .onGet((): number => {
