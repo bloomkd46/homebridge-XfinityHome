@@ -49,7 +49,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
     if (!this.refreshToken) {
-      this.refreshToken = accessory.context.device.xhome.refreshToken;
+      this.log.info('Loading Refresh Token From Cache');
+      this.refreshToken = accessory.context.refreshToken;
+      this.log.info(this.refreshToken || 'ERROR LOADING TOKEN');
     }
   }
 
@@ -95,11 +97,11 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
           this.log.info('Adding new accessory:', device.device.name || 'Panel');
 
           // create a new accessory
-          const accessory = new this.api.platformAccessory(device.device.name, uuid);
+          const accessory = new this.api.platformAccessory(device.device.name || 'Panel', uuid);
 
           // store a copy of the device object in the `accessory.context`
           // the `context` property can be used to store any data about the accessory you may need
-          accessory.context.device = device;
+          accessory.context.device = device.device;
 
           switch (device.device.deviceType) {
             case 'panel':

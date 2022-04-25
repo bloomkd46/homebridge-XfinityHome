@@ -15,17 +15,19 @@ export default class DryContactAccessory extends Accessory {
     this.service = this.accessory.getService(this.platform.Service.ContactSensor) ||
       this.accessory.addService(this.platform.Service.ContactSensor);
 
+    this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
+
     this.service.getCharacteristic(this.platform.Characteristic.ContactSensorState)
       .onGet(this.getContactDetected.bind(this))
       .on('change', this.notifyContactChange.bind(this));
-    this.service.getCharacteristic(this.platform.Characteristic.Active)
+    this.service.getCharacteristic(this.platform.Characteristic.StatusActive)
       .onGet(this.getActive.bind(this))
       .on('change', this.notifyActiveChange.bind(this))
-      ?.onSet(this.setActive.bind(this));
+      .onSet(this.setActive.bind(this));
 
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, await this.getContactDetected());
-      this.service.updateCharacteristic(this.platform.Characteristic.Active, this.getActive());
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
         device.device.properties.temperature / 100);
     };
@@ -48,7 +50,7 @@ export default class DryContactAccessory extends Accessory {
 
   async notifyContactChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
-      this.log(3, `Contact ${value.newValue === 0 ? 'Detected' : 'Not Detected'}`);
+      this.log(3, value.newValue === 0 ? 'Closed' : 'Opened');
     }
   }
 

@@ -25,11 +25,11 @@ export default class PanelAccessory extends Accessory {
     this.service.getCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState)
       .onGet(this.getCurrentState.bind(this))
       .on('change', this.notifyCurrentStateChange.bind(this));
-    this.service.getCharacteristic(this.platform.Characteristic.SecuritySystemAlarmType)
+    /*this.service.getCharacteristic(this.platform.Characteristic.SecuritySystemAlarmType)
       .onGet(() => {
         this.log('warn', 'Security Alarm Type \'Get\' triggered');
         return 0;
-      });
+      });*/
 
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, await this.getTargetState());
@@ -87,7 +87,7 @@ export default class PanelAccessory extends Accessory {
 
   getCurrentState(): CharacteristicValue {
     return this.device.device.properties.status === 'arming' ?
-      this.armModes.indexOf('disarmed') : this.armModes.indexOf(this.device.device.properties.armType);
+      this.armModes.indexOf('disarmed') : this.armModes.indexOf(this.device.device.properties.armType || 'disarmed');
     /*return new Promise((resolve, reject) => {
 this.device.get()
   .then(device => resolve(device.properties.status === 'arming' ?
