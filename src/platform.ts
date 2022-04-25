@@ -44,14 +44,12 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
    * It should be used to setup event handlers for characteristics and update respective values.
    */
   configureAccessory(accessory: PlatformAccessory) {
-    this.log.info('Loading accessory from cache:', accessory.displayName);
+    this.log.debug('Loading accessory from cache:', accessory.displayName);
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
     if (!this.refreshToken) {
-      this.log.info('Loading Refresh Token From Cache');
       this.refreshToken = accessory.context.device.xhome.refreshToken;
-      this.log.info(this.refreshToken || 'ERROR LOADING TOKEN');
     }
   }
 
@@ -61,6 +59,11 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
    * must not be registered again to prevent "duplicate UUID" errors.
    */
   async discoverDevices() {
+    this.log.info('Loaded ' + (this.accessories.length === 1 ?
+      this.accessories.length + ' Accessory' : this.accessories.length + 'Accessories') + ' From Cache');
+    if (this.refreshToken) {
+      this.log.info('Using Refresh Token From Cache:', this.refreshToken);
+    }
     try {
       this.xhome = await XHome.init(this.refreshToken || this.config.refreshToken);
       for (const device of [...this.xhome.Panel, ...this.xhome.MotionSensors, ...this.xhome.DryContactSensors, ...this.xhome.Lights]) {
@@ -123,9 +126,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
         }
       }
     } catch (e) {
-      this.log.error('Failed To Login With Error', e);
+      this.log.error('Failed To Login With Error:', e);
       if (this.refreshToken) {
-        this.log.info('Attempting To Login With Config Refresh Token');
+        this.log.warn('Attempting To Login With Config Refresh Token');
         this.refreshToken = undefined;
         this.discoverDevices();
       }
