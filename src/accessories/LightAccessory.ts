@@ -28,6 +28,13 @@ export default class LightAccessory extends Accessory {
         .onSet(this.set.bind(this))
         .on('change', this.notifyBrightnessChange.bind(this));
     }
+
+    this.device.activityCallback = async (event) => {
+      this.service.updateCharacteristic(this.platform.Characteristic.On, event.metadata.isOn === 'true');
+      if (this.device.device.properties.dimAllowed) {
+        this.service.updateCharacteristic(this.platform.Characteristic.Brightness, parseFloat(event.metadata.level));
+      }
+    };
   }
 
   async getIsOn(): Promise<CharacteristicValue> {
