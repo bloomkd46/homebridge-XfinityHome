@@ -63,11 +63,16 @@ export default class PanelAccessory extends Accessory {
               reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
             });
         } else {
-          this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night')
-            .then(() => resolve()).catch(err => {
-              this.log('error', 'Failed To Arm With Error:\n', err.response.data);
-              reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
-            });
+          if (this.device.device.properties.status === 'notReady') {
+            this.log('warn', 'Failed To Arm With Error:\n', 'Panel Not Ready');
+            reject(new this.StatusError(HAPStatus.NOT_ALLOWED_IN_CURRENT_STATE));
+          } else {
+            this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night')
+              .then(() => resolve()).catch(err => {
+                this.log('error', 'Failed To Arm With Error:\n', err.response.data);
+                reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+              });
+          }
         }
       } else {
         this.log('warn',
