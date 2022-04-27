@@ -61,8 +61,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
       try {
         require('debug').disable();
       } catch (ex) { }
-      const ROOT = this.homebridgeStoragePath().endsWith(' / ') ?
-        this.homebridgeStoragePath() + 'XfinityHome/' : this.homebridgeStoragePath() + '/XfinityHome/';
+      const ROOT = this.homebridgeStoragePath.endsWith(' / ') ?
+        this.homebridgeStoragePath + 'XfinityHome/' : this.homebridgeStoragePath + '/XfinityHome/';
 
       const pemFile = path.join(ROOT, 'certs', 'ca.pem');
 
