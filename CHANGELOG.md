@@ -1,3 +1,7 @@
+### 0.0.17 
+* Replaced PushEvents with onRequests
+
+
 ### 0.0.16 
 * Fixed function typos for custom ui
 
