@@ -2,9 +2,10 @@
 /* eslint-disable new-cap */
 'use strict';
 
-import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
-import { existsSync, promises, readFileSync } from 'fs';
-
+const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
+const { existsSync, readFileSync } = require('fs');
+//import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
+//import { existsSync, promises, readFileSync } from 'fs';
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor () {
     super();
