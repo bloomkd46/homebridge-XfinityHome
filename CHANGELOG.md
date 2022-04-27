@@ -1,3 +1,7 @@
+### 0.0.11 
+* QR code last attempt
+
+
 ### 0.0.10 
 * Attempting To Fix QR code
 
