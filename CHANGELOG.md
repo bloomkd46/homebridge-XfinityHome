@@ -1,3 +1,7 @@
+### 0.0.7 
+* Fixed Missing Port In Custom UI
+
+
 ### 0.0.6 
 * More Attempts To Fix UI
 
