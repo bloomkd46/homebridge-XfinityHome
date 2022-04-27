@@ -75,7 +75,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
 
       const proxy = Proxy();
-      const localIPPorts = localIPs.map(ip => `${ip}:${program.port}`);
+      const localIPPorts = localIPs.map(ip => `${ip}:${8080}`);
 
       proxy.onError(function (ctx, err) {
         switch (err.code) {
@@ -88,7 +88,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
             return;
 
           case 'EACCES':
-            console.error(`Permission was denied to use port ${program.port}.`);
+            console.error(`Permission was denied to use port ${8080}.`);
             return;
 
           default:
@@ -161,7 +161,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
           proxy.close();
       });
       return new Promise((resolve) => {
-        proxy.listen({ port: program.port, sslCaDir: ROOT }, async err => {
+        proxy.listen({ port: 8080, sslCaDir: ROOT }, async err => {
           if (err) {
             console.error('Error starting proxy: ' + err);
           }
