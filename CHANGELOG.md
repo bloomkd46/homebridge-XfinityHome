@@ -1,3 +1,7 @@
+### 0.0.4 
+* Fixed QRCode in server.js script for custom ui
+
+
 ### 0.0.3 
 * Changed import statements to require statments
 
