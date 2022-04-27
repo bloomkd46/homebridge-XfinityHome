@@ -1,3 +1,7 @@
+### 0.0.12 
+* Tweaked storage directory for custom ui
+
+
 ### 0.0.11 
 * QR code last attempt
 
