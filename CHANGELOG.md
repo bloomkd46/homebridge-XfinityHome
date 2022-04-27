@@ -1,3 +1,7 @@
+### 0.0.2 
+* Fixed typo for custom-ui public folder
+
+
 ### 0.0.1 
 Represents previous uninstallable version
 
