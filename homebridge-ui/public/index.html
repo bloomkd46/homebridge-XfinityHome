@@ -264,9 +264,10 @@
             currentConfig[0].refreshToken = token;
             await homebridge.updatePluginConfig(currentConfig);
             await homebridge.savePluginConfig();
+            homebridge.hideSpinner();
             clearInterval(interval);
           }
-        }, 500);
+        }, 1000);
         /*homebridge.addEventListener('proxy', async () => {
           homebridge.showSpinner();
           document.getElementById('part1').style.display = 'none';
@@ -324,6 +325,7 @@
     } catch (err) {
       homebridge.toast.error(err.message, 'Error');
       console.log(err);
+      homebridge.closeSettings();
     } finally {
       homebridge.hideSpinner();
     }
