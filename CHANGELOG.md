@@ -1,3 +1,7 @@
+### 0.0.19 
+* Removed setInterval for debugging
+
+
 ### 0.0.18 
 * UI Tweaks
 
