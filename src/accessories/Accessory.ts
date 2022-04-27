@@ -2,6 +2,7 @@ import { CharacteristicChange, HapStatusError, PlatformAccessory, Service } from
 import { Panel, DryContact, Motion, Light } from 'xhome';
 import { XfinityHomePlatform } from '../platform';
 import fs from 'fs';
+import path from 'path';
 
 export default class Accessory {
   protected temperatureService?: Service;
@@ -10,6 +11,7 @@ export default class Accessory {
   protected StatusError: typeof HapStatusError;
   protected projectDir: string;
   protected logPath: string;
+  protected generalLogPath: string;
 
   constructor(
     platform: XfinityHomePlatform,
@@ -17,9 +19,10 @@ export default class Accessory {
     device: Panel | DryContact | Motion | Light,
   ) {
     this.name = device.device.name || 'Panel';
-    this.projectDir = platform.api.user.storagePath().endsWith('/') ?
-      platform.api.user.storagePath() + 'XfinityHome/' : platform.api.user.storagePath() + '/XfinityHome/';
-    this.logPath = this.projectDir + this.name + '.log';
+    this.projectDir = path.join(platform.api.user.storagePath(), 'XfinityHome');
+    this.logPath = path.join(this.projectDir, this.name + '.log');
+    this.generalLogPath = path.join(this.projectDir, 'General.log');
+
     if (!fs.existsSync(this.projectDir)) {
       fs.mkdirSync(this.projectDir);
     }
@@ -27,7 +30,7 @@ export default class Accessory {
       if (typeof type === 'number') {
         const date = new Date();
         if (type < 4) {
-          fs.appendFileSync(this.projectDir + 'General.log',
+          fs.appendFileSync(this.generalLogPath,
             `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
             `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
             `${this.name}: ${message}\n`);
