@@ -1,3 +1,7 @@
+### 0.0.5 
+* Attempting to fix custom ui
+
+
 ### 0.0.4 
 * Fixed QRCode in server.js script for custom ui
 
