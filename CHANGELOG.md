@@ -1,3 +1,7 @@
+### 0.0.10 
+* Attempting To Fix QR code
+
+
 ### 0.0.9 
 * Hopefully Fixed QRCode
 
