@@ -63,7 +63,7 @@ export default class PanelAccessory extends Accessory {
               reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
             });
         } else {
-          if (this.device.device.properties.status === 'notReady') {
+          if (this.device.device.properties.status !== 'ready') {
             this.log('warn', 'Failed To Arm With Error:\n', 'Panel Not Ready');
             reject(new this.StatusError(HAPStatus.NOT_ALLOWED_IN_CURRENT_STATE));
           } else {
