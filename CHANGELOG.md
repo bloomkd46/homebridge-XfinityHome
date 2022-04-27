@@ -1,3 +1,8 @@
+### 0.0.14 
+* Removed qrcode from custom ui
+* Fixed file paths to work on windows
+
+
 ### 0.0.13 
 * Fixed Function/String Mixup
 
