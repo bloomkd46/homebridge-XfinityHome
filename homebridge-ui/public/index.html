@@ -240,7 +240,7 @@
         document.getElementById('ip').innerText = proxy.ip;
         document.getElementById('port').innerText = proxy.port;
         const certificate = document.getElementById('certificate');
-        const certificateLink = `http://${proxy.host}:${proxy.port}/cert`;
+        const certificateLink = `http://${proxy.ip}:${proxy.port}/cert`;
         certificate.innerText = certificateLink;
         certificate.href = certificateLink;
         document.getElementById('part1').style.display = 'block';

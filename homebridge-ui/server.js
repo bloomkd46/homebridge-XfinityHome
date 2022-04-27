@@ -98,7 +98,6 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
 
       proxy.onRequest(function (ctx, callback) {
-        this.pushEvent('proxy', {});
         if (ctx.clientToProxyRequest.method === 'GET' && ctx.clientToProxyRequest.url === '/cert' && localIPPorts.includes(ctx.clientToProxyRequest.headers.host)) {
           ctx.use(Proxy.gunzip);
           console.log('Intercepted certificate request');
@@ -139,6 +138,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
             callback();
           });
         } else {
+          this.pushEvent('proxy', {});
           ctx.onRequestData(function (ctx, chunk, callback) {
             ctx.onResponseData(function (ctx, chunk, callback) {
               this.pushEvent('sslProxy', {});
