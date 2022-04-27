@@ -61,8 +61,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
       try {
         require('debug').disable();
       } catch (ex) { }
-
-      const ROOT = path.resolve(__dirname);
+      const ROOT = this.homebridgeStoragePath().endsWith(' / ') ?
+        this.homebridgeStoragePath() + 'XfinityHome/' : this.homebridgeStoragePath() + '/XfinityHome/';
 
       const pemFile = path.join(ROOT, 'certs', 'ca.pem');
 
@@ -157,7 +157,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         }
       });*/
       this.onRequest("/stopProxy", () => {
-        if (proxy)
+        if (typeof proxy.close() === 'function')
           proxy.close();
       });
       return new Promise((resolve) => {
@@ -168,8 +168,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
           const address = localIPs[0];
           const port = 8080;
           const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`, { type: 'svg' });
-          writeFileSync('public/qrcode.svg', qrcode);
-          resolve({ ip: address, port: port });;
+          writeFileSync(ROOT + 'qrcode.svg', qrcode);
+          resolve({ qrcode: ROOT + 'qrcode.svg', ip: address, port: port });;
         });
       });
 

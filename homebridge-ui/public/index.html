@@ -241,6 +241,7 @@
         const proxy = await homebridge.request('/startProxy');
         document.getElementById('ip').innerText = proxy.ip;
         document.getElementById('port').innerText = proxy.port;
+        document.getElementById('qrCode').src = proxy.qrCode;
         document.getElementById('part1').style.display = 'block';
 
         homebridge.addEventListener('proxy', async () => {
