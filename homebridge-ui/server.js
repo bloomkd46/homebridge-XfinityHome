@@ -2,9 +2,10 @@
 /* eslint-disable new-cap */
 'use strict';
 
-import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
-import { existsSync, promises, readFileSync } from 'fs';
-
+const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
+const { existsSync, readFileSync, writeFileSync } = require('fs');
+//import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
+//import { existsSync, promises, readFileSync } from 'fs';
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor () {
     super();
@@ -60,12 +61,12 @@ class PluginUiServer extends HomebridgePluginUiServer {
       try {
         require('debug').disable();
       } catch (ex) { }
-
-      const ROOT = path.resolve(__dirname);
+      const ROOT = this.homebridgeStoragePath.endsWith(' / ') ?
+        this.homebridgeStoragePath + 'XfinityHome/' : this.homebridgeStoragePath + '/XfinityHome/';
 
       const pemFile = path.join(ROOT, 'certs', 'ca.pem');
 
-      let localIPs = [];
+      const localIPs = [];
       const ifaces = os.networkInterfaces();
       Object.keys(ifaces).forEach(name => {
         ifaces[name].forEach(network => {
@@ -74,7 +75,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
 
       const proxy = Proxy();
-      const localIPPorts = localIPs.map(ip => `${ip}:${program.port}`);
+      const localIPPorts = localIPs.map(ip => `${ip}:${8080}`);
 
       proxy.onError(function (ctx, err) {
         switch (err.code) {
@@ -87,7 +88,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
             return;
 
           case 'EACCES':
-            console.error(`Permission was denied to use port ${program.port}.`);
+            console.error(`Permission was denied to use port ${8080}.`);
             return;
 
           default:
@@ -96,7 +97,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
 
       proxy.onRequest(function (ctx, callback) {
-        this.pushEvent('proxy');
+        this.pushEvent('proxy', {});
         if (ctx.clientToProxyRequest.method === 'GET' && ctx.clientToProxyRequest.url === '/cert' && localIPPorts.includes(ctx.clientToProxyRequest.headers.host)) {
           ctx.use(Proxy.gunzip);
           console.log('Intercepted certificate request');
@@ -139,7 +140,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         } else {
           ctx.onRequestData(function (ctx, chunk, callback) {
             ctx.onResponseData(function (ctx, chunk, callback) {
-              this.pushEvent('sslProxy');
+              this.pushEvent('sslProxy', {});
             });
           });
         }
@@ -156,18 +157,19 @@ class PluginUiServer extends HomebridgePluginUiServer {
         }
       });*/
       this.onRequest("/stopProxy", () => {
-        if (proxy)
+        if (typeof proxy.close() === 'function')
           proxy.close();
       });
       return new Promise((resolve) => {
-        proxy.listen({ port: program.port, sslCaDir: ROOT }, err => {
+        proxy.listen({ port: 8080, sslCaDir: ROOT }, async err => {
           if (err) {
             console.error('Error starting proxy: ' + err);
           }
-          let { address, port } = proxy.httpServer.address();
-          if (address === '::' || address === '0.0.0.0') address = localIPs[0];
-
-          resolve({ qrcode: await QRCode.toString(`http://${address}:${port}/cert`), ip: address, port: port });;
+          const address = localIPs[0];
+          const port = 8080;
+          const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`, { type: 'svg' });
+          writeFileSync(ROOT + 'qrcode.svg', qrcode);
+          resolve({ qrcode: ROOT + 'qrcode.svg', ip: address, port: port });;
         });
       });
 

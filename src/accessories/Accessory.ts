@@ -1,5 +1,5 @@
 import { CharacteristicChange, HapStatusError, PlatformAccessory, Service } from 'homebridge';
-import { Panel, DryContact, Motion, Light } from 'xhome';
+import { Panel, DryContact, Motion, Light } from 'xfinityhome';
 import { XfinityHomePlatform } from '../platform';
 import fs from 'fs';
 import path from 'path';

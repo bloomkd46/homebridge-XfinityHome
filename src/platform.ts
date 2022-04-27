@@ -3,7 +3,7 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import PanelAccessory from './accessories/PanelAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
-import XHome, { Panel, Motion, DryContact, Light } from 'xhome';
+import XHome, { Panel, Motion, DryContact, Light } from 'xfinityhome';
 import DryContactAccessory from './accessories/DryContactAccessory';
 import LightAccessory from './accessories/LightAccessory';
 
@@ -61,13 +61,13 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
    * must not be registered again to prevent "duplicate UUID" errors.
    */
   async discoverDevices() {
-    this.log.info('Loaded ' + (this.accessories.length === 1 ?
-      this.accessories.length + ' Accessory' : this.accessories.length + 'Accessories') + ' From Cache');
     if (this.refreshToken) {
       this.log.info('Using Refresh Token From Cache:', this.refreshToken);
     }
     try {
       this.xhome = await XHome.init(this.refreshToken || this.config.refreshToken);
+      this.log.info('Loaded ' + (this.accessories.length === 1 ?
+        this.accessories.length + ' Accessory' : this.accessories.length + ' Accessories') + ' From Cache');
       for (const device of [...this.xhome.Panel, ...this.xhome.MotionSensors, ...this.xhome.DryContactSensors, ...this.xhome.Lights]) {
         const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
         const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);

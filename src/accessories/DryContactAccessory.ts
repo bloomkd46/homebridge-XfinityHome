@@ -1,7 +1,7 @@
 import { Service, PlatformAccessory, CharacteristicValue, HAPStatus, CharacteristicChange } from 'homebridge';
 import { XfinityHomePlatform } from '../platform';
 import Accessory from './Accessory';
-import { DryContact } from 'xhome';
+import { DryContact } from 'xfinityhome';
 
 export default class DryContactAccessory extends Accessory {
   private service: Service;

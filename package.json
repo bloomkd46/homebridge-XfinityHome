@@ -1,8 +1,7 @@
 {
-  "private": false,
   "displayName": "Homebridge Xfinity Home",
   "name": "homebridge-xfinityhome",
-  "version": "1.0.0",
+  "version": "0.0.13",
   "description": "A homebridge plugin to control your Xfinity Home security system.",
   "license": "Apache-2.0",
   "repository": {
@@ -21,8 +20,7 @@
     "lint": "eslint src/**.ts --max-warnings=0",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
-    "prepublishOnly": "npm run lint && npm run build",
-    "postinstall": "cd node_modules && git clone https://github.com/bloomkd46/XHome xhome && cd xhome && npm install && npm run build"
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
     "homebridge",
@@ -34,7 +32,9 @@
     "homebridge-plugin"
   ],
   "dependencies": {
-    "@homebridge/plugin-ui-utils": "^0.0.19"
+    "@homebridge/plugin-ui-utils": "^0.0.19",
+    "xfinityhome": "^1.0.0",
+    "qrcode": "^1.4.1"
   },
   "devDependencies": {
     "@types/node": "^16.10.9",

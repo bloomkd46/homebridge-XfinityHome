@@ -1,5 +1,5 @@
 <p class="text-center">
-  <img src="https://user-images.githubusercontent.com/75853497/143301930-e2f3bc9a-9f0d-4e03-95f8-c69769712ca5.png"
+  <img src="https://user-images.githubusercontent.com/75853497/164517422-300169c1-fb15-4742-a1ee-f524b9d10fe6.png"
     alt="homebridge-XfinityHome logo" style="width: 60%;" />
 </p>
 <div id="pageIntro" class="text-center" style="display: none;">
@@ -27,8 +27,8 @@
     <h4>Part 1: Profile & Proxy Configuration</h4>
     <dl>
       <dt>1. Scan The QR Code To Download The Profile</dt>
-      <dd><span id="qrCode" class="text-nowrap">Loading...</span><br>or go to <span class="btn btn-link">http://<span
-            id="ip">Loading...</span>:<span id="port">Loading...</span>/cert</span>
+      <dd><img id="qrCode" src="qrcode.svg">Loading...</img><br>or go to http://<span id="ip">Loading...</span>:<span
+          id="port">Loading...</span>/cert
       </dd>
       <dt>2. Install & Trust The Profile</dt>
       <dd>
@@ -72,7 +72,7 @@
           </li>
           <li>On the proxy configuration screen, tap on <strong>Manual</strong> to reveal additional settings. Then set
             the server to
-            <strong id="ip" class="text-info">Loading...</strong> and the port to <strong id="port" class="text-info">Loading...</strong>
+            <span id="ip" class="text-info">Loading...</span> and the port to <span id="port" class="text-info">Loading...</span>
             <br>
             <strong class="text-danger">Leave the Authentication switch off.</strong>
           </li>
@@ -155,22 +155,22 @@
 </div>
 <!--<script type="text/javascript" src="js/index.js"></script>-->
 <script>
-  (async () => {
+  ; (async () => {
     try {
-      let currentConfig = await homebridge.getPluginConfig();
+      const currentConfig = await homebridge.getPluginConfig();
       let configToolActive = false;
-      showIntro = () => {
+      const showIntro = () => {
         const introContinue = document.getElementById('introContinue');
         introContinue.addEventListener('click', () => {
           homebridge.showSpinner();
           document.getElementById('pageIntro').style.display = 'none';
           document.getElementById('menuWrapper').style.display = 'inline-flex';
           showConfigTool();
-          homebridge.hideSpinner();
+          //homebridge.hideSpinner();
         });
         document.getElementById('pageIntro').style.display = 'block';
       };
-      showLogs = async () => {
+      const showLogs = async () => {
         homebridge.showSpinner();
         if (configToolActive) await homebridge.request('/stopProxy');
         homebridge.hideSchemaForm();
@@ -203,7 +203,7 @@
           option.value = a.UUID;
           deviceSelect.add(option);
         });
-        showDeviceLog = async UUID => {
+        const showDeviceLog = async UUID => {
           homebridge.showSpinner();
           const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           const context = thisAcc.context;
@@ -221,7 +221,7 @@
         }
         homebridge.hideSpinner();
       };
-      showConfigTool = () => {
+      const showConfigTool = async () => {
         homebridge.showSpinner();
         configToolActive = true;
         homebridge.hideSchemaForm();
@@ -241,7 +241,7 @@
         const proxy = await homebridge.request('/startProxy');
         document.getElementById('ip').innerText = proxy.ip;
         document.getElementById('port').innerText = proxy.port;
-        document.getElementById('qrCode').innerText = proxy.qrcode;
+        document.getElementById('qrCode').src = proxy.qrCode;
         document.getElementById('part1').style.display = 'block';
 
         homebridge.addEventListener('proxy', async () => {
@@ -261,7 +261,7 @@
         });
         homebridge.hideSpinner();
       };
-      showSettings = () => {
+      const showSettings = async () => {
         homebridge.showSpinner();
         if (configToolActive) await homebridge.request('/stopProxy');
         document.getElementById('menuConfigTool').classList.remove('btn-elegant');
@@ -288,13 +288,13 @@
       menuSettings.addEventListener('click', () => showSettings());
       menuLogs.addEventListener('click', () => showLogs());
       menuConfigTool.addEventListener('click', () => showConfigTool());
-      document.getElementById('exitSetup').addEventListener('click', () => { await homebridge.request('/stopProxy'); showSettings(); });
+      exitSetup.addEventListener('click', async () => { await homebridge.request('/stopProxy'); showSettings(); });
       //disabledEnable.addEventListener('click', () => enablePlugin())
       if (currentConfig.length) {
         document.getElementById('menuWrapper').style.display = 'inline-flex';
         showSettings();
       } else {
-        currentConfig.push({ name: 'iRobot' });
+        currentConfig.push({ name: 'Xfinity Home' });
         await homebridge.updatePluginConfig(currentConfig);
         showIntro();
       }
