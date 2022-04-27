@@ -3,7 +3,7 @@
 'use strict';
 
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
-const { existsSync, readFileSync, writeFileSync, statSync } = require('fs');
+const { existsSync, readFileSync, mkdirSync, statSync } = require('fs');
 const path = require('path');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 //import { existsSync, promises, readFileSync } from 'fs';
@@ -63,6 +63,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         require('debug').disable();
       } catch (ex) { }
       const ROOT = path.join(this.homebridgeStoragePath, 'XfinityHome');
+      if (!existsSync(ROOT)) mkdir(ROOT);
 
       const pemFile = path.join(ROOT, 'certs', 'ca.pem');
 
