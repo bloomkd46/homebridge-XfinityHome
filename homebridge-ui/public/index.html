@@ -72,7 +72,7 @@
           </li>
           <li>On the proxy configuration screen, tap on <strong>Manual</strong> to reveal additional settings. Then set
             the server to
-            <strong id="ip" class="text-info">Loading...</strong> and the port to <strong id="port" class="text-info">Loading...</strong>
+            <span id="ip" class="text-info">Loading...</span> and the port to <span id="port" class="text-info">Loading...</span>
             <br>
             <strong class="text-danger">Leave the Authentication switch off.</strong>
           </li>
@@ -288,7 +288,7 @@
       menuSettings.addEventListener('click', () => showSettings());
       menuLogs.addEventListener('click', () => showLogs());
       menuConfigTool.addEventListener('click', () => showConfigTool());
-      document.getElementById('exitSetup').addEventListener('click', async () => { await homebridge.request('/stopProxy'); showSettings(); });
+      exitSetup.addEventListener('click', async () => { await homebridge.request('/stopProxy'); showSettings(); });
       //disabledEnable.addEventListener('click', () => enablePlugin())
       if (currentConfig.length) {
         document.getElementById('menuWrapper').style.display = 'inline-flex';

@@ -167,7 +167,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
           }
           const address = localIPs[0];
           const port = 8080;
-          const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`, { type: 'svg' });
+          const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`, { type: 'terminal' });
           resolve({ qrcode: qrcode, ip: address, port: port });;
         });
       });
