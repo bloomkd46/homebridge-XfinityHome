@@ -3,7 +3,7 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import PanelAccessory from './accessories/PanelAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
-import XHome, { Panel, Motion, DryContact, Light } from 'xhome';
+import XHome, { Panel, Motion, DryContact, Light } from 'xfinityhome';
 import DryContactAccessory from './accessories/DryContactAccessory';
 import LightAccessory from './accessories/LightAccessory';
 

@@ -1,7 +1,7 @@
 import { Service, PlatformAccessory, CharacteristicValue, HAPStatus, CharacteristicChange } from 'homebridge';
 import { XfinityHomePlatform } from '../platform';
 import Accessory from './Accessory';
-import { Motion } from 'xhome';
+import { Motion } from 'xfinityhome';
 
 export default class MotionAccessory extends Accessory {
   private service: Service;

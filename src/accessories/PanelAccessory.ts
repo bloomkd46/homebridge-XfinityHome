@@ -1,6 +1,6 @@
 import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
 import { XfinityHomePlatform } from '../platform';
-import { Panel } from 'xhome';
+import { Panel } from 'xfinityhome';
 import Accessory from './Accessory';
 
 
