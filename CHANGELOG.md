@@ -1,3 +1,7 @@
+### 0.0.6 
+* More Attempts To Fix UI
+
+
 ### 0.0.5 
 * Attempting to fix custom ui
 
