@@ -55,7 +55,6 @@ class PluginUiServer extends HomebridgePluginUiServer {
 
     this.onRequest('/startProxy', async () => {
       const Proxy = require('http-mitm-proxy');
-      const QRCode = require('qrcode');
       const path = require('path');
       const os = require('os');
       // Disable debug messages from the proxy
@@ -63,7 +62,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         require('debug').disable();
       } catch (ex) { }
       const ROOT = path.join(this.homebridgeStoragePath, 'XfinityHome');
-      if (!existsSync(ROOT)) mkdir(ROOT);
+      if (!existsSync(ROOT)) mkdirSync(ROOT);
 
       const pemFile = path.join(ROOT, 'certs', 'ca.pem');
 
@@ -112,7 +111,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
             'Connection': 'keep-alive',
           });
           //ctx.proxyToClientResponse.end(fs.readFileSync(path.join(ROOT, 'certs', 'ca.pem')));
-          ctx.proxyToClientResponse.write(fs.readFileSync(pemFile));
+          ctx.proxyToClientResponse.write(readFileSync(pemFile));
           ctx.proxyToClientResponse.end();
 
           return;
