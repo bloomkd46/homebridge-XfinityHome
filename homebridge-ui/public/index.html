@@ -155,7 +155,7 @@
 </div>
 <!--<script type="text/javascript" src="js/index.js"></script>-->
 <script>
-  (async () => {
+  ; (async () => {
     try {
       let currentConfig = await homebridge.getPluginConfig();
       let configToolActive = false;
@@ -166,7 +166,7 @@
           document.getElementById('pageIntro').style.display = 'none';
           document.getElementById('menuWrapper').style.display = 'inline-flex';
           showConfigTool();
-          homebridge.hideSpinner();
+          //homebridge.hideSpinner();
         });
         document.getElementById('pageIntro').style.display = 'block';
       };
@@ -294,7 +294,7 @@
         document.getElementById('menuWrapper').style.display = 'inline-flex';
         showSettings();
       } else {
-        currentConfig.push({ name: 'iRobot' });
+        currentConfig.push({ name: 'Xfinity Home' });
         await homebridge.updatePluginConfig(currentConfig);
         showIntro();
       }
