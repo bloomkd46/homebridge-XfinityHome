@@ -27,7 +27,7 @@
     <h4>Part 1: Profile & Proxy Configuration</h4>
     <dl>
       <dt>1. Scan The QR Code To Download The Profile</dt>
-      <dd><span id="qrCode" class="text-nowrap">Loading...</span><br>or go to http://<span id="ip">Loading...</span>:<span
+      <dd><img id="qrCode" src="qrcode.svg">Loading...</img><br>or go to http://<span id="ip">Loading...</span>:<span
           id="port">Loading...</span>/cert
       </dd>
       <dt>2. Install & Trust The Profile</dt>
@@ -241,7 +241,6 @@
         const proxy = await homebridge.request('/startProxy');
         document.getElementById('ip').innerText = proxy.ip;
         document.getElementById('port').innerText = proxy.port;
-        document.getElementById('qrCode').innerText = proxy.qrcode;
         document.getElementById('part1').style.display = 'block';
 
         homebridge.addEventListener('proxy', async () => {

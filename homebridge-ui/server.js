@@ -3,7 +3,7 @@
 'use strict';
 
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
-const { existsSync, readFileSync } = require('fs');
+const { existsSync, readFileSync, writeFileSync } = require('fs');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 //import { existsSync, promises, readFileSync } from 'fs';
 class PluginUiServer extends HomebridgePluginUiServer {
@@ -167,8 +167,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
           }
           const address = localIPs[0];
           const port = 8080;
-          const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`, { type: 'terminal' });
-          resolve({ qrcode: qrcode, ip: address, port: port });;
+          const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`, { type: 'svg' });
+          writeFileSync('public/qrcode.svg', qrcode);
+          resolve({ ip: address, port: port });;
         });
       });
 
