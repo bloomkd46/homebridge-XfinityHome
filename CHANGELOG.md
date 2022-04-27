@@ -1,3 +1,7 @@
+### 0.0.15 
+* Tweaked UI
+
+
 ### 0.0.14 
 * Removed qrcode from custom ui
 * Fixed file paths to work on windows
