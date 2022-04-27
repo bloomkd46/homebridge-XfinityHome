@@ -4,6 +4,7 @@
 
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
 const { existsSync, readFileSync, writeFileSync } = require('fs');
+const path = require('path');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 //import { existsSync, promises, readFileSync } from 'fs';
 class PluginUiServer extends HomebridgePluginUiServer {
@@ -17,16 +18,16 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/getCachedAccessories', async () => {
       try {
         // Define the plugin and create the array to return
-        const plugin = 'homebridge-irobot';
+        const plugin = 'homebridge-xfinityhome';
         const devicesToReturn = [];
 
         // The path and file of the cached accessories
-        const accFile = this.homebridgeStoragePath + '/accessories/cachedAccessories';
+        const accFile = path.join(this.homebridgeStoragePath, '/accessories/cachedAccessories');
 
         // Check the file exists
         if (existsSync(accFile)) {
           // Read the cached accessories file
-          let cachedAccessories = await promises.readFile(accFile);
+          let cachedAccessories = readFileSync(accFile);
 
           // Parse the JSON
           cachedAccessories = JSON.parse(cachedAccessories);
