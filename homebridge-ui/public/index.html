@@ -245,21 +245,43 @@
         certificate.href = certificateLink;
         document.getElementById('part1').style.display = 'block';
 
-        homebridge.addEventListener('proxy', async () => {
+        let proxyActive = false;
+        const interval = setInterval(() => {
+          if (!proxyActive) {
+            const isActive = await homebridge.request('/proxyActive');
+            proxyActive = isActive;
+            if (isActive) {
+              homebridge.showSpinner();
+              document.getElementById('part1').style.display = 'none';
+              document.getElementById('part2').style.display = 'block';
+              homebridge.hideSpinner();
+            }
+          }
+          if ((await homebridge.request('/token')) || false) {
+            homebridge.showSpinner();
+            document.getElementById('part2').style.display = 'none';
+            document.getElementById('part3').style.display = 'block';
+            currentConfig[0].refreshToken = token;
+            await homebridge.updatePluginConfig(currentConfig);
+            await homebridge.savePluginConfig();
+            clearInterval(interval);
+          }
+        }, 500);
+        /*homebridge.addEventListener('proxy', async () => {
           homebridge.showSpinner();
           document.getElementById('part1').style.display = 'none';
           document.getElementById('part2').style.display = 'block';
           homebridge.hideSpinner();
-        });
+        });*/
 
-        homebridge.addEventListener('token', async (token) => {
+        /*homebridge.addEventListener('token', async (token) => {
           homebridge.showSpinner();
           document.getElementById('part2').style.display = 'none';
           document.getElementById('part3').style.display = 'block';
           currentConfig[0].refreshToken = token;
           await homebridge.updatePluginConfig(currentConfig);
           await homebridge.savePluginConfig();
-        });
+        });*/
         homebridge.hideSpinner();
       };
       const showSettings = async () => {

@@ -77,6 +77,14 @@ class PluginUiServer extends HomebridgePluginUiServer {
       const proxy = Proxy();
       const localIPPorts = localIPs.map(ip => `${ip}:${585}`);
 
+      let token = '';
+      let proxyActive = false;
+      let sslActive = false;
+
+      this.onRequest('/proxyActive', () => { return proxyActive; });
+      this.onRequest('/token', () => { return token; });
+      this.onRequest('/sslActive', () => { return sslActive; });
+
       proxy.onError(function (ctx, err) {
         switch (err.code) {
           case 'ERR_STREAM_DESTROYED':
@@ -132,15 +140,18 @@ class PluginUiServer extends HomebridgePluginUiServer {
             return callback(null, chunk);
           });
           ctx.onResponseEnd(function (ctx, callback) {
-            this.pushEvent('token', { refreshToken: JSON.parse(Buffer.concat(chunks).toString()).refresh_token });
+            token = JSON.parse(Buffer.concat(chunks).toString()).refresh_token;
+            //this.pushEvent('token', { refreshToken: JSON.parse(Buffer.concat(chunks).toString()).refresh_token });
             //emitter.emit('tuya-config', Buffer.concat(chunks).toString());
             callback();
           });
         } else {
-          this.pushEvent('proxy', {});
+          //this.pushEvent('proxy', {});
+          proxyActive = true;
           ctx.onRequestData(function (ctx, chunk, callback) {
             ctx.onResponseData(function (ctx, chunk, callback) {
-              this.pushEvent('sslProxy', {});
+              //this.pushEvent('sslProxy', {});
+              sslActive = true;
             });
           });
         }
