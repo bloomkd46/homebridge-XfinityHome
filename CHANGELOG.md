@@ -1,3 +1,7 @@
+### 0.0.13 
+* Fixed Function/String Mixup
+
+
 ### 0.0.12 
 * Tweaked storage directory for custom ui
 
