@@ -3,7 +3,7 @@
 'use strict';
 
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
-const { existsSync, readFileSync, writeFileSync } = require('fs');
+const { existsSync, readFileSync, writeFileSync, statSync } = require('fs');
 const path = require('path');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 //import { existsSync, promises, readFileSync } from 'fs';
@@ -62,8 +62,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       try {
         require('debug').disable();
       } catch (ex) { }
-      const ROOT = this.homebridgeStoragePath.endsWith(' / ') ?
-        this.homebridgeStoragePath + 'XfinityHome/' : this.homebridgeStoragePath + '/XfinityHome/';
+      const ROOT = path.join(this.homebridgeStoragePath, 'XfinityHome');
 
       const pemFile = path.join(ROOT, 'certs', 'ca.pem');
 
@@ -76,7 +75,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
 
       const proxy = Proxy();
-      const localIPPorts = localIPs.map(ip => `${ip}:${8080}`);
+      const localIPPorts = localIPs.map(ip => `${ip}:${585}`);
 
       proxy.onError(function (ctx, err) {
         switch (err.code) {
@@ -89,7 +88,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
             return;
 
           case 'EACCES':
-            console.error(`Permission was denied to use port ${8080}.`);
+            console.error(`Permission was denied to use port ${585}.`);
             return;
 
           default:
@@ -109,7 +108,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
             'Content-Type': 'application/x-x509-ca-cert',
             'Content-Disposition': 'attachment; filename=cert.pem',
             'Content-Transfer-Encoding': 'binary',
-            'Content-Length': fs.statSync(pemFile).size,
+            'Content-Length': statSync(pemFile).size,
             'Connection': 'keep-alive',
           });
           //ctx.proxyToClientResponse.end(fs.readFileSync(path.join(ROOT, 'certs', 'ca.pem')));
@@ -158,19 +157,17 @@ class PluginUiServer extends HomebridgePluginUiServer {
         }
       });*/
       this.onRequest("/stopProxy", () => {
-        if (typeof proxy.close() === 'function')
+        if (typeof proxy.close === 'function')
           proxy.close();
       });
       return new Promise((resolve) => {
-        proxy.listen({ port: 8080, sslCaDir: ROOT }, async err => {
+        proxy.listen({ port: 585, sslCaDir: ROOT }, async err => {
           if (err) {
             console.error('Error starting proxy: ' + err);
           }
           const address = localIPs[0];
-          const port = 8080;
-          const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`, { type: 'svg' });
-          writeFileSync(ROOT + 'qrcode.svg', qrcode);
-          resolve({ qrcode: ROOT + 'qrcode.svg', ip: address, port: port });;
+          const port = 585;
+          resolve({ ip: address, port: port });;
         });
       });
 
