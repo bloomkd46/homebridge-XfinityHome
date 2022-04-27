@@ -1,3 +1,7 @@
+### 0.0.16 
+* Fixed function typos for custom ui
+
+
 ### 0.0.15 
 * Tweaked UI
 
