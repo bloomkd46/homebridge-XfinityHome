@@ -157,9 +157,9 @@
 <script>
   ; (async () => {
     try {
-      let currentConfig = await homebridge.getPluginConfig();
+      const currentConfig = await homebridge.getPluginConfig();
       let configToolActive = false;
-      showIntro = () => {
+      const showIntro = () => {
         const introContinue = document.getElementById('introContinue');
         introContinue.addEventListener('click', () => {
           homebridge.showSpinner();
@@ -170,7 +170,7 @@
         });
         document.getElementById('pageIntro').style.display = 'block';
       };
-      showLogs = async () => {
+      const showLogs = async () => {
         homebridge.showSpinner();
         if (configToolActive) await homebridge.request('/stopProxy');
         homebridge.hideSchemaForm();
@@ -203,7 +203,7 @@
           option.value = a.UUID;
           deviceSelect.add(option);
         });
-        showDeviceLog = async UUID => {
+        const showDeviceLog = async UUID => {
           homebridge.showSpinner();
           const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           const context = thisAcc.context;
@@ -221,7 +221,7 @@
         }
         homebridge.hideSpinner();
       };
-      showConfigTool = () => {
+      const showConfigTool = async () => {
         homebridge.showSpinner();
         configToolActive = true;
         homebridge.hideSchemaForm();
@@ -261,7 +261,7 @@
         });
         homebridge.hideSpinner();
       };
-      showSettings = () => {
+      const showSettings = async () => {
         homebridge.showSpinner();
         if (configToolActive) await homebridge.request('/stopProxy');
         document.getElementById('menuConfigTool').classList.remove('btn-elegant');
@@ -288,7 +288,7 @@
       menuSettings.addEventListener('click', () => showSettings());
       menuLogs.addEventListener('click', () => showLogs());
       menuConfigTool.addEventListener('click', () => showConfigTool());
-      document.getElementById('exitSetup').addEventListener('click', () => { await homebridge.request('/stopProxy'); showSettings(); });
+      document.getElementById('exitSetup').addEventListener('click', async () => { await homebridge.request('/stopProxy'); showSettings(); });
       //disabledEnable.addEventListener('click', () => enablePlugin())
       if (currentConfig.length) {
         document.getElementById('menuWrapper').style.display = 'inline-flex';
