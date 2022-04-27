@@ -66,7 +66,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
 
       const pemFile = path.join(ROOT, 'certs', 'ca.pem');
 
-      let localIPs = [];
+      const localIPs = [];
       const ifaces = os.networkInterfaces();
       Object.keys(ifaces).forEach(name => {
         ifaces[name].forEach(network => {
@@ -165,8 +165,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
           if (err) {
             console.error('Error starting proxy: ' + err);
           }
-          let { address, port } = proxy.httpServer.address();
-          if (address === '::' || address === '0.0.0.0') address = localIPs[0];
+          const address = localIPs[0];
+          const port = 8080;
           const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`);
           resolve({ qrcode: qrcode, ip: address, port: port });;
         });
