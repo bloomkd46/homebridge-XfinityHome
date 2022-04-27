@@ -1,3 +1,7 @@
+### 0.0.9 
+* Hopefully Fixed QRCode
+
+
 ### 0.0.8 
 * Fixed Custom UI
 
