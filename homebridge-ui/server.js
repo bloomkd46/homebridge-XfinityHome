@@ -161,14 +161,14 @@ class PluginUiServer extends HomebridgePluginUiServer {
           proxy.close();
       });
       return new Promise((resolve) => {
-        proxy.listen({ port: program.port, sslCaDir: ROOT }, err => {
+        proxy.listen({ port: program.port, sslCaDir: ROOT }, async err => {
           if (err) {
             console.error('Error starting proxy: ' + err);
           }
           let { address, port } = proxy.httpServer.address();
           if (address === '::' || address === '0.0.0.0') address = localIPs[0];
-
-          resolve({ qrcode: await QRCode.toString(`http://${address}:${port}/cert`), ip: address, port: port });;
+          const qrcode = await require('qrcode').toString(`http://${address}:${port}/cert`);
+          resolve({ qrcode: qrcode, ip: address, port: port });;
         });
       });
 
