@@ -33,7 +33,7 @@
   ],
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^0.0.19",
-    "xfinityhome": "^1.0.0"
+    "xfinityhome": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^16.10.9",
