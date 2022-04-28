@@ -245,29 +245,21 @@
         certificate.href = certificateLink;
         document.getElementById('part1').style.display = 'block';
 
-        let proxyActive = false;
-        const interval = setInterval(async () => {
-          if (!proxyActive) {
-            const isActive = await homebridge.request('/proxyActive');
-            proxyActive = isActive;
-            if (isActive) {
-              homebridge.showSpinner();
-              document.getElementById('part1').style.display = 'none';
-              document.getElementById('part2').style.display = 'block';
-              homebridge.hideSpinner();
-            }
-          }
-          if ((await homebridge.request('/token')) || false) {
-            homebridge.showSpinner();
-            document.getElementById('part2').style.display = 'none';
-            document.getElementById('part3').style.display = 'block';
-            currentConfig[0].refreshToken = token;
-            await homebridge.updatePluginConfig(currentConfig);
-            await homebridge.savePluginConfig();
-            homebridge.hideSpinner();
-            clearInterval(interval);
-          }
-        }, 500);
+        await homebridge.request('/proxyActive');
+        homebridge.showSpinner();
+        document.getElementById('part1').style.display = 'none';
+        document.getElementById('part2').style.display = 'block';
+        homebridge.hideSpinner();
+
+        const token = await homebridge.request('/token');
+        homebridge.showSpinner();
+        document.getElementById('part2').style.display = 'none';
+        document.getElementById('part3').style.display = 'block';
+        currentConfig[0].refreshToken = token;
+        await homebridge.updatePluginConfig(currentConfig);
+        await homebridge.savePluginConfig();
+        homebridge.hideSpinner();
+
         /*homebridge.addEventListener('proxy', async () => {
           homebridge.showSpinner();
           document.getElementById('part1').style.display = 'none';
@@ -312,7 +304,7 @@
       menuSettings.addEventListener('click', () => showSettings());
       menuLogs.addEventListener('click', () => showLogs());
       menuConfigTool.addEventListener('click', () => showConfigTool());
-      exitSetup.addEventListener('click', async () => { await homebridge.request('/stopProxy'); showSettings(); });
+      exitSetup.addEventListener('click', async () => { await homebridge.request('/stopProxy'); configToolActive = false; showSettings(); });
       //disabledEnable.addEventListener('click', () => enablePlugin())
       if (currentConfig.length) {
         document.getElementById('menuWrapper').style.display = 'inline-flex';

@@ -5,10 +5,12 @@
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
 const { existsSync, readFileSync, mkdirSync, statSync } = require('fs');
 const path = require('path');
+const { EventEmitter } = require('events');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 //import { existsSync, promises, readFileSync } from 'fs';
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor () {
+    const events = new EventEmitter();
     super();
 
     /*
@@ -53,6 +55,22 @@ class PluginUiServer extends HomebridgePluginUiServer {
       }
     });
 
+    this.onRequest('/proxyActive', async () => {
+      return new Promise((resolve) => {
+        events.on('proxy', () => resolve());
+      });
+    });
+    this.onRequest('/sslActive', async () => {
+      return new Promise((resolve) => {
+        events.on('ssl', () => resolve());
+      });
+    });
+    this.onRequest('/token', async () => {
+      return new Promise((resolve) => {
+        events.on('token', token => resolve(token));
+      });
+    });
+
     this.onRequest('/startProxy', async () => {
       const Proxy = require('http-mitm-proxy');
       const path = require('path');
@@ -76,14 +94,6 @@ class PluginUiServer extends HomebridgePluginUiServer {
 
       const proxy = Proxy();
       const localIPPorts = localIPs.map(ip => `${ip}:${585}`);
-
-      let token = '';
-      let proxyActive = false;
-      let sslActive = false;
-
-      this.onRequest('/proxyActive', () => { return proxyActive; });
-      this.onRequest('/token', () => { return token; });
-      this.onRequest('/sslActive', () => { return sslActive; });
 
       proxy.onError(function (ctx, err) {
         switch (err.code) {
@@ -140,18 +150,19 @@ class PluginUiServer extends HomebridgePluginUiServer {
             return callback(null, chunk);
           });
           ctx.onResponseEnd(function (ctx, callback) {
-            token = JSON.parse(Buffer.concat(chunks).toString()).refresh_token;
+            events.emit('token', JSON.parse(Buffer.concat(chunks).toString()).refresh_token);
+            //token = JSON.parse(Buffer.concat(chunks).toString()).refresh_token;
             //this.pushEvent('token', { refreshToken: JSON.parse(Buffer.concat(chunks).toString()).refresh_token });
             //emitter.emit('tuya-config', Buffer.concat(chunks).toString());
             callback();
           });
         } else {
           //this.pushEvent('proxy', {});
-          proxyActive = true;
+          events.emit('proxy');
           ctx.onRequestData(function (ctx, chunk, callback) {
             ctx.onResponseData(function (ctx, chunk, callback) {
               //this.pushEvent('sslProxy', {});
-              sslActive = true;
+              events.emit('ssl');
             });
           });
         }
