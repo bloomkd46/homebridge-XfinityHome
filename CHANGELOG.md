@@ -1,3 +1,8 @@
+### 0.0.21 
+* Bumped xfinityhome dependency
+* changed how custom ui waits for token
+
+
 ### 0.0.20 
 * Fixed Custom UI By Making SetInterval Async
 
