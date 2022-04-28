@@ -1,3 +1,7 @@
+### 0.0.20 
+* Fixed Custom UI By Making SetInterval Async
+
+
 ### 0.0.19 
 * Removed setInterval for debugging
 
