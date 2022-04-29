@@ -27,7 +27,9 @@
     <h4>Part 1: Profile & Proxy Configuration</h4>
     <dl>
       <dt>1. Download The Profile</dt>
-      <dd>Open <a id="certificate" href="" target="_blank">Loading...</a> On Your iPhone</dd>
+      <dd><span id="qrcode-alt">Open <a id="certificate" href="" target="_blank">Loading...</a> On Your iPhone</span>
+        <svg id="qrcode" style="display: none"></svg>
+      </dd>
       <dt>2. Install & Trust The Profile</dt>
       <dd>
         <ol>
@@ -239,11 +241,22 @@
         const proxy = await homebridge.request('/startProxy');
         document.getElementById('ip').innerText = proxy.ip;
         document.getElementById('port').innerText = proxy.port;
+        document.getElementById('qrcode-alt').style.display = 'inline';
         const certificate = document.getElementById('certificate');
         const certificateLink = `http://${proxy.ip}:${proxy.port}/cert`;
         certificate.innerText = certificateLink;
         certificate.href = certificateLink;
+
+        const qrcode = document.getElementById('qrcode');
+        //qrcode.alt = certificateLink;
+        //qrcode.src = 'file://' + proxy.qrcode;
+        qrcode.innerHTML = proxy.qrcode;
+        if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
+          qrcode.style.display = 'block';
+          document.getElementById('qrcode-alt').style.display = 'none';
+        }
         document.getElementById('part1').style.display = 'block';
+        homebridge.hideSpinner();
 
         await homebridge.request('/proxyActive');
         homebridge.showSpinner();
@@ -275,7 +288,7 @@
           await homebridge.updatePluginConfig(currentConfig);
           await homebridge.savePluginConfig();
         });*/
-        homebridge.hideSpinner();
+        //homebridge.hideSpinner();
       };
       const showSettings = async () => {
         homebridge.showSpinner();
