@@ -1,3 +1,8 @@
+### 0.0.22 
+* UI Fixes
+* Re-Added QRCode
+
+
 ### 0.0.21 
 * Bumped xfinityhome dependency
 * changed how custom ui waits for token
