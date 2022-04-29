@@ -1,3 +1,8 @@
+### 0.0.23 
+* Fixed QR Code
+* Added QR Code Prompt
+
+
 ### 0.0.22 
 * UI Fixes
 * Re-Added QRCode
