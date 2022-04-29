@@ -1,3 +1,8 @@
+### 0.0.25 
+* Proxy Tweaks
+* UI Tweaks
+
+
 ### 0.0.24 
 * Hopefully sped up proxy
 * Aligned QR code
