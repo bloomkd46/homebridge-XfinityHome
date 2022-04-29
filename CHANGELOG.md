@@ -1,3 +1,7 @@
+### 0.0.31 
+* Removed Chalk As It Had No Effect
+
+
 ### 0.0.30 
 * Fixed Timestamp In Logs
 * Added Temperature Unit In Log
