@@ -1,3 +1,7 @@
+### 0.0.28 
+* Fixed Typo When Loading Logs
+
+
 ### 0.0.27 
 * Fixed Logs In Custom UI
 
