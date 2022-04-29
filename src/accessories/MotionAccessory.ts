@@ -55,8 +55,7 @@ export default class MotionAccessory extends Accessory {
   }
 
   getActive(): CharacteristicValue {
-    return this.device.device.properties.isBypassed ? false :
-      this.platform.xhome.Panel[0].device.properties.armType === 'away' ? true : false;
+    return !this.device.device.properties.isBypassed;
   }
 
   async setActive(value: CharacteristicValue): Promise<void> {
