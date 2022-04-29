@@ -1,3 +1,9 @@
+### 0.0.24 
+* Hopefully sped up proxy
+* Aligned QR code
+* made QR code bigger
+
+
 ### 0.0.23 
 * Fixed QR Code
 * Added QR Code Prompt
