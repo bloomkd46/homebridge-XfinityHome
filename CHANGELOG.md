@@ -1,3 +1,7 @@
+### 0.0.27 
+* Fixed Logs In Custom UI
+
+
 ### 0.0.26 
 * Added Logs To Custom UI
 
