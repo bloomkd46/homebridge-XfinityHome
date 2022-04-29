@@ -29,8 +29,8 @@
       <dt>1. Download The Profile</dt>
       <dd><span id="qrcode-alt">Open <a id="certificate" href="" target="_blank">Loading...</a> On Your iPhone To Download The
           Profile</span>
-        <span id="qrcode">Scan The QR Code Below To Download The Profile<br><svg id="qrcode-svg" style="width: 60%;"
-            class="align-middle"></svg></span>
+        <span id="qrcode" style="display: none;">Scan The QR Code Below To Download The Profile<br><svg id="qrcode-svg"
+            style="height: 100%;" class="align-middle"></svg></span>
       </dd>
       <dt>2. Install & Trust The Profile</dt>
       <dd>
@@ -80,6 +80,7 @@
           </li>
         </ol>
       </dd>
+      <dd>If This Page Dosen't Redirect Open A Browser On Your Phen (Ex. Safari)</dd>
     </dl>
   </div>
   <div id="part2" style="display: none;">
@@ -111,15 +112,11 @@
       <dd>
         <ol>
           <li>
-            On your iPhone, go to Settings and open Wi-Fi. Hit the info button <strong class="btn btn-link">(i)</strong>,
-            for
-            the
-            WiFi connection you are using. This will open the configuration for your connection.
+            On your iPhone, go to Settings and open Wi-Fi. Hit the info button <strong class="text-info">(i)</strong>,
+            for the WiFi connection you are using. This will open the configuration for your connection.
           </li>
           <li>On your WiFi connection screen, scroll to the bottom and hit <strong>Configure Proxy</strong>. This will
-            open the proxy
-            configuration
-            screen.
+            open the proxy configuration screen.
           </li>
           <li>On the proxy configuration screen, tap on <strong>Off</strong>.
           </li>
@@ -141,8 +138,8 @@
           </li>
         </ol>
       </dd>
-      <dt> Click <strong>Exit Setup</strong> Below When You Are Done</dt>
-      <dd>The Config Will Automatically Update</dd>
+      <dt> Click <span class="text-warning">Exit Setup</span> Below When You Are Done</dt>
+      <dd>Note: Your Config Will Automatically Update</dd>
     </dl>
   </div>
   <button id="exitSetup" type="button" class="btn btn-outline-warning ml-0">Exit Setup</button>
@@ -160,7 +157,6 @@
   ; (async () => {
     try {
       const currentConfig = await homebridge.getPluginConfig();
-      let configToolActive = false;
       const showIntro = () => {
         const introContinue = document.getElementById('introContinue');
         introContinue.addEventListener('click', () => {
@@ -174,7 +170,6 @@
       };
       const showLogs = async () => {
         homebridge.showSpinner();
-        if (configToolActive) await homebridge.request('/stopProxy');
         homebridge.hideSchemaForm();
         document.getElementById('menuHome').classList.remove('btn-elegant');
         document.getElementById('menuHome').classList.add('btn-primary');
@@ -225,7 +220,7 @@
       };
       const showConfigTool = async () => {
         homebridge.showSpinner();
-        configToolActive = true;
+        document.getElementById('menuWrapper').style.display = 'none';
         homebridge.hideSchemaForm();
         document.getElementById('menuConfigTool').classList.add('btn-elegant');
         document.getElementById('menuConfigTool').classList.remove('btn-primary');
@@ -252,6 +247,7 @@
         //qrcode.alt = certificateLink;
         //qrcode.src = 'file://' + proxy.qrcode;
         document.getElementById('qrcode-svg').innerHTML = proxy.qrcode;
+        document.getElementById('qrcode').style.display = 'none';
         if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
           document.getElementById('qrcode').style.display = 'block';
           document.getElementById('qrcode-alt').style.display = 'none';
@@ -293,7 +289,6 @@
       };
       const showSettings = async () => {
         homebridge.showSpinner();
-        if (configToolActive) await homebridge.request('/stopProxy');
         document.getElementById('menuConfigTool').classList.remove('btn-elegant');
         document.getElementById('menuConfigTool').classList.add('btn-primary');
         document.getElementById('menuLogs').classList.remove('btn-elegant');
@@ -318,7 +313,11 @@
       menuSettings.addEventListener('click', () => showSettings());
       menuLogs.addEventListener('click', () => showLogs());
       menuConfigTool.addEventListener('click', () => showConfigTool());
-      exitSetup.addEventListener('click', async () => { await homebridge.request('/stopProxy'); configToolActive = false; showSettings(); });
+      exitSetup.addEventListener('click', async () => {
+        await homebridge.request('/stopProxy');
+        document.getElementById('menuWrapper').style.display = 'inline-flex';
+        showSettings();
+      });
       //disabledEnable.addEventListener('click', () => enablePlugin())
       if (currentConfig.length) {
         document.getElementById('menuWrapper').style.display = 'inline-flex';
