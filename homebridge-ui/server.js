@@ -52,7 +52,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     });
     this.onRequest('/getLogs', async (payload) => {
       try {
-        return readFileSync(payload.logPath).split('\n').join('<br>');
+        return readFileSync(payload.logPath).toString().split('\n').join('<br>');
       } catch (err) {
         return err;
       }
