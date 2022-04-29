@@ -211,10 +211,11 @@
         };
         deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
         if (cachedAccessories.length > 0) {
-          const generalLog = cachedAccessories.unshift({ displayName: 'General', context: { logPath: await homebridge.request('/getGeneralLog') } });
+          //const generalLog = cachedAccessories.unshift({ displayName: 'General', context: { logPath: await homebridge.request('/getGeneralLog') } })[0];
+          const generalLog = await homebridge.request('/getGeneralLog');
           const option = document.createElement('option');
-          option.text = generalLog.displayName;
-          option.value = generalLog.context.logPath;
+          option.text = 'General';
+          option.value = generalLog;
           deviceSelect.add(option);
           showDeviceLog(generalLog.context.logPath);
         } else {

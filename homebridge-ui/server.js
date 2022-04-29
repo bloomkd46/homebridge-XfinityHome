@@ -48,7 +48,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       }
     });
     this.onRequest('/getGeneralLog', async () => {
-      return path.join(this.homebridgeStoragePath, '/XfinityHome/General.log');
+      return path.join(this.homebridgeStoragePath, 'XfinityHome', 'General.log');
     });
     this.onRequest('/getLogs', async (payload) => {
       try {
@@ -63,11 +63,11 @@ class PluginUiServer extends HomebridgePluginUiServer {
         events.on('proxy', () => resolve());
       });
     });
-    this.onRequest('/sslActive', async () => {
+    /*this.onRequest('/sslActive', async () => {
       return new Promise((resolve) => {
         events.on('ssl', () => resolve());
       });
-    });
+    });*/
     this.onRequest('/token', async () => {
       return new Promise((resolve) => {
         events.on('token', token => resolve(token));
