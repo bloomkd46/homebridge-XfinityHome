@@ -1,3 +1,7 @@
+### 0.0.29 
+* Tweaked Custom UI Logs
+
+
 ### 0.0.28 
 * Fixed Typo When Loading Logs
 
