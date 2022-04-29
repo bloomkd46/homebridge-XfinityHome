@@ -1,3 +1,9 @@
+### 0.0.30 
+* Fixed Timestamp In Logs
+* Added Temperature Unit In Log
+* Improved Log Layout In Custom UI
+
+
 ### 0.0.29 
 * Tweaked Custom UI Logs
 
