@@ -63,6 +63,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
   async discoverDevices() {
     if (this.refreshToken) {
       this.log.info('Using Refresh Token From Cache:', this.refreshToken);
+    } else if (!this.config.refreshToken) {
+      this.log.error('No Refresh Token Found');
+      return;
     }
     try {
       this.xhome = await XHome.init(this.refreshToken || this.config.refreshToken);

@@ -15,7 +15,7 @@
       "refreshToken": {
         "title": "Refresh Token",
         "type": "string",
-        "required": true,
+        "required": false,
         "description": "The Refresh Token You Got Using The Configuration Tool"
       },
       "temperatureSensors": {
