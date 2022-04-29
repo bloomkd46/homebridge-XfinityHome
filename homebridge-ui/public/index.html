@@ -171,13 +171,13 @@
       const showLogs = async () => {
         homebridge.showSpinner();
         homebridge.hideSchemaForm();
-        document.getElementById('menuHome').classList.remove('btn-elegant');
-        document.getElementById('menuHome').classList.add('btn-primary');
+        document.getElementById('menuConfigTool').classList.remove('btn-elegant');
+        document.getElementById('menuConfigTool').classList.add('btn-primary');
         document.getElementById('menuLogs').classList.add('btn-elegant');
         document.getElementById('menuLogs').classList.remove('btn-primary');
         document.getElementById('menuSettings').classList.remove('btn-elegant');
         document.getElementById('menuSettings').classList.add('btn-primary');
-        document.getElementById('pageSupport').style.display = 'none';
+        document.getElementById('pageConfigTool').style.display = 'none';
         document.getElementById('pageLogs').style.display = 'block';
         const cachedAccessories =
           typeof homebridge.getCachedAccessories === 'function'
@@ -195,10 +195,12 @@
         const deviceSelect = document.getElementById('deviceSelect');
         deviceSelect.innerHTML = '';
         cachedAccessories.forEach(a => {
-          const option = document.createElement('option');
-          option.text = a.displayName;
-          option.value = a.UUID;
-          deviceSelect.add(option);
+          if (a.context.logPath) {
+            const option = document.createElement('option');
+            option.text = a.displayName;
+            option.value = a.context.logPath;
+            deviceSelect.add(option);
+          }
         });
         const showDeviceLog = async logPath => {
           homebridge.showSpinner();
@@ -207,10 +209,14 @@
           document.getElementById('logZone').innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
           homebridge.hideSpinner();
         };
-        deviceSelect.addEventListener('change', event => showDeviceLog(cachedAccessories.find(x => x.UUID === event.target.value).context.logPath));
+        deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
         if (cachedAccessories.length > 0) {
-          //cachedAccessories.unshift({ context: {logPath: } });
-          showDeviceLog(cachedAccessories[0].UUID);
+          const generalLog = cachedAccessories.unshift({ displayName: 'General', context: { logPath: await homebridge.request('/getGeneralLog') } });
+          const option = document.createElement('option');
+          option.text = generalLog.displayName;
+          option.value = generalLog.context.logPath;
+          deviceSelect.add(option);
+          showDeviceLog(generalLog.context.logPath);
         } else {
           const option = document.createElement('option');
           option.text = 'No Devices';

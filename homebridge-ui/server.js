@@ -47,9 +47,12 @@ class PluginUiServer extends HomebridgePluginUiServer {
         return [];
       }
     });
+    this.onRequest('/getGeneralLog', async () => {
+      return path.join(this.homebridgeStoragePath, '/XfinityHome/General.log');
+    });
     this.onRequest('/getLogs', async (payload) => {
       try {
-        return readFileSync(payload.logPath);
+        return readFileSync(payload.logPath).split('\n').join('<br>');
       } catch (err) {
         return err;
       }
