@@ -1,3 +1,7 @@
+### 0.0.26 
+* Added Logs To Custom UI
+
+
 ### 0.0.25 
 * Proxy Tweaks
 * UI Tweaks
