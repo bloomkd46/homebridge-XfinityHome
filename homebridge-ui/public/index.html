@@ -200,15 +200,16 @@
           option.value = a.UUID;
           deviceSelect.add(option);
         });
-        const showDeviceLog = async UUID => {
+        const showDeviceLog = async logPath => {
           homebridge.showSpinner();
-          const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
-          const context = thisAcc.context;
-          document.getElementById('logZone').innerHTML = await homebridge.request('/getLogs', { logPath: context.logPath });
+          //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
+          //const context = thisAcc.context;
+          document.getElementById('logZone').innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
           homebridge.hideSpinner();
         };
-        deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
+        deviceSelect.addEventListener('change', event => showDeviceLog(cachedAccessories.find(x => x.UUID === event.target.value).context.logPath));
         if (cachedAccessories.length > 0) {
+          //cachedAccessories.unshift({ context: {logPath: } });
           showDeviceLog(cachedAccessories[0].UUID);
         } else {
           const option = document.createElement('option');
