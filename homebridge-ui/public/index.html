@@ -150,7 +150,7 @@
       <select class="form-control" id="deviceSelect"></select>
     </div>
   </form>
-  <p id="logZone" class="text-nowrap">Loading...</p>
+  <div class="card bg-dark text-nowrap" style="height: 60vh; overflow: scroll" id="logZone" class="text-nowrap"> Loading...</div>
 </div>
 <!--<script type="text/javascript" src="js/index.js"></script>-->
 <script>
@@ -206,7 +206,9 @@
           homebridge.showSpinner();
           //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           //const context = thisAcc.context;
-          document.getElementById('logZone').innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
+          const logZone = document.getElementById('logZone');
+          logZone.innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
+          logZone.scrollTo(0, logZone.scrollHeight);
           homebridge.hideSpinner();
         };
         deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
@@ -216,6 +218,7 @@
           const option = document.createElement('option');
           option.text = 'General';
           option.value = generalLog;
+          option.selected = true;
           deviceSelect.add(option, 0);
           showDeviceLog(generalLog);
         } else {
