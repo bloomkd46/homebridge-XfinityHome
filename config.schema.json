@@ -18,6 +18,12 @@
         "required": false,
         "description": "The Refresh Token You Got Using The Configuration Tool"
       },
+      "pin": {
+        "title": "Pin",
+        "type": "string",
+        "required": false,
+        "description": "Used For Arming And Disarming Your System. Leave Blank To Disable"
+      },
       "temperatureSensors": {
         "title": "Include Temperature Sensors",
         "type": "boolean",
