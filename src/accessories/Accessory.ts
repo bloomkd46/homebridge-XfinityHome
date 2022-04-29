@@ -108,7 +108,7 @@ export default class Accessory {
         })
         .on('change', async (value: CharacteristicChange): Promise<void> => {
           if (value.newValue !== value.oldValue) {
-            this.log(4, `Updating Temperature To ${value.newValue}`);
+            this.log(4, `Updating Temperature To ${value.newValue}°C`);
           }
         });
     }
