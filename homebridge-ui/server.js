@@ -179,7 +179,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         }
       });*/
       this.onRequest("/stopProxy", () => {
-        if (typeof proxy.close === 'function') { proxy.close(); }
+        if (proxy && typeof proxy.close === 'function') { proxy.close(); }
         if (existsSync(path.join(ROOT, 'certs'))) {
           rmSync(path.join(ROOT, 'certs'), { recursive: true, force: true });
         }
