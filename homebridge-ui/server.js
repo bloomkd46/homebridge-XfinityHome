@@ -3,7 +3,7 @@
 'use strict';
 
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
-const { existsSync, readFileSync, mkdirSync, statSync } = require('fs');
+const { existsSync, readFileSync, mkdirSync, statSync, rmdirSync } = require('fs');
 const path = require('path');
 const { EventEmitter } = require('events');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
@@ -159,12 +159,12 @@ class PluginUiServer extends HomebridgePluginUiServer {
         } else {
           //this.pushEvent('proxy', {});
           events.emit('proxy');
-          ctx.onRequestData(function (ctx, chunk, callback) {
+          /*ctx.onRequestData(function (ctx, chunk, callback) {
             ctx.onResponseData(function (ctx, chunk, callback) {
               //this.pushEvent('sslProxy', {});
               events.emit('ssl');
             });
-          });
+          });*/
         }
         return callback();
       });
@@ -179,8 +179,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
         }
       });*/
       this.onRequest("/stopProxy", () => {
-        if (typeof proxy.close === 'function')
-          proxy.close();
+        if (typeof proxy.close === 'function') { proxy.close(); }
+        if (existsSync(path.join(ROOT, 'certs'))) {
+          rmdirSync(path.join(ROOT, 'certs'));
+        }
+        if (existsSync(path.join(ROOT, 'keys'))) {
+          rmdirSync(path.join(ROOT, 'keys'));
+        }
       });
       return new Promise((resolve) => {
         proxy.listen({ port: 585, sslCaDir: ROOT }, async err => {
