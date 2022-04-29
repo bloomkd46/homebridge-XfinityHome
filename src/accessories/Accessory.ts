@@ -3,7 +3,6 @@ import { Panel, DryContact, Motion, Light } from 'xfinityhome';
 import { XfinityHomePlatform } from '../platform';
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 
 export default class Accessory {
   protected temperatureService?: Service;
@@ -35,7 +34,7 @@ export default class Accessory {
           `${date.getHours() > 12 ? 'PM' : 'AM'}`;
 
         if (type < 4) {
-          fs.appendFileSync(this.generalLogPath, `[${chalk.blue(time)}] ${this.name}: ${message}\n`);
+          fs.appendFileSync(this.generalLogPath, `[${time}] ${this.name}: ${message}\n`);
         }
         fs.appendFileSync(this.logPath, `[${time}] ${message}\n`);
         if (type <= (platform.config.logLevel ?? 3)) {
