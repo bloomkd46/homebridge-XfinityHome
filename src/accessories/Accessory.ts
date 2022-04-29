@@ -3,6 +3,7 @@ import { Panel, DryContact, Motion, Light } from 'xfinityhome';
 import { XfinityHomePlatform } from '../platform';
 import fs from 'fs';
 import path from 'path';
+import chalk from 'chalk';
 
 export default class Accessory {
   protected temperatureService?: Service;
@@ -29,16 +30,14 @@ export default class Accessory {
     this.log = (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => {
       if (typeof type === 'number') {
         const date = new Date();
+        const time = `${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
+          `${('0' + (date.getHours() % 12)).slice(-2)}:${('0' + (date.getMinutes())).slice(-2)}:${('0' + (date.getSeconds())).slice(-2)} ` +
+          `${date.getHours() > 12 ? 'PM' : 'AM'}`;
+
         if (type < 4) {
-          fs.appendFileSync(this.generalLogPath,
-            `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
-            `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
-            `${this.name}: ${message}\n`);
+          fs.appendFileSync(this.generalLogPath, `[${chalk.blue(time)}] ${this.name}: ${message}\n`);
         }
-        fs.appendFileSync(this.logPath,
-          `[${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
-          `${date.getHours() % 12}:${date.getMinutes()}:${date.getSeconds()} ${date.getHours() > 12 ? 'PM' : 'AM'}] ` +
-          message + '\n');
+        fs.appendFileSync(this.logPath, `[${time}] ${message}\n`);
         if (type <= (platform.config.logLevel ?? 3)) {
           platform.log.info(`${this.name}: ${message}`);
         } else {
