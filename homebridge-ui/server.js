@@ -3,7 +3,7 @@
 'use strict';
 
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
-const { existsSync, readFileSync, mkdirSync, statSync, rmdirSync } = require('fs');
+const { existsSync, readFileSync, mkdirSync, statSync, rmSync } = require('fs');
 const path = require('path');
 const { EventEmitter } = require('events');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
@@ -181,10 +181,10 @@ class PluginUiServer extends HomebridgePluginUiServer {
       this.onRequest("/stopProxy", () => {
         if (typeof proxy.close === 'function') { proxy.close(); }
         if (existsSync(path.join(ROOT, 'certs'))) {
-          rmdirSync(path.join(ROOT, 'certs'));
+          rmSync(path.join(ROOT, 'certs'), { recursive: true, force: true });
         }
         if (existsSync(path.join(ROOT, 'keys'))) {
-          rmdirSync(path.join(ROOT, 'keys'));
+          rmSync(path.join(ROOT, 'keys'), { recursive: true, force: true });
         }
       });
       return new Promise((resolve) => {
