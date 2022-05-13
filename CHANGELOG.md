@@ -1,3 +1,8 @@
+### 0.0.33 
+* Spelling Fixes
+* Fixed DeleteLog Function Breaking UI
+
+
 ### 0.0.32 
 * Better Logging
 * Added Ability To Bypass Sensors (hopefully 🤞)
