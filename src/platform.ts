@@ -48,11 +48,11 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
-    if (!this.refreshToken) {
+    /*if (!this.refreshToken) {
       this.log.info('Loading Refresh Token From Cache');
       this.refreshToken = accessory.context.refreshToken;
       this.log.info(this.refreshToken || 'ERROR LOADING TOKEN');
-    }
+    }*/
   }
 
   /**
@@ -63,7 +63,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
   async discoverDevices() {
     if (this.refreshToken) {
       this.log.info('Using Refresh Token From Cache:', this.refreshToken);
-    } else if (!this.config.refreshToken) {
+    } else if (this.config.refreshToken) {
+      this.log.info('Using Refresh Token From Config:', this.config.refreshToken);
+    } else {
       this.log.error('No Refresh Token Found');
       return;
     }
@@ -75,7 +77,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
         const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
         const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
         if (existingAccessory) {
-          this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+          this.log.debug('Restoring existing accessory from cache:', existingAccessory.displayName);
           switch (device.device.deviceType) {
             case 'panel':
               new PanelAccessory(this, existingAccessory, device as Panel);
