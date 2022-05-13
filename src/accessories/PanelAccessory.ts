@@ -108,7 +108,7 @@ this.device.get()
   async notifyCurrentStateChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       const mode = this.armModes[value.newValue as number].charAt(0).toUpperCase() + this.armModes[value.newValue as number].slice(1);
-      this.log(1, value.newValue === this.armModes.indexOf('disarmed') ? 'Disarmed' : `Armed ${mode}`);
+      setTimeout(() => this.log(1, value.newValue === this.armModes.indexOf('disarmed') ? 'Disarmed' : `Armed ${mode}`), 500);
     }
   }
 }
