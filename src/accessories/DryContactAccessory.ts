@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue, HAPStatus, CharacteristicChange } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue, HAPStatus, CharacteristicChange, Perms } from 'homebridge';
 import { XfinityHomePlatform } from '../platform';
 import Accessory from './Accessory';
 import { DryContact } from 'xfinityhome';
@@ -23,7 +23,9 @@ export default class DryContactAccessory extends Accessory {
     this.service.getCharacteristic(this.platform.Characteristic.StatusActive)
       .onGet(this.getActive.bind(this))
       .on('change', this.notifyActiveChange.bind(this))
-      .onSet(this.setActive.bind(this));
+      .onSet(this.setActive.bind(this)).setProps({
+        perms: [Perms.PAIRED_READ, Perms.PAIRED_WRITE, Perms.NOTIFY],
+      });
 
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, await this.getContactDetected());
