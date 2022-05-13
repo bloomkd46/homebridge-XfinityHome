@@ -85,9 +85,11 @@ export default class Accessory {
       });
 
     if ((device.device.properties as { temperature?: number }).temperature && (platform.config.temperatureSensors ?? true)) {
-      this.log('info', 'Enabling Temperature Support');
-      this.temperatureService = accessory.getService(platform.Service.TemperatureSensor) ||
-        accessory.addService(platform.Service.TemperatureSensor);
+      this.temperatureService = accessory.getService(platform.Service.TemperatureSensor);
+      if (!this.temperatureService) {
+        this.log('info', 'Enabling Temperature Support');
+        this.temperatureService = accessory.addService(platform.Service.TemperatureSensor);
+      }
 
       this.temperatureService.setCharacteristic(platform.Characteristic.Name, device.device.name + ' Temperature');
 
