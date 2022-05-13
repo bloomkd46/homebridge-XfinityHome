@@ -1,3 +1,11 @@
+### 0.0.32 
+* Better Logging
+* Added Ability To Bypass Sensors (hopefully 🤞)
+* Renamed The Configuration Tool To Proxy Tool
+* Better Appearing UI
+* Added Ability To Download And Delete Log Files (hopefully 🤞)
+
+
 ### 0.0.31 
 * Removed Chalk As It Had No Effect
 
