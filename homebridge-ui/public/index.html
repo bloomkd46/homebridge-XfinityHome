@@ -1,26 +1,17 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <p class="text-center">
   <img src="https://user-images.githubusercontent.com/75853497/164517422-300169c1-fb15-4742-a1ee-f524b9d10fe6.png"
     alt="homebridge-XfinityHome logo" style="width: 60%;" />
 </p>
 <div id="pageIntro" class="text-center" style="display: none;">
   <p class="lead">Thank you for installing <strong>homebridge-XfinityHome</strong></p>
-  <p>
-    You can configure your refresh token on the next page
-  </p>
-  <button type="button" class="btn btn-primary" id="introContinue">
-    Continue &rarr;
-  </button>
+  <p> You can configure your refresh token on the next page </p>
+  <button type="button" class="btn btn-primary" id="introContinue"> Continue &rarr; </button>
 </div>
 <div id="menuWrapper" class="btn-group w-100 mb-0" role="group" aria-label="UI Menu" style="display: none;">
-  <button type="button" class="btn btn-primary ml-0" id="menuSettings">
-    Settings
-  </button>
-  <button type="button" class="btn btn-primary" id="menuConfigTool">
-    Proxy Tool
-  </button>
-  <button type="button" class="btn btn-primary mr-0" id="menuLogs">
-    Logs
-  </button>
+  <button type="button" class="btn btn-primary ml-0" id="menuSettings"> Settings </button>
+  <button type="button" class="btn btn-primary" id="menuConfigTool"> Proxy Tool </button>
+  <button type="button" class="btn btn-primary mr-0" id="menuLogs"> Logs </button>
 </div>
 <div id="pageConfigTool" class="mt-4" style="display: none;">
   <div id="part1" style="display: none;">
@@ -35,46 +26,29 @@
       <dt>2. Install & Trust The Profile</dt>
       <dd>
         <ol>
-          <li>Launch the <strong>Settings</strong> app on your phone. Just below your name, you will find
-            <strong>Profile Downloaded</strong>; tap it.
-            <br>
-            <small>If you are using an older iOS, you won't see that. Go to <strong>General</strong>, scroll down, and
-              tap on <strong>Profiles &
-                Device Management</strong>; then tap on <strong>NodeMITMProxyCA</strong>.</small>
+          <li>Launch the <strong>Settings</strong> app on your phone. Just below your name, you will find <strong>Profile
+              Downloaded</strong>; tap it. <br>
+            <small>If you are using an older iOS, you won't see that. Go to <strong>General</strong>, scroll down, and tap on
+              <strong>Profiles & Device Management</strong>; then tap on <strong>NodeMITMProxyCA</strong>.</small>
           </li>
-          <li>
-            Hit <strong>Install</strong> on the top-right of the screen. If your phone has a passcode, you would be
-            asked to enter it. A
-            confirmation dialog will pop up; hit <strong>Install</strong> again. Finally hit <strong>Done</strong> to
-
-          </li>
-          <li>On your iPhone, go to <strong>Settings</strong>, open <strong>General</strong>, and tap on
-            <strong>About.</strong> Towards the bottom, locate and open
-            <strong>Certificate Trust
-              Settings</strong>.
-          </li>
-          <li>Enable full trust for <strong>NodeMITMProxyCA</strong> by flicking its switch. You will be prompted with a
-            warning; just
-            hit <strong>Continue</strong>.
-          </li>
+          <li> Hit <strong>Install</strong> on the top-right of the screen. If your phone has a passcode, you would be asked to enter it. A
+            confirmation dialog will pop up; hit <strong>Install</strong> again. Finally hit <strong>Done</strong> to </li>
+          <li>On your iPhone, go to <strong>Settings</strong>, open <strong>General</strong>, and tap on <strong>About.</strong> Towards the
+            bottom, locate and open <strong>Certificate Trust Settings</strong>. </li>
+          <li>Enable full trust for <strong>NodeMITMProxyCA</strong> by flicking its switch. You will be prompted with a warning; just hit
+            <strong>Continue</strong>. </li>
         </ol>
       </dd>
       <dt>3. Configure The Proxy</dt>
       <dd>
         <ol>
-          <li>
-            On your iPhone, go to <strong>Settings</strong> and open <strong>Wi-Fi</strong>. Hit the info button <strong
-              class="text-info">(i)</strong>, for the WiFi connection you are using. This will open the configuration
-            for your connection.
+          <li> On your iPhone, go to <strong>Settings</strong> and open <strong>Wi-Fi</strong>. Hit the info button <strong
+              class="text-info">(i)</strong>, for the WiFi connection you are using. This will open the configuration for your connection.
           </li>
-          <li>On your WiFi connection screen, scroll to the bottom and hit <strong>Configure Proxy</strong>. This will
-            open the proxy
-            configuration
-            screen.
-          </li>
-          <li>On the proxy configuration screen, tap on <strong>Manual</strong> to reveal additional settings. Then set
-            the server to
-            <span id="ip" class="text-info">Loading...</span> and the port to <span id="port" class="text-info">Loading...</span>
+          <li>On your WiFi connection screen, scroll to the bottom and hit <strong>Configure Proxy</strong>. This will open the proxy
+            configuration screen. </li>
+          <li>On the proxy configuration screen, tap on <strong>Manual</strong> to reveal additional settings. Then set the server to <span
+              id="ip" class="text-info">Loading...</span> and the port to <span id="port" class="text-info">Loading...</span>
             <br>
             <strong class="text-danger">Leave the Authentication switch off.</strong>
           </li>
@@ -95,9 +69,7 @@
           <li>Click <strong>Sign Out</strong></li>
           <li>Re-Login</li>
           <li>If nothing happens open an <a href="https://www.github.com/bloomkd46/homebridge-XfinityHome/issues/new/choose">Issue</a> to
-            recieve
-            further
-            assistance</li>
+            recieve further assistance</li>
         </ol>
       </dd>
     </dl>
@@ -111,31 +83,21 @@
       <dt>2. Disable The Proxy</dt>
       <dd>
         <ol>
-          <li>
-            On your iPhone, go to Settings and open Wi-Fi. Hit the info button <strong class="text-info">(i)</strong>,
-            for the WiFi connection you are using. This will open the configuration for your connection.
-          </li>
-          <li>On your WiFi connection screen, scroll to the bottom and hit <strong>Configure Proxy</strong>. This will
-            open the proxy configuration screen.
-          </li>
-          <li>On the proxy configuration screen, tap on <strong>Off</strong>.
-          </li>
+          <li> On your iPhone, go to Settings and open Wi-Fi. Hit the info button <strong class="text-info">(i)</strong>, for the WiFi
+            connection you are using. This will open the configuration for your connection. </li>
+          <li>On your WiFi connection screen, scroll to the bottom and hit <strong>Configure Proxy</strong>. This will open the proxy
+            configuration screen. </li>
+          <li>On the proxy configuration screen, tap on <strong>Off</strong>. </li>
         </ol>
       </dd>
       <dt>Uninstall The Profile</dt>
       <dd>
         <ol>
-          <li>
-            On your iPhone, go to <strong>Settings > General > About > Certificate Trust Settings</strong> and switch
-            off full trust for
-            <strong>NodeMITMProxyCA</strong>.
-          </li>
-          <li>
-            On your iPhone, go to <strong>Settings > General > Profiles & Device Management > NodeMITMProxyCA</strong>
-            and tap <strong>Remove
-              Profile</strong>. If oneis set, you will be asked to enter your passcode. You would also be asked to
-            confirm that you want to remove the profile; hit Remove.
-          </li>
+          <li> On your iPhone, go to <strong>Settings > General > About > Certificate Trust Settings</strong> and switch off full trust for
+            <strong>NodeMITMProxyCA</strong>. </li>
+          <li> On your iPhone, go to <strong>Settings > General > Profiles & Device Management > NodeMITMProxyCA</strong> and tap
+            <strong>Remove Profile</strong>. If oneis set, you will be asked to enter your passcode. You would also be asked to confirm that
+            you want to remove the profile; hit Remove. </li>
         </ol>
       </dd>
       <dt> Click <span class="text-warning">Exit Setup</span> Below When You Are Done</dt>
@@ -150,6 +112,10 @@
       <select class="form-control" id="deviceSelect"></select>
     </div>
   </form>
+  <div class="clearfix">
+    <button id="logDelete" class="float-right btn btn-danger"><i class="fa fa-trash-o"></i></button>
+    <a id="logDownload" download="" href=""><button class="float-left btn btn-primary"><i class="fa fa-download"></i></button></a>
+  </div>
   <div class="card text-nowrap" style="height: 55vh; overflow: scroll" id="logZone"> Loading...</div>
 </div>
 <!--<script type="text/javascript" src="js/index.js"></script>-->
@@ -206,6 +172,12 @@
           homebridge.showSpinner();
           //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           //const context = thisAcc.context;
+          const logDownload = document.getElementById('logDownload');
+          logDownload.href = logPath;
+          logDownload.download = logPath.split('/').split('\\').pop().replace('.log', '');
+
+          logDelete.addEventListener('click', () => await homebridge.request('/deleteLog', { logPath: logPath }));
+
           const logZone = document.getElementById('logZone');
           logZone.innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
           logZone.scrollTo(0, logZone.scrollHeight);

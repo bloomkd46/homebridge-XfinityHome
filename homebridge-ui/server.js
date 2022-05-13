@@ -57,6 +57,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
         return err;
       }
     });
+    this.onRequest('/deleteLog', async (payload) => {
+      try {
+        return rmSync(payload.logPath, { force: true });
+      } catch (err) {
+        return err;
+      }
+    });
 
     this.onRequest('/proxyActive', async () => {
       return new Promise((resolve) => {
