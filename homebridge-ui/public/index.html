@@ -176,7 +176,11 @@
           logDownload.href = logPath;
           logDownload.download = logPath.split('/').split('\\').pop().replace('.log', '');
 
-          logDelete.addEventListener('click', () => await homebridge.request('/deleteLog', { logPath: logPath }));
+          logDelete.addEventListener('click', () => {
+            homebridge.showSpinner();
+            await homebridge.request('/deleteLog', { logPath: logPath });
+            homebridge.hideSpinner();
+          });
 
           const logZone = document.getElementById('logZone');
           logZone.innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
