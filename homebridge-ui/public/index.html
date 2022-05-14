@@ -177,19 +177,24 @@
           logDownload.href = homebridge.request('/getRelativePath', { path: logPath });
           //logDownload.href = window.URL.createObjectURL(logPath);
 
-          logDelete.removeAllListeners();
-          logDelete.addEventListener('click', () => {
+          const deleteLog = async () => {
             homebridge.showSpinner();
             await homebridge.request('/deleteLog', { logPath: logPath });
             homebridge.hideSpinner();
-          });
+          };
+
+          logDelete.removeEventListener();
+          logDelete.addEventListener('click', deleteLog);
 
           const logZone = document.getElementById('logZone');
           logZone.innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
           logZone.scrollTo(0, logZone.scrollHeight);
 
-          logRefresh.removeAllListeners();
-          logRefresh.on('click', () => showDeviceLog(logPath));
+          const refreshLog = async () => {
+            showDeviceLog(logPath);
+          };
+          logRefresh.removeEventListener(refreshLog);
+          logRefresh.on('click', refreshLog);
           homebridge.hideSpinner();
         };
         deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
