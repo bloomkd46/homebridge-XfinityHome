@@ -55,6 +55,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
         return err;
       }
     });
+    this.onRequest('/getRelativePath', (payload) => {
+      return path.relative(path.join(__dirname, '/public/'), payload.path);
+    });
     this.onRequest('/deleteLog', async (payload) => {
       try {
         return rmSync(payload.logPath, { force: true });

@@ -114,7 +114,8 @@
   </form>
   <div class="clearfix">
     <button id="logDelete" class="float-right btn btn-danger"><i class="fa fa-trash-o"></i></button>
-    <a id="logDownload" download="" href=""><button class="float-left btn btn-primary"><i class="fa fa-download"></i></button></a>
+    <a id="logDownload" download="" href=""><button class="float-right btn btn-primary"><i class="fa fa-download"></i></button></a>
+    <button id="logRefresh" class="float-right btn btn-info"><i class="fa fa-refresh"></i></button>
   </div>
   <div class="card text-nowrap" style="height: 55vh; overflow: scroll" id="logZone"> Loading...</div>
 </div>
@@ -173,9 +174,10 @@
           //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           //const context = thisAcc.context;
           const logDownload = document.getElementById('logDownload');
-          logDownload.href = logPath;
-          logDownload.download = logPath.split('/').split('\\').pop().replace('.log', '');
+          logDownload.href = homebridge.request('/getRelativePath', { path: logPath });
+          //logDownload.href = window.URL.createObjectURL(logPath);
 
+          logDelete.removeAllListeners();
           logDelete.addEventListener('click', () => {
             homebridge.showSpinner();
             await homebridge.request('/deleteLog', { logPath: logPath });
@@ -185,6 +187,9 @@
           const logZone = document.getElementById('logZone');
           logZone.innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
           logZone.scrollTo(0, logZone.scrollHeight);
+
+          logRefresh.removeAllListeners();
+          logRefresh.on('click', () => showDeviceLog(logPath));
           homebridge.hideSpinner();
         };
         deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
