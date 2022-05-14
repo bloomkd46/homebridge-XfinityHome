@@ -177,7 +177,7 @@
           //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           //const context = thisAcc.context;
           const logDownload = document.getElementById('logDownload');
-          logDownload.href = homebridge.request('/getRelativePath', { path: logPath });
+          logDownload.href = await homebridge.request('/getRelativePath', { path: logPath });
           //logDownload.href = window.URL.createObjectURL(logPath);
 
           const logZone = document.getElementById('logZone');
