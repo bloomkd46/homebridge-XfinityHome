@@ -48,11 +48,11 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
-    /*if (!this.refreshToken) {
-      this.log.info('Loading Refresh Token From Cache');
+    if (!this.refreshToken) {
+      //this.log.info('Loading Refresh Token From Cache');
       this.refreshToken = accessory.context.refreshToken;
-      this.log.info(this.refreshToken || 'ERROR LOADING TOKEN');
-    }*/
+      //this.log.info(this.refreshToken || 'ERROR LOADING TOKEN');
+    }
   }
 
   /**
