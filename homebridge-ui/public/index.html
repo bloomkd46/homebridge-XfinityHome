@@ -123,6 +123,7 @@
 <script>
   ; (async () => {
     try {
+      let currentLogPath = '';
       const currentConfig = await homebridge.getPluginConfig();
       const showIntro = () => {
         const introContinue = document.getElementById('introContinue');
@@ -170,6 +171,8 @@
           }
         });
         const showDeviceLog = async logPath => {
+          currentLogPath = logPath;
+          //const logDelete = document.createElement('logDelete')
           homebridge.showSpinner();
           //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           //const context = thisAcc.context;
@@ -177,24 +180,11 @@
           logDownload.href = homebridge.request('/getRelativePath', { path: logPath });
           //logDownload.href = window.URL.createObjectURL(logPath);
 
-          const deleteLog = async () => {
-            homebridge.showSpinner();
-            await homebridge.request('/deleteLog', { logPath: logPath });
-            homebridge.hideSpinner();
-          };
-
-          logDelete.removeEventListener();
-          logDelete.addEventListener('click', deleteLog);
-
           const logZone = document.getElementById('logZone');
           logZone.innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
           logZone.scrollTo(0, logZone.scrollHeight);
 
-          const refreshLog = async () => {
-            showDeviceLog(logPath);
-          };
-          logRefresh.removeEventListener(refreshLog);
-          logRefresh.on('click', refreshLog);
+          logRefresh.addEventListener('click', showDeviceLog(logPath));
           homebridge.hideSpinner();
         };
         deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
@@ -314,6 +304,11 @@
         await homebridge.request('/stopProxy');
         document.getElementById('menuWrapper').style.display = 'inline-flex';
         showSettings();
+      });
+      logDelete.addEventListener('click', async () => {
+        homebridge.showSpinner();
+        await homebridge.request('/deleteLog', { logPath: currentLogPath });
+        homebridge.hideSpinner();
       });
       //disabledEnable.addEventListener('click', () => enablePlugin())
       if (currentConfig.length) {
