@@ -1,3 +1,7 @@
+### 0.0.37 
+* Fixed Exponential Refresh Logs Loop
+
+
 ### 0.0.36 
 * Hopefully Fixed Log Deletion
 
