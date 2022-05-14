@@ -184,7 +184,6 @@
           logZone.innerHTML = await homebridge.request('/getLogs', { logPath: logPath });
           logZone.scrollTo(0, logZone.scrollHeight);
 
-          logRefresh.addEventListener('click', showDeviceLog(logPath));
           homebridge.hideSpinner();
         };
         deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
@@ -203,6 +202,7 @@
           deviceSelect.add(option);
           deviceSelect.disabled = true;
         }
+        logRefresh.addEventListener('click', showDeviceLog(currentLogPath));
         homebridge.hideSpinner();
       };
       const showConfigTool = async () => {
