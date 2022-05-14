@@ -1,3 +1,7 @@
+### 0.0.36 
+* Hopefully Fixed Log Deletion
+
+
 ### 0.0.35 
 * Fixed Refresh Token Not Being Loaded From Cache
 * Fixed Event Listeners (Hopefully 🤞)
