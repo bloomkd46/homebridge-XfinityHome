@@ -1,3 +1,7 @@
+### 0.0.34 
+* Tweaked log buttons
+
+
 ### 0.0.33 
 * Spelling Fixes
 * Fixed DeleteLog Function Breaking UI
