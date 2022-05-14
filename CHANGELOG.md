@@ -1,3 +1,8 @@
+### 0.0.35 
+* Fixed Refresh Token Not Being Loaded From Cache
+* Fixed Event Listeners (Hopefully 🤞)
+
+
 ### 0.0.34 
 * Tweaked log buttons
 
