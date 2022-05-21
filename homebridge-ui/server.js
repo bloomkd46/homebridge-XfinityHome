@@ -1,7 +1,8 @@
+//@ts-check
 'use strict';
 
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
-const { existsSync, readFileSync, mkdirSync, statSync, rmSync } = require('fs');
+const { existsSync, readFileSync, mkdirSync, statSync, rmSync, watch, watchFile, unwatchFile } = require('fs');
 const path = require('path');
 const { EventEmitter } = require('events');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
@@ -10,6 +11,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
   constructor () {
     const events = new EventEmitter();
     super();
+
+    const storagePath = this.homebridgeStoragePath ?? '';
 
     /*
       A native method getCachedAccessories() was introduced in config-ui-x v4.37.0
@@ -22,15 +25,15 @@ class PluginUiServer extends HomebridgePluginUiServer {
         const devicesToReturn = [];
 
         // The path and file of the cached accessories
-        const accFile = path.join(this.homebridgeStoragePath, '/accessories/cachedAccessories');
+        const accFile = path.join(storagePath, '/accessories/cachedAccessories');
 
         // Check the file exists
         if (existsSync(accFile)) {
           // Read the cached accessories file
-          let cachedAccessories = readFileSync(accFile);
+          const cachedAccessoriesBuffer = readFileSync(accFile);
 
           // Parse the JSON
-          cachedAccessories = JSON.parse(cachedAccessories);
+          const cachedAccessories = JSON.parse(cachedAccessoriesBuffer.toString());
 
           // We only want the accessories for this plugin
           cachedAccessories
@@ -46,7 +49,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       }
     });
     this.onRequest('/getGeneralLog', async () => {
-      return path.join(this.homebridgeStoragePath, 'XfinityHome', 'General.log');
+      return path.join(storagePath, 'XfinityHome', 'General.log');
     });
     this.onRequest('/getLogs', async (payload) => {
       try {
@@ -65,10 +68,34 @@ class PluginUiServer extends HomebridgePluginUiServer {
         return err;
       }
     });
+    this.onRequest('/watchForChanges', async (payload) => {
+      return new Promise(resolve => {
+        try {
+          const aborter = new AbortController();
+          const watcher = watch(payload.path, { signal: aborter.signal });
+          watcher.once('change', event => {
+            aborter.abort();
+            resolve(readFileSync(payload.logPath).toString().split('\n').join('<br>'));
+          });
+          watcher.once('error', err => {
+            aborter.abort(err);
+            watchFile(payload.path, () => {
+              unwatchFile(payload.path);
+              resolve(readFileSync(payload.logPath).toString().split('\n').join('<br>'));
+            });
+          });
+        } catch {
+          watchFile(payload.path, () => {
+            unwatchFile(payload.path);
+            resolve(readFileSync(payload.logPath).toString().split('\n').join('<br>'));
+          });
+        }
+      });
+    });
 
     this.onRequest('/proxyActive', async () => {
       return new Promise((resolve) => {
-        events.on('proxy', () => resolve());
+        events.on('proxy', () => resolve(''));
       });
     });
     /*this.onRequest('/sslActive', async () => {
@@ -90,7 +117,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       try {
         require('debug').disable();
       } catch (ex) { }
-      const ROOT = path.join(this.homebridgeStoragePath, 'XfinityHome');
+      const ROOT = path.join(storagePath, 'XfinityHome');
       if (!existsSync(ROOT)) mkdirSync(ROOT);
 
       const pemFile = path.join(ROOT, 'certs', 'ca.pem');
@@ -98,7 +125,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       const localIPs = [];
       const ifaces = os.networkInterfaces();
       Object.keys(ifaces).forEach(name => {
-        ifaces[name].forEach(network => {
+        ifaces[name]?.forEach(network => {
           if (network.family === 'IPv4' && !network.internal) localIPs.push(network.address);
         });
       });
@@ -107,7 +134,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       const localIPPorts = localIPs.map(ip => `${ip}:${585}`);
 
       proxy.onError(function (ctx, err) {
-        switch (err.code) {
+        switch (err?.name) {
           case 'ERR_STREAM_DESTROYED':
           case 'ECONNRESET':
             return;
@@ -126,11 +153,11 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
 
       proxy.onRequest(function (ctx, callback) {
-        if (ctx.clientToProxyRequest.method === 'GET' && ctx.clientToProxyRequest.url === '/cert' && localIPPorts.includes(ctx.clientToProxyRequest.headers.host)) {
+        if (ctx.clientToProxyRequest.method === 'GET' && ctx.clientToProxyRequest.url === '/cert' && localIPPorts.includes(ctx.clientToProxyRequest.headers.host ?? '')) {
           ctx.use(Proxy.gunzip);
           console.log('Intercepted certificate request');
 
-          ctx.proxyToClientResponse.writeHeader(200, {
+          ctx.proxyToClientResponse.writeHead(200, {
             'Accept-Ranges': 'bytes',
             'Cache-Control': 'public, max-age=0',
             'Content-Type': 'application/x-x509-ca-cert',
@@ -149,7 +176,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
           ctx.use(Proxy.gunzip);
 
           ctx.onRequestData(function (ctx, chunk, callback) {
-            return callback(null, chunk);
+            return callback(undefined, chunk);
           });
           ctx.onRequestEnd(function (ctx, callback) {
             callback();
@@ -158,7 +185,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
           let chunks = [];
           ctx.onResponseData(function (ctx, chunk, callback) {
             chunks.push(chunk);
-            return callback(null, chunk);
+            return callback(undefined, chunk);
           });
           ctx.onResponseEnd(function (ctx, callback) {
             events.emit('token', JSON.parse(Buffer.concat(chunks).toString()).refresh_token);
@@ -197,6 +224,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         if (existsSync(path.join(ROOT, 'keys'))) {
           rmSync(path.join(ROOT, 'keys'), { recursive: true, force: true });
         }
+        return '';
       });
       return new Promise((resolve) => {
         proxy.listen({ port: 585, sslCaDir: ROOT }, async err => {
