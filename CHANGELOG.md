@@ -1,3 +1,7 @@
+### 0.0.38-beta.2 
+* UI Bug Fixes
+
+
 ### 0.0.38 Beta 1 
 * UI Improvements
 
