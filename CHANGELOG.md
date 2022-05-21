@@ -1,3 +1,7 @@
+### 0.0.38 Beta 1 
+* UI Improvements
+
+
 ### 0.0.37 
 * Fixed Exponential Refresh Logs Loop
 
