@@ -190,7 +190,7 @@
 
           homebridge.request('/watchForChanges', { path: logPath }).then(newLogs => {
             if (logPath === currentLogPath) {
-              showDeviceLog(newLogs);
+              showDeviceLog(logPath);
             }
           });
         };

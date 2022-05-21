@@ -75,19 +75,19 @@ class PluginUiServer extends HomebridgePluginUiServer {
           const watcher = watch(payload.path, { signal: aborter.signal });
           watcher.once('change', event => {
             aborter.abort();
-            resolve(readFileSync(payload.path).toString().split('\n').join('<br>'));
+            resolve('');
           });
           watcher.once('error', err => {
             aborter.abort(err);
             watchFile(payload.path, () => {
               unwatchFile(payload.path);
-              resolve(readFileSync(payload.path).toString().split('\n').join('<br>'));
+              resolve('');
             });
           });
         } catch {
           watchFile(payload.path, () => {
             unwatchFile(payload.path);
-            resolve(readFileSync(payload.path).toString().split('\n').join('<br>'));
+            resolve('');
           });
         }
       });
