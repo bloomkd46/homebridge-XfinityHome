@@ -188,7 +188,7 @@
 
           homebridge.hideSpinner();
 
-          homebridge.request('/watchForChanges').then(newLogs => {
+          homebridge.request('/watchForChanges', { path: logPath }).then(newLogs => {
             if (logPath === currentLogPath) {
               showDeviceLog(newLogs);
             }
@@ -210,7 +210,7 @@
           deviceSelect.add(option);
           deviceSelect.disabled = true;
         }
-        logRefresh.addEventListener('click', showDeviceLog(currentLogPath));
+        //logRefresh.addEventListener('click', showDeviceLog(currentLogPath));
         homebridge.hideSpinner();
       };
       const showConfigTool = async () => {
