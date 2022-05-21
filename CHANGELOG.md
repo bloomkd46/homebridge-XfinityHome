@@ -1,3 +1,8 @@
+### 0.0.38 
+* Improved Custom UI
+* Added Triggered State To Panel
+
+
 ### 0.0.38 Beta 4 
 * Fixed UI's log auto-update logic error
 
