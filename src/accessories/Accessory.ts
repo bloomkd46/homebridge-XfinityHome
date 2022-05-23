@@ -65,20 +65,20 @@ export default class Accessory {
       .setCharacteristic(platform.Characteristic.Name, this.name)
       .setCharacteristic(platform.Characteristic.FirmwareRevision, device.device.firmwareVersion)
       .getCharacteristic(platform.Characteristic.Identify).on('set', () => {
-        this.log('info', 'Identifying Device:\n', device.device);
+        this.log('info', 'Identifying Device:', device.device);
         if (device.device.deviceType.startsWith('light')) {
           let mode = (device as Light).device.properties.isOn;
           const startMode = mode;
           const interval = setInterval(() => {
             (device as Light).set(!mode).catch(err => {
-              this.log('error', 'Failed To Toggle Light With Error:\n', err.response.data);
+              this.log('error', 'Failed To Toggle Light With Error:', err);
             });
             mode = !mode;
           }, 750);
           setTimeout(() => {
             clearInterval(interval);
             (device as Light).set(startMode).catch(err => {
-              this.log('error', 'Failed To Toggle Light With Error:\n', err.response.data);
+              this.log('error', 'Failed To Toggle Light With Error:', err);
             });
           }, 5000);
         }
@@ -98,7 +98,7 @@ export default class Accessory {
           return (device as DryContact | Motion).device.properties.temperature / 100;
           /*return new Promise((resolve, reject) => {
             device.get().then(device => resolve(device.properties.temperature / 100)).catch(err => {
-              this.log('error', 'Failed To Fetch Temperature With Error:\n', err.response.data);
+              this.log('error', 'Failed To Fetch Temperature With Error:', err);
               reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
             });
           });*/

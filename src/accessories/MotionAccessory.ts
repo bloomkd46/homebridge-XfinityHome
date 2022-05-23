@@ -25,7 +25,7 @@ export default class MotionAccessory extends Accessory {
       .on('change', this.notifyActiveChange.bind(this))
       .onSet(this.setActive.bind(this))
       .setProps({
-        perms: [Perms.PAIRED_READ, Perms.PAIRED_WRITE, Perms.NOTIFY]
+        perms: [Perms.PAIRED_READ, Perms.PAIRED_WRITE, Perms.NOTIFY],
       });
 
     this.device.activityCallback = async () => {
@@ -45,7 +45,7 @@ export default class MotionAccessory extends Accessory {
 
         resolve(device.properties.isFaulted);
       }).catch(err => {
-        this.log('error', 'Failed To Fetch Motion State With Error:\n', err.response.data);
+        this.log('error', 'Failed To Fetch Motion State With Error:', err);
         reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
       });
     });

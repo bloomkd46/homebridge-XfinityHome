@@ -44,7 +44,7 @@ export default class LightAccessory extends Accessory {
           this.service.updateCharacteristic(this.platform.Characteristic.Brightness, device.properties.level) : undefined;
         resolve(device.properties.isOn);
       }).catch(err => {
-        this.log('error', 'Failed To Fetch IsOn State With Error:\n', err.response.data);
+        this.log('error', 'Failed To Fetch IsOn State With Error:', err);
         reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
       });
     });
@@ -63,7 +63,7 @@ export default class LightAccessory extends Accessory {
         //this.service.updateCharacteristic(this.platform.Characteristic[typeof value === 'boolean' ? 'On' : 'Brightness'], value);
         resolve();
       }).catch(err => {
-        this.log('error', `Failed To Set ${typeof value === 'number' ? 'Brightness' : 'IsOn'} With Error:\n`, err.response.data);
+        this.log('error', `Failed To Set ${typeof value === 'number' ? 'Brightness' : 'IsOn'} With Error:`, err);
         reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
       });
     });

@@ -44,7 +44,7 @@ export default class DryContactAccessory extends Accessory {
 
         resolve(device.properties.isFaulted ? 1 : 0);
       }).catch(err => {
-        this.log('error', 'Failed To Fetch Contact State With Error:\n', err.response.data);
+        this.log('error', 'Failed To Fetch Contact State With Error:', err);
         reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
       });
     });

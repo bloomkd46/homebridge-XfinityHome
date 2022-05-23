@@ -47,7 +47,7 @@ export default class PanelAccessory extends Accessory {
           resolve(this.armModes.indexOf(device.properties.armType || 'disarmed'));
         })
         .catch(err => {
-          this.log('error', 'Failed To Fetch Target State With Error:\n', err.response.data);
+          this.log('error', 'Failed To Fetch Target State With Error:', err);
           reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
         });
     });
@@ -59,24 +59,24 @@ export default class PanelAccessory extends Accessory {
         if (state === this.armModes.indexOf('disarmed')) {
           this.device.disarm(this.platform.config.pin)
             .then(() => resolve()).catch(err => {
-              this.log('error', 'Failed To Disarm With Error:\n', err.response.data);
+              this.log('error', 'Failed To Disarm With Error:', err);
               reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
             });
         } else {
           if (this.device.device.properties.status !== 'ready') {
-            this.log('warn', 'Failed To Arm With Error:\n', 'Panel Not Ready');
+            this.log('warn', 'Failed To Arm With Error:', 'Panel Not Ready');
             reject(new this.StatusError(HAPStatus.NOT_ALLOWED_IN_CURRENT_STATE));
           } else {
             this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night')
               .then(() => resolve()).catch(err => {
-                this.log('error', 'Failed To Arm With Error:\n', err.response.data);
+                this.log('error', 'Failed To Arm With Error:', err);
                 reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
               });
           }
         }
       } else {
         this.log('warn',
-          `Failed To ${state === this.armModes.indexOf('disarmed') ? 'Disarm' : 'Arm'} With Error:\n`, 'No Pin Configured');
+          `Failed To ${state === this.armModes.indexOf('disarmed') ? 'Disarm' : 'Arm'} With Error:`, 'No Pin Configured');
         reject(new this.StatusError(HAPStatus.INSUFFICIENT_AUTHORIZATION));
       }
     });
@@ -100,7 +100,7 @@ this.device.get()
     this.armModes.indexOf('disarmed') : this.armModes.indexOf(device.properties.armType)))
 
   .catch(err => {
-    this.log('error', 'Failed To Fetch Current State With Error:\n', err.response.data);
+    this.log('error', 'Failed To Fetch Current State With Error:', err);
     reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
   });
 });*/
