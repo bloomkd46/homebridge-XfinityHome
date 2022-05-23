@@ -38,7 +38,7 @@ export default class Accessory {
         fs.appendFileSync(this.generalLogPath, `[${time}] ${this.name}: ${message} ${args.join(' ')}\n`);
       }
       fs.appendFileSync(this.logPath, `[${time}] ${message} ${args.join(' ')}\n`);
-      if (typeof type === 'number') {
+      if (typeof type === 'string') {
         platform.log[type](`${this.name}: ${message} `, ...args);
       } else if (type <= (platform.config.logLevel ?? 3)) {
         platform.log.info(`${this.name}: ${message} `, ...args);
