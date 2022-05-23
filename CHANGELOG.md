@@ -1,3 +1,7 @@
+### 0.0.39 
+* Logging Tweaks
+
+
 ### 0.0.38 
 * Improved Custom UI
 * Added Triggered State To Panel
