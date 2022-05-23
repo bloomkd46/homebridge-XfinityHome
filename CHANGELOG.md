@@ -1,3 +1,7 @@
+### 0.0.40 
+* Fixed string/number mixup resulting in reboot loop
+
+
 ### 0.0.39 
 * Logging Tweaks
 
