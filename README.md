@@ -7,14 +7,14 @@
 
 Homebridge plugin to integrate Xfinity Home Devices into HomeKit
   
- [[unverified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+
 [![downloads](https://img.shields.io/npm/dt/homebridge-xfinityhome)](https://npmcharts.com/compare/homebridge-xfinityhome?log=true&interval=1&minimal=true)
 
 [![npm](https://img.shields.io/npm/v/homebridge-xfinityhome/latest?label=latest)](https://www.npmjs.com/package/homebridge-xfinityhome)
 [![npm](https://img.shields.io/npm/v/homebridge-xfinityhome/beta?label=beta)](https://github.com/bloomkd46/homebridge-XfinityHome/wiki/Beta-Version)  
  
-[![build workflow](https://github.com/bloomkd46/homebridge-iRobot/actions/workflows/build.yml/badge.svg)](https://github.com/bloomkd46/homebridge-iRobot/actions/workflows/build.yml)
-[![license](https://badgen.net/github/license/bloomkd46/homebridge-irobot)](/LICENSE)
+[![build workflow](https://github.com/bloomkd46/homebridge-XfinityHome/actions/workflows/build.yml/badge.svg)](https://github.com/bloomkd46/homebridge-XfinityHome/actions/workflows/build.yml)
+[![license](https://badgen.net/github/license/bloomkd46/homebridge-xfinityhome)](/LICENSE)
 
 
 </span>
@@ -22,20 +22,25 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 ### Plugin Information
 
 - This plugin allows you to view and control your Xfinity Home System within HomeKit. The plugin:
-  - downloads a device list if your Xfinity Home credentials are supplied
-  - controls your devices locally
-  - listens for real-time device updates when controlled externally
-  - 
+  - downloads a device list
+  - listens for real-time device updates
+  - Supports Doors, Windows, Motion Sensors, Lights And Panel.
+
 ## Features:
   - [x] 2FA Compatible
   - [x] Easy Setup
   - [x] Arm/Disarm Control
   - [x] Event notifications
+  - [x] Critical Notification When Alarm Triggered
+  - [x] Device-By-Device Logs In Custom UI
+  - [x] Ability To Bypass Sensors (Using 3rd-Party Apps Such As [Controller For HomeKit](https://controllerforhomekit.com))
 
 ## TODO:
-  - [ ] Add Camera Support
+  - [ ] Add First-Gen Camera Support
+  - [ ] Add Next-Gen Camera HomeKit Secure Video Support
   - [ ] Add Email/Password Option
   - [ ] Verify Plugin
+  - [ ] Add Device Tab In Custom UI
 
 ### Prerequisites
 
