@@ -1,3 +1,7 @@
+### 0.0.41 
+* Fixed IP Showing Up As undefined In The Proxy Tool When Running Node v18
+
+
 ### 0.0.40 
 * Fixed string/number mixup resulting in reboot loop
 
