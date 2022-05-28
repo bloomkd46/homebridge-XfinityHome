@@ -126,9 +126,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
       const ifaces = os.networkInterfaces();
       Object.keys(ifaces).forEach(name => {
         ifaces[name]?.forEach(network => {
-          if (network.family === 'IPv4' && !network.internal) localIPs.push(network.address);
+          const familyV4Value = typeof network.family === 'string' ? 'IPv4' : 4;
+          if (network.family === familyV4Value && !network.internal) localIPs.push(network.address);
         });
       });
+      localIPs.push(os.hostname() + os.hostname().endsWith('.local') ? '' : '.local');
+
+
 
       const proxy = Proxy();
       const localIPPorts = localIPs.map(ip => `${ip}:${585}`);
