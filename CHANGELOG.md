@@ -1,3 +1,7 @@
+### 0.1.0 
+* Bumped XHome dependency
+
+
 ### 0.0.41 
 * Fixed IP Showing Up As undefined In The Proxy Tool When Running Node v18
 
