@@ -1,4 +1,8 @@
 ### 0.1.2 Beta 2 
+* Continued work on adding safari downloads
+
+
+### 0.1.2 Beta 2 
 * Added Download Support In Safari (hopefully 🤞)
 
 
