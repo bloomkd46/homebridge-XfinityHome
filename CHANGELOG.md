@@ -1,3 +1,7 @@
+### 0.1.2 Beta 4 
+* Fixed File Download Url
+
+
 ### 0.1.2 Beta 3 
 * Fixed Filesaver Dependency
 
