@@ -5,6 +5,7 @@ const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
 const { existsSync, readFileSync, mkdirSync, statSync, rmSync, watch, watchFile, unwatchFile } = require('fs');
 const path = require('path');
 const { EventEmitter } = require('events');
+const fileSaver = require('file-saver');
 //import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 //import { existsSync, promises, readFileSync } from 'fs';
 class PluginUiServer extends HomebridgePluginUiServer {
@@ -67,6 +68,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
       } catch (err) {
         return err;
       }
+    });
+    this.onRequest('/downloadLog', async (payload) => {
+      fileSaver.saveAs(new Blob([readFileSync(payload.logPath)], { type: 'text/plain;charset=utf-8' }));
     });
     this.onRequest('/watchForChanges', async (payload) => {
       return new Promise(resolve => {

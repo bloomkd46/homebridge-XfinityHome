@@ -114,7 +114,7 @@
   </form>
   <div class="clearfix">
     <button id="logDelete" class="float-right btn btn-danger"><i class="fa fa-trash-o"></i></button>
-    <a id="logDownload" download="" href=""><button class="float-right btn btn-primary"><i class="fa fa-download"></i></button></a>
+    <button id="logDownload" class="float-right btn btn-primary"><i class="fa fa-download"></i></button>
     <!--<button id="logRefresh" class="float-right btn btn-info"><i class="fa fa-refresh"></i></button>-->
   </div>
   <div class="card text-nowrap" style="height: 55vh; overflow: scroll" id="logZone"> Loading...</div>
@@ -177,9 +177,9 @@
           const logs = await homebridge.request('/getLogs', { logPath: logPath });
           //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           //const context = thisAcc.context;
-          const logDownload = document.getElementById('logDownload');
+          /*const logDownload = document.getElementById('logDownload');
           logDownload.href = `data:text/plain,${logs.split('<br>').join('%0D%0A')}`;//await homebridge.request('/getRelativePath', { path: logPath });
-          logDownload.download = logPath.split('/').pop();
+          logDownload.download = logPath.split('/').pop();*/
           //logDownload.href = window.URL.createObjectURL(logPath);
 
           const logZone = document.getElementById('logZone');
@@ -316,6 +316,11 @@
       logDelete.addEventListener('click', async () => {
         homebridge.showSpinner();
         await homebridge.request('/deleteLog', { logPath: currentLogPath });
+        homebridge.hideSpinner();
+      });
+      logDownload.addEventListener('click', async () => {
+        homebridge.showSpinner();
+        await homebridge.request('/downloadLog', { logPath: currentLogPath });
         homebridge.hideSpinner();
       });
       //disabledEnable.addEventListener('click', () => enablePlugin())
