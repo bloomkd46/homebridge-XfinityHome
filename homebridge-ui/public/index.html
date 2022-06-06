@@ -179,7 +179,7 @@
           //const logDelete = document.createElement('logDelete')
           homebridge.showSpinner();
           const logs = await homebridge.request('/getLogs', { logPath: logPath });
-          currentLog = logs;
+          currentLog = `data:text/plain,${logs.split('<br>').join('%0D%0A')}`;
           //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           //const context = thisAcc.context;
           /*const logDownload = document.getElementById('logDownload');
