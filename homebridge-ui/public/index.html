@@ -120,10 +120,13 @@
   <div class="card text-nowrap" style="height: 55vh; overflow: scroll" id="logZone"> Loading...</div>
 </div>
 <!--<script type="text/javascript" src="js/index.js"></script>-->
+<script type="text/javascript" src="https://raw.githubusercontent.com/eligrey/FileSaver.js/master/dist/FileSaver.min.js"></script>
 <script>
   ; (async () => {
     try {
       let currentLogPath = '';
+      let currentLog = '';
+      let currentFilename = '';
       const currentConfig = await homebridge.getPluginConfig();
       const showIntro = () => {
         const introContinue = document.getElementById('introContinue');
@@ -172,9 +175,11 @@
         });
         const showDeviceLog = async logPath => {
           currentLogPath = logPath;
+          currentFilename = logPath.split('/').pop();
           //const logDelete = document.createElement('logDelete')
           homebridge.showSpinner();
           const logs = await homebridge.request('/getLogs', { logPath: logPath });
+          currentLog = logs;
           //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
           //const context = thisAcc.context;
           /*const logDownload = document.getElementById('logDownload');
@@ -320,7 +325,7 @@
       });
       logDownload.addEventListener('click', async () => {
         homebridge.showSpinner();
-        await homebridge.request('/downloadLog', { logPath: currentLogPath });
+        saveAs(currentLog, currentFilename);
         homebridge.hideSpinner();
       });
       //disabledEnable.addEventListener('click', () => enablePlugin())
