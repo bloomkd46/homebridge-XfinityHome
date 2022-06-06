@@ -1,3 +1,7 @@
+### 0.1.2 Beta 2 
+* Added Download Support In Safari (hopefully 🤞)
+
+
 ### 0.1.1 
 * Bumped XHome Dependency To Resolve Issue #2 
 
