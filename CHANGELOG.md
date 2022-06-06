@@ -1,3 +1,7 @@
+### 0.1.1 
+* Bumped XHome Dependency To Resolve Issue #2 
+
+
 ### 0.1.0 
 * Bumped XHome dependency
 
