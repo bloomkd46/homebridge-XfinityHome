@@ -1,3 +1,7 @@
+### 0.1.2 Beta 3 
+* Fixed Filesaver Dependency
+
+
 ### 0.1.2 Beta 2 
 * Continued work on adding safari downloads
 
