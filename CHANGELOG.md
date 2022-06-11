@@ -1,3 +1,7 @@
+### 0.1.2 
+* Bumped Home Dependency To Address Issue #3 
+
+
 ### 0.1.2 Beta 4 
 * Fixed File Download Url
 
