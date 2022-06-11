@@ -21,7 +21,7 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 
 ### Plugin Information
 
-- This plugin allows you to view and control your Xfinity Home System within HomeKit. The plugin:
+- This plugin allows you to view and control your Xfinity Home System within HomeKit. This plugin:
   - downloads a device list
   - listens for real-time device updates
   - Supports Doors, Windows, Motion Sensors, Lights And Panel.
@@ -29,17 +29,25 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 ## Features:
   - [x] 2FA Compatible
   - [x] Easy Setup
-  - [x] Arm/Disarm Control
-  - [x] Event notifications
-  - [x] Critical Notification When Alarm Triggered
+  - [x] Real-Time Device Updates
   - [x] Device-By-Device Logs In Custom UI
-  - [x] Ability To Bypass Sensors (Using 3rd-Party Apps Such As [Controller For HomeKit](https://controllerforhomekit.com))
+      ## Device Features:
+      |  Device Type   | Features:                                                                                  |
+      | :------------: | :----------------------------------------------------------------------------------------- |
+      |     Panel      | Arm/Disarm Control <br> Armed/Disarmed Notifications <br> Critical Notification If Tripped |
+      | Contact Sensor | Bypass Control* <br> Opened/Closed Notifications <br> Current Temperature**                |
+      | Motion Sensor  | Bypass Control* <br> Motion Detected Notification <br> Current Temperature**               |
+      |  Light Switch  | On/Off Control <br> Dimming Control***                                                     |
 
+> \*Using 3rd-Party Apps Such As [Controller For HomeKit](https://controllerforhomekit.com)<br>
+> \*\*Updates When Sensor Tripped<br>
+> \*\*\*If Hardware Supports It<br>
+> Don't See A Device? Let Me Know By Submitting A [Feature Request](https://github.com/bloomkd46/homebridge-XfinityHome/issues/new/c)
 ## TODO:
   - [ ] Add First-Gen Camera Support
   - [ ] Add Next-Gen Camera HomeKit Secure Video Support
   - [ ] Add Email/Password Option
-  - [ ] Verify Plugin
+  - [ ] Verify Plugin (Pending)
   - [ ] Add Device Tab In Custom UI
 
 ### Prerequisites
@@ -62,4 +70,4 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 ### Disclaimer
 
 - I am in no way affiliated with Xfinity Home and this plugin is a personal project that I maintain in my free time.
-- Use this plugin entirely at your own risk - please see licence for more information.
+- Use this plugin entirely at your own risk - please see license for more information.
