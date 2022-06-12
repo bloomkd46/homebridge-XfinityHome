@@ -1,3 +1,7 @@
+### 0.2.0 Beta 1 
+* Started to add device info area to custom ui
+
+
 ### 0.1.2 
 * Bumped Home Dependency To Address Issue #3 
 
