@@ -29,15 +29,11 @@ export default class LightAccessory extends Accessory {
         .on('change', this.notifyBrightnessChange.bind(this));
     }
 
-    this.device.activityCallback = async (event) => {
-      this.service.updateCharacteristic(this.platform.Characteristic.On, event.metadata.isOn === 'true');
+    this.device.activityCallback = async () => {
+      this.service.updateCharacteristic(this.platform.Characteristic.On, await this.getIsOn());
       if (this.device.device.properties.dimAllowed) {
-        this.service.updateCharacteristic(this.platform.Characteristic.Brightness, parseFloat(event.metadata.level));
+        this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness());
       }
-      this.accessory.context.logPath = this.logPath;
-      this.accessory.context.device = device;
-      this.accessory.context.refreshToken = this.device.xhome.refreshToken;
-      this.platform.api.updatePlatformAccessories([this.accessory]);
     };
   }
 
