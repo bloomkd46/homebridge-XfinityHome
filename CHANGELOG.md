@@ -1,3 +1,7 @@
+### 0.2.0 
+* Added Device Info Area to Custom UI
+
+
 ### 0.2.0-beta.2 
 * Represents previous beta
 
