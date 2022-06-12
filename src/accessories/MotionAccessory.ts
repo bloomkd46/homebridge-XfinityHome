@@ -44,6 +44,11 @@ export default class MotionAccessory extends Accessory {
           this.device.device.properties.temperature / 100);
 
         resolve(device.properties.isFaulted);
+
+        this.accessory.context.logPath = this.logPath;
+        this.accessory.context.device = device;
+        this.accessory.context.refreshToken = this.device.xhome.refreshToken;
+        this.platform.api.updatePlatformAccessories([this.accessory]);
       }).catch(err => {
         this.log('error', 'Failed To Fetch Motion State With Error:', err);
         reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));

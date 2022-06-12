@@ -45,6 +45,11 @@ export default class PanelAccessory extends Accessory {
         .then(device => {
           this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState());
           resolve(this.armModes.indexOf(device.properties.armType || 'disarmed'));
+
+          this.accessory.context.logPath = this.logPath;
+          this.accessory.context.device = device;
+          this.accessory.context.refreshToken = this.device.xhome.refreshToken;
+          this.platform.api.updatePlatformAccessories([this.accessory]);
         })
         .catch(err => {
           this.log('error', 'Failed To Fetch Target State With Error:', err);

@@ -41,8 +41,12 @@ export default class DryContactAccessory extends Accessory {
         this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
         this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
           this.device.device.properties.temperature / 100);
-
         resolve(device.properties.isFaulted ? 1 : 0);
+
+        this.accessory.context.logPath = this.logPath;
+        this.accessory.context.device = device;
+        this.accessory.context.refreshToken = this.device.xhome.refreshToken;
+        this.platform.api.updatePlatformAccessories([this.accessory]);
       }).catch(err => {
         this.log('error', 'Failed To Fetch Contact State With Error:', err);
         reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));

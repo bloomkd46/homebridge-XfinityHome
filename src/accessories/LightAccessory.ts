@@ -43,6 +43,11 @@ export default class LightAccessory extends Accessory {
         device.properties.level ?
           this.service.updateCharacteristic(this.platform.Characteristic.Brightness, device.properties.level) : undefined;
         resolve(device.properties.isOn);
+
+        this.accessory.context.logPath = this.logPath;
+        this.accessory.context.device = device;
+        this.accessory.context.refreshToken = this.device.xhome.refreshToken;
+        this.platform.api.updatePlatformAccessories([this.accessory]);
       }).catch(err => {
         this.log('error', 'Failed To Fetch IsOn State With Error:', err);
         reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
