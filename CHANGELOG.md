@@ -1,3 +1,7 @@
+### 0.2.3 
+* Fixed light info not updating in custom ui
+
+
 ### 0.2.2 
 * Fixed Light Not Auto-Updating In Custom UI
 
