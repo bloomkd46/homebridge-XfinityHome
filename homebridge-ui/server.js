@@ -56,7 +56,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       try {
         return readFileSync(payload.logPath).toString().split('\n').join('<br>');
       } catch (err) {
-        return err;
+        return `Failed To Load Logs From ${payload.logPath}`;
       }
     });
     this.onRequest('/getRelativePath', (payload) => {

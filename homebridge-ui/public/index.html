@@ -54,13 +54,13 @@
           </li>
         </ol>
       </dd>
-      <dd>If This Page Doesn't Redirect Open A Browser On Your Then (Ex. Safari)</dd>
+      <dt>4. Open <strong>Xfinity Home</strong></dt>
     </dl>
   </div>
   <div id="part2" style="display: none;">
     <h4>Part 2: Token Configuration</h4>
     <dl>
-      <dt>1. Open <strong>Xfinity Home</strong></dt>
+      <dt>1. Open <strong>Xfinity Home</strong> If You Haven't Already</dt>
       <dt>If You Still See This Page Then Follow The Steps Below</dt>
       <dd>
         <ol>
@@ -116,191 +116,237 @@
     <button id="logDelete" class="float-right btn btn-danger"><i class="fa fa-trash-o"></i></button>
     <a id="logDownload" download="" href=""><button class="float-right btn btn-primary"><i class="fa fa-download"></i></button></a>
     <button id="logSave" class="float-right btn btn-primary" style="display: none;"><i class="fa fa-download"></i></button>
-    <!--<button id="logRefresh" class="float-right btn btn-info"><i class="fa fa-refresh"></i></button>-->
+    <button id="deviceInfo" class="float-right btn btn-info" onclick="$('#deviceDetails').modal('show')" style="display:none"><i
+        class="fa fa-info-circle"></i></button>
   </div>
   <div class="card text-nowrap" style="height: 55vh; overflow: scroll" id="logZone"> Loading...</div>
-</div>
-<!--<script type="text/javascript" src="js/index.js"></script>-->
-<script type="text/javascript" src="filesaver/Filesaver.js"></script>
-<script>
-  ; (async () => {
-    try {
-      let currentLogPath = '';
-      let currentLog = '';
-      let currentFilename = '';
-      const currentConfig = await homebridge.getPluginConfig();
-      const showIntro = () => {
-        const introContinue = document.getElementById('introContinue');
-        introContinue.addEventListener('click', () => {
-          homebridge.showSpinner();
-          document.getElementById('pageIntro').style.display = 'none';
-          document.getElementById('menuWrapper').style.display = 'inline-flex';
-          showConfigTool();
-          //homebridge.hideSpinner();
-        });
-        document.getElementById('pageIntro').style.display = 'block';
-      };
-      const showLogs = async () => {
-        homebridge.showSpinner();
-        homebridge.hideSchemaForm();
-        document.getElementById('menuConfigTool').classList.remove('btn-elegant');
-        document.getElementById('menuConfigTool').classList.add('btn-primary');
-        document.getElementById('menuLogs').classList.add('btn-elegant');
-        document.getElementById('menuLogs').classList.remove('btn-primary');
-        document.getElementById('menuSettings').classList.remove('btn-elegant');
-        document.getElementById('menuSettings').classList.add('btn-primary');
-        document.getElementById('pageConfigTool').style.display = 'none';
-        document.getElementById('pageLogs').style.display = 'block';
-        const cachedAccessories =
-          typeof homebridge.getCachedAccessories === 'function'
-            ? await homebridge.getCachedAccessories()
-            : await homebridge.request('/getCachedAccessories');
-        if (cachedAccessories.length > 0) {
-          cachedAccessories.sort((a, b) => {
-            return a.displayName.toLowerCase() > b.displayName.toLowerCase()
-              ? 1
-              : b.displayName.toLowerCase() > a.displayName.toLowerCase()
-                ? -1
-                : 0;
+  <!-- The Modal -->
+  <div class="modal fade" id="deviceDetails">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title" id="deviceName">Loading...</h4>
+          <button type="button" class="close" onclick="$('#deviceDetails').modal('hide')">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <table class="table w-100">
+            <thead>
+              <tr class="table-active">
+                <th scope="col" style="width: 40%;">Field</th>
+                <th scope="col" style="width: 60%;" id="displayName">Value</th>
+              </tr>
+            </thead>
+            <tbody id="deviceDetails">
+            </tbody>
+          </table>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" onclick="$('#deviceDetails').modal('hide')">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--<script type="text/javascript" src="js/index.js"></script>-->
+  <script type="text/javascript" src="filesaver/Filesaver.js"></script>
+  <script>
+    ; (async () => {
+      try {
+        let currentLogPath = '';
+        let currentLog = '';
+        let currentFilename = '';
+        const currentConfig = await homebridge.getPluginConfig();
+        const showIntro = () => {
+          const introContinue = document.getElementById('introContinue');
+          introContinue.addEventListener('click', () => {
+            homebridge.showSpinner();
+            document.getElementById('pageIntro').style.display = 'none';
+            document.getElementById('menuWrapper').style.display = 'inline-flex';
+            showConfigTool();
+            //homebridge.hideSpinner();
           });
-        }
-        const deviceSelect = document.getElementById('deviceSelect');
-        deviceSelect.innerHTML = '';
-        cachedAccessories.forEach(a => {
-          if (a.context.logPath) {
-            const option = document.createElement('option');
-            option.text = a.displayName;
-            option.value = a.context.logPath;
-            deviceSelect.add(option);
-          }
-        });
-        const showDeviceLog = async logPath => {
-          currentLogPath = logPath;
-          currentFilename = logPath.split('/').pop();
-          //const logDelete = document.createElement('logDelete')
+          document.getElementById('pageIntro').style.display = 'block';
+        };
+        const showLogs = async () => {
           homebridge.showSpinner();
-          const logs = await homebridge.request('/getLogs', { logPath: logPath });
-          currentLog = `data:text/plain,${logs.split('<br>').join('%0D%0A')}`;
-          //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
-          //const context = thisAcc.context;
-          const logDownload = document.getElementById('logDownload');
-          logDownload.href = `data:text/plain,${logs.split('<br>').join('%0D%0A')}`;//await homebridge.request('/getRelativePath', { path: logPath });
-          logDownload.download = logPath.split('/').pop();
-          //logDownload.href = window.URL.createObjectURL(logPath);
-
-          const logZone = document.getElementById('logZone');
-          logZone.innerHTML = logs;
-          logZone.scrollTo(0, logZone.scrollHeight);
-
-          homebridge.hideSpinner();
-
-          homebridge.request('/watchForChanges', { path: logPath }).then(newLogs => {
-            if (logPath === currentLogPath) {
-              showDeviceLog(logPath);
+          homebridge.hideSchemaForm();
+          document.getElementById('menuConfigTool').classList.remove('btn-elegant');
+          document.getElementById('menuConfigTool').classList.add('btn-primary');
+          document.getElementById('menuLogs').classList.add('btn-elegant');
+          document.getElementById('menuLogs').classList.remove('btn-primary');
+          document.getElementById('menuSettings').classList.remove('btn-elegant');
+          document.getElementById('menuSettings').classList.add('btn-primary');
+          document.getElementById('pageConfigTool').style.display = 'none';
+          document.getElementById('pageLogs').style.display = 'block';
+          const cachedAccessories =
+            typeof homebridge.getCachedAccessories === 'function'
+              ? await homebridge.getCachedAccessories()
+              : await homebridge.request('/getCachedAccessories');
+          if (cachedAccessories.length > 0) {
+            cachedAccessories.sort((a, b) => {
+              return a.displayName.toLowerCase() > b.displayName.toLowerCase()
+                ? 1
+                : b.displayName.toLowerCase() > a.displayName.toLowerCase()
+                  ? -1
+                  : 0;
+            });
+          }
+          const deviceSelect = document.getElementById('deviceSelect');
+          deviceSelect.innerHTML = '';
+          cachedAccessories.forEach(a => {
+            if (a.context.logPath) {
+              const option = document.createElement('option');
+              option.text = a.displayName;
+              option.value = a.context.logPath;
+              deviceSelect.add(option);
             }
           });
+          const showDeviceLog = async logPath => {
+            currentLogPath = logPath;
+            currentFilename = logPath.split('/').pop();
+            //const logDelete = document.createElement('logDelete')
+            homebridge.showSpinner();
+            const logs = await homebridge.request('/getLogs', { logPath: logPath });
+            currentLog = `data:text/plain,${logs.split('<br>').join('%0D%0A')}`;
+            //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
+            //const context = thisAcc.context;
+            const logDownload = document.getElementById('logDownload');
+            logDownload.href = `data:text/plain,${logs.split('<br>').join('%0D%0A')}`;//await homebridge.request('/getRelativePath', { path: logPath });
+            logDownload.download = logPath.split('/').pop();
+            //logDownload.href = window.URL.createObjectURL(logPath);
+
+            const logZone = document.getElementById('logZone');
+            logZone.innerHTML = logs;
+            logZone.scrollTo(0, logZone.scrollHeight);
+
+            const device = cachedAccessories.find(x => x.context.logPath == logPath);
+            if (device) {
+              document.getElementById('deviceInfo').style.display = 'inline';
+              document.getElementById('deviceName').innerHTML = device.displayName;
+              let deviceHTML = '';
+              Object.keys(device.context.device).forEach(key => {
+                deviceHTML +=
+                  `<tr>
+                    <th scope="row">${key}</th>
+                    <td>${device.context.device[key]}</td>
+                  </tr>`;
+              });
+              document.getElementById('deviceDetails').innerHTML = deviceHTML;
+            } else {
+              document.getElementById('deviceInfo').style.display = 'none';
+            }
+
+            homebridge.hideSpinner();
+
+            homebridge.request('/watchForChanges', { path: logPath }).then(newLogs => {
+              if (logPath === currentLogPath) {
+                showDeviceLog(logPath);
+              }
+            });
+          };
+          deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
+          if (cachedAccessories.length > 0) {
+            //const generalLog = cachedAccessories.unshift({ displayName: 'General', context: { logPath: await homebridge.request('/getGeneralLog') } })[0];
+            const generalLog = await homebridge.request('/getGeneralLog');
+            const option = document.createElement('option');
+            option.text = 'General';
+            option.value = generalLog;
+            option.selected = true;
+            deviceSelect.add(option, 0);
+            showDeviceLog(generalLog);
+          } else {
+            const option = document.createElement('option');
+            option.text = 'No Devices';
+            deviceSelect.add(option);
+            deviceSelect.disabled = true;
+          }
+          //logRefresh.addEventListener('click', showDeviceLog(currentLogPath));
+          homebridge.hideSpinner();
         };
-        deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
-        if (cachedAccessories.length > 0) {
-          //const generalLog = cachedAccessories.unshift({ displayName: 'General', context: { logPath: await homebridge.request('/getGeneralLog') } })[0];
-          const generalLog = await homebridge.request('/getGeneralLog');
-          const option = document.createElement('option');
-          option.text = 'General';
-          option.value = generalLog;
-          option.selected = true;
-          deviceSelect.add(option, 0);
-          showDeviceLog(generalLog);
-        } else {
-          const option = document.createElement('option');
-          option.text = 'No Devices';
-          deviceSelect.add(option);
-          deviceSelect.disabled = true;
-        }
-        //logRefresh.addEventListener('click', showDeviceLog(currentLogPath));
-        homebridge.hideSpinner();
-      };
-      const showConfigTool = async () => {
-        homebridge.showSpinner();
-        document.getElementById('menuWrapper').style.display = 'none';
-        homebridge.hideSchemaForm();
-        document.getElementById('menuConfigTool').classList.add('btn-elegant');
-        document.getElementById('menuConfigTool').classList.remove('btn-primary');
-        document.getElementById('menuLogs').classList.remove('btn-elegant');
-        document.getElementById('menuLogs').classList.add('btn-primary');
-        document.getElementById('menuSettings').classList.remove('btn-elegant');
-        document.getElementById('menuSettings').classList.add('btn-primary');
-        document.getElementById('pageConfigTool').style.display = 'block';
-        document.getElementById('pageLogs').style.display = 'none';
+        const showConfigTool = async () => {
+          homebridge.showSpinner();
+          document.getElementById('menuWrapper').style.display = 'none';
+          homebridge.hideSchemaForm();
+          document.getElementById('menuConfigTool').classList.add('btn-elegant');
+          document.getElementById('menuConfigTool').classList.remove('btn-primary');
+          document.getElementById('menuLogs').classList.remove('btn-elegant');
+          document.getElementById('menuLogs').classList.add('btn-primary');
+          document.getElementById('menuSettings').classList.remove('btn-elegant');
+          document.getElementById('menuSettings').classList.add('btn-primary');
+          document.getElementById('pageConfigTool').style.display = 'block';
+          document.getElementById('pageLogs').style.display = 'none';
 
-        document.getElementById('part1').style.display = 'block';
-        document.getElementById('part2').style.display = 'none';
-        document.getElementById('part3').style.display = 'none';
+          document.getElementById('part1').style.display = 'block';
+          document.getElementById('part2').style.display = 'none';
+          document.getElementById('part3').style.display = 'none';
 
-        const proxy = await homebridge.request('/startProxy');
-        document.getElementById('ip').innerText = proxy.ip;
-        document.getElementById('port').innerText = proxy.port;
-        document.getElementById('qrcode-alt').style.display = 'inline';
-        const certificate = document.getElementById('certificate');
-        const certificateLink = `http://${proxy.ip}:${proxy.port}/cert`;
-        certificate.innerText = certificateLink;
-        certificate.href = certificateLink;
+          const proxy = await homebridge.request('/startProxy');
+          document.getElementById('ip').innerText = proxy.ip;
+          document.getElementById('port').innerText = proxy.port;
+          document.getElementById('qrcode-alt').style.display = 'inline';
+          const certificate = document.getElementById('certificate');
+          const certificateLink = `http://${proxy.ip}:${proxy.port}/cert`;
+          certificate.innerText = certificateLink;
+          certificate.href = certificateLink;
 
-        //qrcode.alt = certificateLink;
-        //qrcode.src = 'file://' + proxy.qrcode;
-        document.getElementById('qrcode-svg').innerHTML = proxy.qrcode;
-        document.getElementById('qrcode').style.display = 'none';
-        if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
-          document.getElementById('qrcode').style.display = 'block';
-          document.getElementById('qrcode-alt').style.display = 'none';
-        }
-        document.getElementById('part1').style.display = 'block';
-        homebridge.hideSpinner();
+          //qrcode.alt = certificateLink;
+          //qrcode.src = 'file://' + proxy.qrcode;
+          document.getElementById('qrcode-svg').innerHTML = proxy.qrcode;
+          document.getElementById('qrcode').style.display = 'none';
+          if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
+            document.getElementById('qrcode').style.display = 'block';
+            document.getElementById('qrcode-alt').style.display = 'none';
+          }
+          document.getElementById('part1').style.display = 'block';
+          homebridge.hideSpinner();
 
-        await homebridge.request('/proxyActive');
-        homebridge.showSpinner();
-        document.getElementById('part1').style.display = 'none';
-        document.getElementById('part2').style.display = 'block';
-        homebridge.hideSpinner();
-
-        const token = await homebridge.request('/token');
-        homebridge.showSpinner();
-        document.getElementById('part2').style.display = 'none';
-        document.getElementById('part3').style.display = 'block';
-        currentConfig[0].refreshToken = token;
-        await homebridge.updatePluginConfig(currentConfig);
-        await homebridge.savePluginConfig();
-        homebridge.hideSpinner();
-
-        /*homebridge.addEventListener('proxy', async () => {
+          await homebridge.request('/proxyActive');
           homebridge.showSpinner();
           document.getElementById('part1').style.display = 'none';
           document.getElementById('part2').style.display = 'block';
           homebridge.hideSpinner();
-        });*/
 
-        /*homebridge.addEventListener('token', async (token) => {
+          const token = await homebridge.request('/token');
           homebridge.showSpinner();
           document.getElementById('part2').style.display = 'none';
           document.getElementById('part3').style.display = 'block';
           currentConfig[0].refreshToken = token;
           await homebridge.updatePluginConfig(currentConfig);
           await homebridge.savePluginConfig();
-        });*/
-        //homebridge.hideSpinner();
-      };
-      const showSettings = async () => {
-        homebridge.showSpinner();
-        document.getElementById('menuConfigTool').classList.remove('btn-elegant');
-        document.getElementById('menuConfigTool').classList.add('btn-primary');
-        document.getElementById('menuLogs').classList.remove('btn-elegant');
-        document.getElementById('menuLogs').classList.add('btn-primary');
-        document.getElementById('menuSettings').classList.add('btn-elegant');
-        document.getElementById('menuSettings').classList.remove('btn-primary');
-        document.getElementById('pageConfigTool').style.display = 'none';
-        document.getElementById('pageLogs').style.display = 'none';
-        homebridge.showSchemaForm();
-        homebridge.hideSpinner();
-      };/*
+          homebridge.hideSpinner();
+
+          /*homebridge.addEventListener('proxy', async () => {
+            homebridge.showSpinner();
+            document.getElementById('part1').style.display = 'none';
+            document.getElementById('part2').style.display = 'block';
+            homebridge.hideSpinner();
+          });*/
+
+          /*homebridge.addEventListener('token', async (token) => {
+            homebridge.showSpinner();
+            document.getElementById('part2').style.display = 'none';
+            document.getElementById('part3').style.display = 'block';
+            currentConfig[0].refreshToken = token;
+            await homebridge.updatePluginConfig(currentConfig);
+            await homebridge.savePluginConfig();
+          });*/
+          //homebridge.hideSpinner();
+        };
+        const showSettings = async () => {
+          homebridge.showSpinner();
+          document.getElementById('menuConfigTool').classList.remove('btn-elegant');
+          document.getElementById('menuConfigTool').classList.add('btn-primary');
+          document.getElementById('menuLogs').classList.remove('btn-elegant');
+          document.getElementById('menuLogs').classList.add('btn-primary');
+          document.getElementById('menuSettings').classList.add('btn-elegant');
+          document.getElementById('menuSettings').classList.remove('btn-primary');
+          document.getElementById('pageConfigTool').style.display = 'none';
+          document.getElementById('pageLogs').style.display = 'none';
+          homebridge.showSchemaForm();
+          homebridge.hideSpinner();
+        };/*
       enablePlugin = async () => {
         homebridge.showSpinner()
         document.getElementById('disabledBanner').style.display = 'none'
@@ -309,41 +355,41 @@
         await homebridge.savePluginConfig()
         homebridge.hideSpinner()
       }*/
-      //menuHome.addEventListener('click', () => showSupport())
-      //menuDevices.addEventListener('click', () => showDevices())
-      menuSettings.addEventListener('click', () => showSettings());
-      menuLogs.addEventListener('click', () => showLogs());
-      menuConfigTool.addEventListener('click', () => showConfigTool());
-      exitSetup.addEventListener('click', async () => {
-        await homebridge.request('/stopProxy');
-        document.getElementById('menuWrapper').style.display = 'inline-flex';
-        showSettings();
-      });
-      logDelete.addEventListener('click', async () => {
-        homebridge.showSpinner();
-        await homebridge.request('/deleteLog', { logPath: currentLogPath });
+        //menuHome.addEventListener('click', () => showSupport())
+        //menuDevices.addEventListener('click', () => showDevices())
+        menuSettings.addEventListener('click', () => showSettings());
+        menuLogs.addEventListener('click', () => showLogs());
+        menuConfigTool.addEventListener('click', () => showConfigTool());
+        exitSetup.addEventListener('click', async () => {
+          await homebridge.request('/stopProxy');
+          document.getElementById('menuWrapper').style.display = 'inline-flex';
+          showSettings();
+        });
+        logDelete.addEventListener('click', async () => {
+          homebridge.showSpinner();
+          await homebridge.request('/deleteLog', { logPath: currentLogPath });
+          homebridge.hideSpinner();
+        });
+        logSave.addEventListener('click', async () => {
+          homebridge.showSpinner();
+          saveAs(currentLog, currentFilename);
+          homebridge.hideSpinner();
+        });
+        //disabledEnable.addEventListener('click', () => enablePlugin())
+        if (currentConfig.length) {
+          document.getElementById('menuWrapper').style.display = 'inline-flex';
+          showSettings();
+        } else {
+          currentConfig.push({ name: 'Xfinity Home' });
+          await homebridge.updatePluginConfig(currentConfig);
+          showIntro();
+        }
+      } catch (err) {
+        homebridge.toast.error(err.message, 'Error');
+        console.log(err);
+        homebridge.closeSettings();
+      } finally {
         homebridge.hideSpinner();
-      });
-      logSave.addEventListener('click', async () => {
-        homebridge.showSpinner();
-        saveAs(currentLog, currentFilename);
-        homebridge.hideSpinner();
-      });
-      //disabledEnable.addEventListener('click', () => enablePlugin())
-      if (currentConfig.length) {
-        document.getElementById('menuWrapper').style.display = 'inline-flex';
-        showSettings();
-      } else {
-        currentConfig.push({ name: 'Xfinity Home' });
-        await homebridge.updatePluginConfig(currentConfig);
-        showIntro();
       }
-    } catch (err) {
-      homebridge.toast.error(err.message, 'Error');
-      console.log(err);
-      homebridge.closeSettings();
-    } finally {
-      homebridge.hideSpinner();
-    }
-  })();
-</script>
+    })();
+  </script>
