@@ -1,3 +1,7 @@
+### 0.2.1 
+* Added missing async
+
+
 ### 0.2.0 
 * Added Device Info Area to Custom UI
 
