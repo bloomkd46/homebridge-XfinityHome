@@ -243,7 +243,7 @@
 
             homebridge.hideSpinner();
 
-            homebridge.request('/watchForChanges', { path: logPath }).then(newLogs => {
+            homebridge.request('/watchForChanges', { path: logPath }).then(async newLogs => {
               if (logPath === currentLogPath) {
                 cachedAccessories = typeof homebridge.getCachedAccessories === 'function'
                   ? await homebridge.getCachedAccessories()
