@@ -1,3 +1,7 @@
+### 0.2.0-beta.2 
+* Represents previous beta
+
+
 ### 0.2.0 Beta 1 
 * Started to add device info area to custom ui
 
