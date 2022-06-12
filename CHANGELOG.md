@@ -1,3 +1,7 @@
+### 0.2.2 
+* Fixed Light Not Auto-Updating In Custom UI
+
+
 ### 0.2.1 
 * Added missing async
 
