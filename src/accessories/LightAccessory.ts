@@ -34,6 +34,10 @@ export default class LightAccessory extends Accessory {
       if (this.device.device.properties.dimAllowed) {
         this.service.updateCharacteristic(this.platform.Characteristic.Brightness, parseFloat(event.metadata.level));
       }
+      this.accessory.context.logPath = this.logPath;
+      this.accessory.context.device = device;
+      this.accessory.context.refreshToken = this.device.xhome.refreshToken;
+      this.platform.api.updatePlatformAccessories([this.accessory]);
     };
   }
 
