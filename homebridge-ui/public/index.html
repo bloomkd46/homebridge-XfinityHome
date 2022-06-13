@@ -245,13 +245,14 @@
 
             homebridge.request('/watchForChanges', { path: logPath }).then(newLogs => {
               if (logPath === currentLogPath) {
+                showDeviceLog(logPath);
                 setTimeout(async () => {
-                  cachedAccessories = await homebridge.request('/getCachedAccessories');
-                  /*typeof homebridge.getCachedAccessories === 'function'
-                    ? await homebridge.getCachedAccessories()
-                    : await homebridge.request('/getCachedAccessories');*/
-                  showDeviceLog(logPath);
-                }, 500);
+                  if (logPath === currentLogPath) {
+                    cachedAccessories = await homebridge.request('/getCachedAccessories');
+
+                    showDeviceLog(logPath);
+                  }
+                }, 1500);
               }
             });
           };
