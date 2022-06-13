@@ -13,8 +13,11 @@ class PluginUiServer extends HomebridgePluginUiServer {
     const events = new EventEmitter();
     super();
 
+    const plugin = 'homebridge-xfinityhome';
+    const platform = 'XfinityHomePlatform';
     const storagePath = this.homebridgeStoragePath ?? '';
     const configPath = this.homebridgeConfigPath ?? '';
+    const config = JSON.parse(readFileSync(configPath, 'utf-8')).platforms.find(plugin => plugin.platform == platform);
 
     /*
       A native method getCachedAccessories() was introduced in config-ui-x v4.37.0
@@ -24,12 +27,10 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/getCachedAccessories', async () => {
       try {
         // Define the plugin and create the array to return
-        const plugin = 'homebridge-xfinityhome';
-        const devicesToReturn = [];
         if (cachedAccessoriesDir && existsSync(cachedAccessoriesDir)) {
           return JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
         } else if (!cachedAccessoriesDir) {
-          cachedAccessoriesDir = path.join(storagePath, '/accessories/cachedAccessories') + (('.' + (JSON.parse(readFileSync(configPath, 'utf-8'))._bridge?.username?.replace(':', ''))) ?? '');
+          cachedAccessoriesDir = path.join(storagePath, '/accessories/cachedAccessories') + (('.' + config._bridge?.username?.replace(':', '')) ?? '');
           return JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
         } else {
           return [];
