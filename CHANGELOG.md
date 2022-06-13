@@ -1,3 +1,7 @@
+### 0.2.5 
+* Fixed Custom UI Returning Empty Accessory Array
+
+
 ### 0.2.4 
 Improved Custom UI's Auto-Update
 
