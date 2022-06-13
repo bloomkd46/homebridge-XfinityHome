@@ -233,7 +233,7 @@
                 deviceHTML +=
                   `<tr>
                     <th scope="row">${key}</th>
-                    <td>${JSON.stringify(device.context.device[key], null, 1).replace('\n', '<br>')}</td>
+                    <td>${JSON.stringify(device.context.device[key], null, 1).split('\n').join('<br>')}</td>
                   </tr>`;
               });
               document.getElementById('deviceDetailsTable').innerHTML = deviceHTML;
@@ -245,10 +245,13 @@
 
             homebridge.request('/watchForChanges', { path: logPath }).then(async newLogs => {
               if (logPath === currentLogPath) {
-                cachedAccessories = /*typeof homebridge.getCachedAccessories === 'function'
-                  ? await homebridge.getCachedAccessories()
-                  :*/ await homebridge.request('/getCachedAccessories');
-                showDeviceLog(logPath);
+                setTimeout(() => {
+                  cachedAccessories = await homebridge.request('/getCachedAccessories');
+                  /*typeof homebridge.getCachedAccessories === 'function'
+                    ? await homebridge.getCachedAccessories()
+                    : await homebridge.request('/getCachedAccessories');*/
+                  showDeviceLog(logPath);
+                }, 500);
               }
             });
           };
