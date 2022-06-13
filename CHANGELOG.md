@@ -1,3 +1,7 @@
+### 0.2.7 
+* Added Missing Async In Custom UI
+
+
 ### 0.2.6 
 * UI Tweaks
 
