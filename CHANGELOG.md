@@ -1,3 +1,7 @@
+### 0.2.6 
+* UI Tweaks
+
+
 ### 0.2.5 
 * Fixed Custom UI Returning Empty Accessory Array
 
