@@ -14,36 +14,26 @@ class PluginUiServer extends HomebridgePluginUiServer {
     super();
 
     const storagePath = this.homebridgeStoragePath ?? '';
+    const configPath = this.homebridgeConfigPath ?? '';
 
     /*
       A native method getCachedAccessories() was introduced in config-ui-x v4.37.0
       The following is for users who have a lower version of config-ui-x
     */
+    let cachedAccessoriesDir;
     this.onRequest('/getCachedAccessories', async () => {
       try {
         // Define the plugin and create the array to return
         const plugin = 'homebridge-xfinityhome';
         const devicesToReturn = [];
-
-        // The path and file of the cached accessories
-        const accFile = path.join(storagePath, '/accessories/cachedAccessories');
-
-        // Check the file exists
-        if (existsSync(accFile)) {
-          // Read the cached accessories file
-          const cachedAccessoriesBuffer = readFileSync(accFile);
-
-          // Parse the JSON
-          const cachedAccessories = JSON.parse(cachedAccessoriesBuffer.toString());
-
-          // We only want the accessories for this plugin
-          cachedAccessories
-            .filter(accessory => accessory.plugin === plugin)
-            .forEach(accessory => devicesToReturn.push(accessory));
+        if (cachedAccessoriesDir && existsSync(cachedAccessoriesDir)) {
+          return JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
+        } else if (!cachedAccessoriesDir) {
+          cachedAccessoriesDir = path.join(storagePath, '/accessories/cachedAccessories') + (('.' + (JSON.parse(readFileSync(configPath, 'utf-8'))._bridge?.username?.replace(':', ''))) ?? '');
+          return JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
+        } else {
+          return [];
         }
-
-        // Return the array
-        return devicesToReturn;
       } catch (err) {
         // Just return an empty accessory list in case of any errors
         return [];
