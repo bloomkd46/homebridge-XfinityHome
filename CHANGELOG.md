@@ -1,3 +1,7 @@
+### 0.2.4 
+Improved Custom UI's Auto-Update
+
+
 ### 0.2.3 
 * Fixed light info not updating in custom ui
 
