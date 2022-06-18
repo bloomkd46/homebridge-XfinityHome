@@ -81,6 +81,10 @@ export default class Accessory {
             reject(new this.StatusError(HAPStatus.READ_ONLY_CHARACTERISTIC));
           }
         });
+      }).on('change', (value) => {
+        if (value.newValue !== value.oldValue) {
+          this.log(3, `Configured Name Changed From ${value.oldValue} To ${value.newValue}`);
+        }
       });
     accessory.getService(platform.Service.AccessoryInformation)!.getCharacteristic(platform.Characteristic.Identify).on('set', () => {
       this.log('info', 'Identifying Device:', device.device);
