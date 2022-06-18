@@ -1,3 +1,7 @@
+### 0.3.0 Beta 1 
+* Added Ability To Change Configured Name
+
+
 ### 0.2.8 
 * UI Tweaks
 
