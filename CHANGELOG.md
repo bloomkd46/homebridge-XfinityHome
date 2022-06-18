@@ -1,3 +1,7 @@
+### 0.3.0 
+* Added Configured Name Field To Accessory's
+
+
 ### 0.3.0 Beta 1 
 * Added Ability To Change Configured Name
 
