@@ -69,7 +69,7 @@ export default class PanelAccessory extends Accessory {
             });
         } else {
           if (this.device.device.properties.status !== 'ready') {
-            this.log('warn', 'Failed To Arm With Error:', 'Panel Not Ready');
+            this.log('warn', 'Failed To Arm With Error:', 'NOT_ALLOWED_IN_CURRENT_STATE');
             reject(new this.StatusError(HAPStatus.NOT_ALLOWED_IN_CURRENT_STATE));
           } else {
             this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night')
