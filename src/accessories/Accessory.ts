@@ -1,5 +1,5 @@
 //@ts-check
-import { CharacteristicChange, HapStatusError, PlatformAccessory, Service } from 'homebridge';
+import { CharacteristicChange, HAPStatus, HapStatusError, PlatformAccessory, Service } from 'homebridge';
 import { Panel, DryContact, Motion, Light } from 'xfinityhome';
 import { XfinityHomePlatform } from '../platform';
 import fs from 'fs';
@@ -28,6 +28,7 @@ export default class Accessory {
       fs.mkdirSync(this.projectDir);
     }
     this.log = (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => {
+      const parsedArgs = args.map(arg => JSON.stringify(arg));
       const date = new Date();
       const time = `${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
         `${('0' + (date.getHours() % 12)).slice(-2)}:${('0' + (date.getMinutes())).slice(-2)}:${('0' + (date.getSeconds())).slice(-2)} ` +
@@ -35,15 +36,15 @@ export default class Accessory {
 
       //if (typeof type === 'number') {
       if (type < 4 || typeof type === 'string') {
-        fs.appendFileSync(this.generalLogPath, `[${time}] ${this.name}: ${message} ${args.join(' ')}\n`);
+        fs.appendFileSync(this.generalLogPath, `[${time}] ${this.name}: ${message} ${parsedArgs.join(' ')}\n`);
       }
-      fs.appendFileSync(this.logPath, `[${time}] ${message} ${args.join(' ')}\n`);
+      fs.appendFileSync(this.logPath, `[${time}] ${message} ${parsedArgs.join(' ')}\n`);
       if (typeof type === 'string') {
-        platform.log[type](`${this.name}: ${message} `, ...args);
+        platform.log[type](`${this.name}: ${message} `, ...parsedArgs);
       } else if (type <= (platform.config.logLevel ?? 3)) {
-        platform.log.info(`${this.name}: ${message} `, ...args);
+        platform.log.info(`${this.name}: ${message} `, ...parsedArgs);
       } else {
-        platform.log.debug(`${this.name}: ${message} `, ...args);
+        platform.log.debug(`${this.name}: ${message} `, ...parsedArgs);
       }
     };
     this.log(4, 'Server Started');
@@ -64,25 +65,42 @@ export default class Accessory {
       .setCharacteristic(platform.Characteristic.Model, device.device.model)
       .setCharacteristic(platform.Characteristic.Name, this.name)
       .setCharacteristic(platform.Characteristic.FirmwareRevision, device.device.firmwareVersion)
-      .getCharacteristic(platform.Characteristic.Identify).on('set', () => {
-        this.log('info', 'Identifying Device:', device.device);
-        if (device.device.deviceType.startsWith('light')) {
-          let mode = (device as Light).device.properties.isOn;
-          const startMode = mode;
-          const interval = setInterval(() => {
-            (device as Light).set(!mode).catch(err => {
-              this.log('error', 'Failed To Toggle Light With Error:', err);
-            });
-            mode = !mode;
-          }, 750);
-          setTimeout(() => {
-            clearInterval(interval);
-            (device as Light).set(startMode).catch(err => {
-              this.log('error', 'Failed To Toggle Light With Error:', err);
-            });
-          }, 5000);
-        }
+      .getCharacteristic(platform.Characteristic.ConfiguredName)
+      .onGet(() => device.device.name)
+      .onSet(name => {
+        return new Promise((resolve, reject) => {
+          if (typeof (device as DryContact | Motion | Light).label === 'function') {
+            (device as DryContact | Motion | Light).label(name as string)
+              .then(() => resolve())
+              .catch(err => {
+                this.log('error', 'Failed To Change Configured Name With Error:', err);
+                reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+              });
+          } else {
+            this.log('error', 'Failed To Change Configured Name With Error:', 'READ_ONLY_CHARACTERISTIC');
+            reject(new this.StatusError(HAPStatus.READ_ONLY_CHARACTERISTIC));
+          }
+        });
       });
+    accessory.getService(platform.Service.AccessoryInformation)!.getCharacteristic(platform.Characteristic.Identify).on('set', () => {
+      this.log('info', 'Identifying Device:', device.device);
+      if (device.device.deviceType.startsWith('light')) {
+        let mode = (device as Light).device.properties.isOn;
+        const startMode = mode;
+        const interval = setInterval(() => {
+          (device as Light).set(!mode).catch(err => {
+            this.log('error', 'Failed To Toggle Light With Error:', err);
+          });
+          mode = !mode;
+        }, 750);
+        setTimeout(() => {
+          clearInterval(interval);
+          (device as Light).set(startMode).catch(err => {
+            this.log('error', 'Failed To Toggle Light With Error:', err);
+          });
+        }, 5000);
+      }
+    });
 
     if ((device.device.properties as { temperature?: number }).temperature && (platform.config.temperatureSensors ?? true)) {
       this.temperatureService = accessory.getService(platform.Service.TemperatureSensor);
