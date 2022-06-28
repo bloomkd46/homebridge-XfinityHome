@@ -1,3 +1,7 @@
+### 1.0.1 
+* Represents previous version for NPM (verified plugin)
+
+
 ### 1.0.0 
 * Verified Plugin 🎉 
 
