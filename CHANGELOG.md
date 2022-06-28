@@ -1,3 +1,7 @@
+### 2.0.0 
+* Verified Plugin 🎉 
+
+
 ### 0.3.0 
 * Added Configured Name Field To Accessory's
 
