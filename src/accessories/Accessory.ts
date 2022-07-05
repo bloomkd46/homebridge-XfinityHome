@@ -133,6 +133,9 @@ export default class Accessory {
             this.log(4, `Updating Temperature To ${value.newValue}°C`);
           }
         });
+    } else if (!(platform.config.temperatureSensors ?? true) && accessory.getService(platform.Service.TemperatureSensor)) {
+      this.log('warn', 'Removing Temperature Support');
+      accessory.removeService(accessory.getService(platform.Service.TemperatureSensor)!);
     }
   }
 }
