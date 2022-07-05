@@ -209,11 +209,11 @@
             //const logDelete = document.createElement('logDelete')
             homebridge.showSpinner();
             const logs = await homebridge.request('/getLogs', { logPath: logPath });
-            currentLog = `data:text/plain,${logs.split('<br>').join('%0D%0A')}`;
+            currentLog = `data:text/plain;base64,${btoa(logs.split('<br>').join('\n'))}`;
             //const thisAcc = cachedAccessories.find(x => x.UUID === UUID);
             //const context = thisAcc.context;
             const logDownload = document.getElementById('logDownload');
-            logDownload.href = `data:text/plain,${logs.split('<br>').join('%0D%0A')}`;//await homebridge.request('/getRelativePath', { path: logPath });
+            logDownload.href = currentLog;//await homebridge.request('/getRelativePath', { path: logPath });
             logDownload.download = logPath.split('/').pop();
             //logDownload.href = window.URL.createObjectURL(logPath);
 
@@ -251,6 +251,8 @@
                   }
                 }, 1500);
               }
+            }).catch(error => {
+              //do nothing
             });
           };
           deviceSelect.addEventListener('change', event => showDeviceLog(event.target.value));
@@ -374,7 +376,10 @@
         });
         logDelete.addEventListener('click', async () => {
           homebridge.showSpinner();
+          const logZone = document.getElementById('logZone');
+          logZone.innerHTML = 'Deleting log file at ' + currentLogPath;
           await homebridge.request('/deleteLog', { logPath: currentLogPath });
+          logZone.innerHTML = 'successfully deleted log file at ' + currentLogPath;
           homebridge.hideSpinner();
         });
         logSave.addEventListener('click', async () => {

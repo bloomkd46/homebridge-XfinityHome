@@ -62,7 +62,11 @@ class PluginUiServer extends HomebridgePluginUiServer {
       }
     });
     this.onRequest('/watchForChanges', async (payload) => {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
+        if (!existsSync(payload.path)) {
+          reject('File does not exist: ' + payload.path);
+          return;
+        }
         try {
           const aborter = new AbortController();
           const watcher = watch(payload.path, { signal: aborter.signal });
