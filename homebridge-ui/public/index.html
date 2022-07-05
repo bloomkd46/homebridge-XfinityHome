@@ -183,10 +183,7 @@
           document.getElementById('menuSettings').classList.add('btn-primary');
           document.getElementById('pageConfigTool').style.display = 'none';
           document.getElementById('pageLogs').style.display = 'block';
-          let cachedAccessories =
-            typeof homebridge.getCachedAccessories === 'function'
-              ? await homebridge.getCachedAccessories()
-              : await homebridge.request('/getCachedAccessories');
+          let cachedAccessories = await homebridge.request('/getCachedAccessories');
           if (cachedAccessories.length > 0) {
             cachedAccessories.sort((a, b) => {
               return a.displayName.toLowerCase() > b.displayName.toLowerCase()
