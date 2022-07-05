@@ -1,3 +1,10 @@
+### 2.1.0 
+* UI Tweaks
+* Better Logging During Boot
+* Better Logging During Shutdown
+* Configured Plugin To Delete Temperature Sensor If Disabled In Config (As Opposed To Just No Longer Updating It)
+
+
 ### 2.0.0 
 * Verified Plugin 🎉 
 
