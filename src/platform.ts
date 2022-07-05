@@ -190,7 +190,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       }
     }
     const accessoriesToRemove = this.cachedAccessories.filter(cachedAccessory =>
-      this.restoredAccessories.find(restoredAccessory => restoredAccessory.UUID === cachedAccessory.UUID));
+      !this.restoredAccessories.find(restoredAccessory => restoredAccessory.UUID === cachedAccessory.UUID));
     for (const accessory of accessoriesToRemove) {
       this.log.warn('Removing Accessory: ', accessory.displayName);
       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
