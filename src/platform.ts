@@ -70,7 +70,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
         `${date.getHours() > 12 ? 'PM' : 'AM'}`;
       fs.appendFileSync(generalLogPath, `[${time}] Server Stopped\n`);
 
-    })
+    });
   }
 
   /**
