@@ -58,7 +58,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       // run the method to discover / register your devices as accessories
       this.discoverDevices();
     });
-    this.api.on(APIEvent.DID_FINISH_LAUNCHING, () => {
+    this.api.on(APIEvent.SHUTDOWN, () => {
       const projectDir = path.join(api.user.storagePath(), 'XfinityHome');
       const generalLogPath = path.join(projectDir, 'General.log');
       if (!fs.existsSync(projectDir)) {
