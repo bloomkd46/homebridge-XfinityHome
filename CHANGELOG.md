@@ -1,3 +1,7 @@
+### 2.1.1 
+* Fixed Cached Accessories Being Deleted At Boot
+
+
 ### 2.1.0 
 * UI Tweaks
 * Better Logging During Boot
