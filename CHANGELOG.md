@@ -1,3 +1,10 @@
+### 2.2.0 
+* Fixed API Event Mixup
+* Changed Log Message From Enabled To Added When Handling Temperature Sensors
+* Better Handling Of Object In Log Error's
+* Better Error Logging During Boot
+
+
 ### 2.1.1 
 * Fixed Cached Accessories Being Deleted At Boot
 
