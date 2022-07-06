@@ -33,7 +33,6 @@ export default class PanelAccessory extends Accessory {
 
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, await this.getTargetState());
-      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState());
     };
 
   }

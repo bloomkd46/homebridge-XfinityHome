@@ -29,9 +29,6 @@ export default class DryContactAccessory extends Accessory {
 
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, await this.getContactDetected());
-      this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
-      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
-        device.device.properties.temperature / 100);
     };
   }
 

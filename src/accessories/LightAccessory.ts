@@ -31,9 +31,6 @@ export default class LightAccessory extends Accessory {
 
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.On, await this.getIsOn());
-      if (this.device.device.properties.dimAllowed) {
-        this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness());
-      }
     };
   }
 

@@ -30,9 +30,6 @@ export default class MotionAccessory extends Accessory {
 
     this.device.activityCallback = async () => {
       this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, await this.getMotionDetected());
-      this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
-      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
-        device.device.properties.temperature / 100);
     };
   }
 
