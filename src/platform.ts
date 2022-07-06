@@ -107,6 +107,16 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       this.xhome = await XHome.init(this.refreshToken || this.config.refreshToken);
     } catch (err) {
       this.log.error('Failed To Login With Error:', err);
+      const projectDir = path.join(this.api.user.storagePath(), 'XfinityHome');
+      const generalLogPath = path.join(projectDir, 'General.log');
+      if (!fs.existsSync(projectDir)) {
+        fs.mkdirSync(projectDir);
+      }
+      const date = new Date();
+      const time = `${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
+        `${('0' + (date.getHours() % 12)).slice(-2)}:${('0' + (date.getMinutes())).slice(-2)}:${('0' + (date.getSeconds())).slice(-2)} ` +
+        `${date.getHours() > 12 ? 'PM' : 'AM'}`;
+      fs.appendFileSync(generalLogPath, `[${time}] Error Encountered While Logging In: ${JSON.stringify(err)}\n`);
       if (this.refreshToken) {
         this.log.warn('Attempting To Login With Config Refresh Token');
         this.refreshToken = undefined;
