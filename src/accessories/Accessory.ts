@@ -109,7 +109,7 @@ export default class Accessory {
     if ((device.device.properties as { temperature?: number }).temperature && (platform.config.temperatureSensors ?? true)) {
       this.temperatureService = accessory.getService(platform.Service.TemperatureSensor);
       if (!this.temperatureService) {
-        this.log('info', 'Enabling Temperature Support');
+        this.log('info', 'Adding Temperature Support');
         this.temperatureService = accessory.addService(platform.Service.TemperatureSensor);
       }
 
