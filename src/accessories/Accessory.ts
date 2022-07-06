@@ -28,7 +28,7 @@ export default class Accessory {
       fs.mkdirSync(this.projectDir);
     }
     this.log = (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => {
-      const parsedArgs = args.map(arg => JSON.stringify(arg));
+      const parsedArgs = args.map(arg => JSON.stringify(arg, null, 2));
       const date = new Date();
       const time = `${('0' + (date.getMonth() + 1)).slice(-2)}/${('0' + date.getDate()).slice(-2)}/${date.getFullYear()}, ` +
         `${('0' + (date.getHours() % 12)).slice(-2)}:${('0' + (date.getMinutes())).slice(-2)}:${('0' + (date.getSeconds())).slice(-2)} ` +
