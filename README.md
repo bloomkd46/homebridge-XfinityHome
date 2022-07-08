@@ -35,12 +35,12 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 
 ### Device Features
 
-      |  Device Type   | Features:                                                                                  |
-      | :------------: | :----------------------------------------------------------------------------------------- |
-      |     Panel      | Arm/Disarm Control <br> Armed/Disarmed Notifications <br> Critical Notification If Tripped |
-      | Contact Sensor | Bypass Control* <br> Opened/Closed Notifications <br> Current Temperature**                |
-      | Motion Sensor  | Bypass Control* <br> Motion Detected Notification <br> Current Temperature**               |
-      |  Light Switch  | On/Off Control <br> Dimming Control***                                                     |
+|  Device Type   | Features:                                                                                  |
+| :------------: | :----------------------------------------------------------------------------------------- |
+|     Panel      | Arm/Disarm Control <br> Armed/Disarmed Notifications <br> Critical Notification If Tripped |
+| Contact Sensor | Bypass Control* <br> Opened/Closed Notifications <br> Current Temperature**                |
+| Motion Sensor  | Bypass Control* <br> Motion Detected Notification <br> Current Temperature**               |
+|  Light Switch  | On/Off Control <br> Dimming Control***                                                     |
 
 > \*Using 3rd-Party Apps Such As [Controller For HomeKit](https://controllerforhomekit.com)<br>
 > \*\*Updates When Sensor Tripped<br>
