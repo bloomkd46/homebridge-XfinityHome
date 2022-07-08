@@ -12,27 +12,29 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 
 [![npm](https://img.shields.io/npm/v/homebridge-xfinityhome/latest?label=latest)](https://www.npmjs.com/package/homebridge-xfinityhome)
 [![npm](https://img.shields.io/npm/v/homebridge-xfinityhome/beta?label=beta)](https://github.com/bloomkd46/homebridge-XfinityHome/wiki/Beta-Version)  
- 
+
 [![build workflow](https://github.com/bloomkd46/homebridge-XfinityHome/actions/workflows/build.yml/badge.svg)](https://github.com/bloomkd46/homebridge-XfinityHome/actions/workflows/build.yml)
 [![license](https://badgen.net/github/license/bloomkd46/homebridge-xfinityhome)](/LICENSE)
 
-
 </span>
 
-### Plugin Information
+## Plugin Information
 
 - This plugin allows you to view and control your Xfinity Home System within HomeKit. This plugin:
   - downloads a device list
   - listens for real-time device updates
   - Supports Doors, Windows, Motion Sensors, Lights And Panel.
 
-## Features:
-  - [x] 2FA Compatible
-  - [x] Easy Setup
-  - [x] Real-Time Device Updates
-  - [x] Device-By-Device Logs In Custom UI
-  - [x] Device-By-Device Info In Custom UI
-      ## Device Features:
+## Features
+
+- [x] 2FA Compatible
+- [x] Easy Setup
+- [x] Real-Time Device Updates
+- [x] Device-By-Device Logs In Custom UI
+- [x] Device-By-Device Info In Custom UI
+
+### Device Features
+
       |  Device Type   | Features:                                                                                  |
       | :------------: | :----------------------------------------------------------------------------------------- |
       |     Panel      | Arm/Disarm Control <br> Armed/Disarmed Notifications <br> Critical Notification If Tripped |
@@ -44,15 +46,16 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 > \*\*Updates When Sensor Tripped<br>
 > \*\*\*If Hardware Supports It<br>
 > Don't See A Device? Let Me Know By Submitting A [Feature Request](https://github.com/bloomkd46/homebridge-XfinityHome/issues/new/c)
-## TODO:
-  - [ ] Add First-Gen Camera Support
-  - [ ] Add Next-Gen Camera HomeKit Secure Video Support
-  - [ ] Add Email/Password Option
+
+## TODO
+
+- [ ] Add First-Gen Camera Support
+- [ ] Add Next-Gen Camera HomeKit Secure Video Support
+- [ ] Add Email/Password Option
 
 ### Prerequisites
 
 - To use this plugin, you will need to already have [Homebridge](https://homebridge.io) (at least v1.3.5) or [HOOBS](https://hoobs.org) (at least v4) installed. Refer to the links for more information and installation instructions.
-
 
 ### Setup
 
