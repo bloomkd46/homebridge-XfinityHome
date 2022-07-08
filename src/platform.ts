@@ -122,6 +122,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
         this.refreshToken = undefined;
         this.discoverDevices();
       }
+      return;
     }
     this.log.info(
       `Loaded ${this.cachedAccessories.length} ${this.cachedAccessories.length === 1 ? 'Accessory' : 'Accessories'} From Cache`,
