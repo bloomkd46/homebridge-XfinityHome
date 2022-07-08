@@ -1,3 +1,7 @@
+### 2.2.1 
+* Fixed Plugin Error Caused By Setup Continuing Even If Login Failed
+
+
 ### 2.2.0 
 * Fixed API Event Mixup
 * Changed Log Message From Enabled To Added When Handling Temperature Sensors
