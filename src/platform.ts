@@ -1,13 +1,15 @@
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, APIEvent } from 'homebridge';
+import fs from 'fs';
+import { API, APIEvent, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
+import path from 'path';
+import XHome, { DryContact, Light, Motion, Panel } from 'xfinityhome';
 
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
-import PanelAccessory from './accessories/PanelAccessory';
-import MotionAccessory from './accessories/MotionAccessory';
-import XHome, { Panel, Motion, DryContact, Light } from 'xfinityhome';
 import DryContactAccessory from './accessories/DryContactAccessory';
 import LightAccessory from './accessories/LightAccessory';
-import fs from 'fs';
-import path from 'path';
+import MotionAccessory from './accessories/MotionAccessory';
+import PanelAccessory from './accessories/PanelAccessory';
+import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
+
+
 
 /**
  * HomebridgePlatform
@@ -121,6 +123,8 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
         this.log.warn('Attempting To Login With Config Refresh Token');
         this.refreshToken = undefined;
         this.discoverDevices();
+      } else {
+        throw 'Setup Failed';
       }
     }
     this.log.info(
