@@ -126,6 +126,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       } else {
         throw 'Setup Failed';
       }
+      return;
     }
     this.log.info(
       `Loaded ${this.cachedAccessories.length} ${this.cachedAccessories.length === 1 ? 'Accessory' : 'Accessories'} From Cache`,
