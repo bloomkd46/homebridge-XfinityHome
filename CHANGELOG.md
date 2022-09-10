@@ -1,3 +1,7 @@
+### 2.3.0 
+* Improved UI
+
+
 ### 2.2.2 
 * Tweaked plugin to crash if setup unsuccessful
 
