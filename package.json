@@ -34,7 +34,7 @@
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^0.0.19",
     "qrcode": "^1.5.0",
-    "xfinityhome": "^1.1.2"
+    "xfinityhome": "^1.2.0"
   },
   "devDependencies": {
     "@types/node": "^16.10.9",

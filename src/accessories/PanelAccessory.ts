@@ -1,7 +1,9 @@
 import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
-import { XfinityHomePlatform } from '../platform';
 import { Panel } from 'xfinityhome';
+
+import { XfinityHomePlatform } from '../platform';
 import Accessory from './Accessory';
+
 
 
 export default class PanelAccessory extends Accessory {
@@ -96,8 +98,9 @@ export default class PanelAccessory extends Accessory {
 
   getCurrentState(): CharacteristicValue {
     return this.device.device.properties.status === 'arming' ?
-      this.armModes.indexOf('disarmed') : this.device.device.properties.status === 'entryDelay' ? this.armModes.indexOf('triggered') :
-        this.armModes.indexOf(this.device.device.properties.armType || 'disarmed');
+      this.armModes.indexOf('disarmed') :
+      (this.device.device.properties.status === 'entryDelay' || this.device.device.properties.status === 'faultAlarm') ?
+        this.armModes.indexOf('triggered') : this.armModes.indexOf(this.device.device.properties.armType || 'disarmed');
     /*return new Promise((resolve, reject) => {
 this.device.get()
   .then(device => resolve(device.properties.status === 'arming' ?
