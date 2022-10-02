@@ -1,3 +1,11 @@
+### 2.3.0 
+* Improved UI
+
+
+### 2.2.2 
+* Tweaked plugin to crash if setup unsuccessful
+
+
 ### 2.2.1 
 * Fixed Plugin Error Caused By Setup Continuing Even If Login Failed
 

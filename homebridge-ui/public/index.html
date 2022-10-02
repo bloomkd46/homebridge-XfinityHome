@@ -230,7 +230,7 @@
                 deviceHTML +=
                   `<tr>
                     <th scope="row">${key}</th>
-                    <td>${JSON.stringify(device.context.device[key], null, 1).split('\n').join('<br>')}</td>
+                    <td><pre style="color: inherit;">${JSON.stringify(device.context.device[key], null, 1)}</pre></td>
                   </tr>`;
               });
               document.getElementById('deviceDetailsTable').innerHTML = deviceHTML;
