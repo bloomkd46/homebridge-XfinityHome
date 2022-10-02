@@ -1,3 +1,7 @@
+### 2.4.0 
+* Added faultAlarm status to panel
+
+
 ### 2.3.0 
 * Improved UI
 
