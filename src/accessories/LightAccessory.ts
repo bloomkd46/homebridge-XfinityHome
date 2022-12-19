@@ -1,13 +1,16 @@
-import { Service, PlatformAccessory, CharacteristicValue, HAPStatus, CharacteristicChange } from 'homebridge';
-import { XfinityHomePlatform } from '../platform';
-import Accessory from './Accessory';
+import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
 import { Light } from 'xfinityhome';
+
+import { XfinityHomePlatform } from '../platform';
+import { CONTEXT } from '../settings';
+import Accessory from './Accessory';
+
 
 export default class LightAccessory extends Accessory {
   private service: Service;
   constructor(
     private readonly platform: XfinityHomePlatform,
-    private readonly accessory: PlatformAccessory,
+    private readonly accessory: PlatformAccessory<CONTEXT>,
     private readonly device: Light,
   ) {
     super(platform, accessory, device);
@@ -18,7 +21,7 @@ export default class LightAccessory extends Accessory {
     this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
 
     this.service.getCharacteristic(this.platform.Characteristic.On)
-
+      .onGet(this.getIsOn.bind(this, false))
       .onSet(this.set.bind(this))
       .on('change', this.notifyIsOnChange.bind(this));
 
@@ -29,56 +32,57 @@ export default class LightAccessory extends Accessory {
         .on('change', this.notifyBrightnessChange.bind(this));
     }
 
-    this.device.activityCallback = async () => {
-      this.service.updateCharacteristic(this.platform.Characteristic.On, await this.getIsOn());
+    this.device.onchange = async (_oldState, newState) => {
+      /** Normally not updated until AFTER `onchange` function execution */
+      this.device.device = newState;
+      this.service.updateCharacteristic(this.platform.Characteristic.On, await this.getIsOn(true));
+      this.device.device.properties.level ?
+        this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness()) : undefined;
+
+      this.accessory.context.logPath = this.logPath;
+      this.accessory.context.device = device;
+      this.accessory.context.refreshToken = this.platform.xhome.refreshToken;
+      this.platform.api.updatePlatformAccessories([this.accessory]);
+
+      if (this.device.device.trouble.length) {
+        this.log('warn', 'Trouble detected!');
+        this.log('warn', 'Please open an issue about this.');
+        this.log('warn', JSON.stringify(this.device.device.trouble, null, 2));
+      }
     };
   }
 
-  async getIsOn(): Promise<CharacteristicValue> {
-    return new Promise((resolve, reject) => {
-      this.device.get().then(device => {
-        device.properties.level ?
-          this.service.updateCharacteristic(this.platform.Characteristic.Brightness, device.properties.level) : undefined;
-        resolve(device.properties.isOn);
-
-        this.accessory.context.logPath = this.logPath;
-        this.accessory.context.device = device;
-        this.accessory.context.refreshToken = this.device.xhome.refreshToken;
-        this.platform.api.updatePlatformAccessories([this.accessory]);
-      }).catch(err => {
-        this.log('error', 'Failed To Fetch IsOn State With Error:', err);
-        reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+  private getIsOn(skipUpdate?: boolean): CharacteristicValue {
+    if (skipUpdate !== true) {
+      this.device.get().catch(err => {
+        this.log('error', 'Failed To Fetch isOn State With Error:', err);
+        throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       });
-    });
+    }
+    return this.device.device.properties.isOn;
   }
 
-  async notifyIsOnChange(value: CharacteristicChange): Promise<void> {
+  private async notifyIsOnChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(2, value.newValue ? 'Enabled' : 'Disabled');
     }
   }
 
-  async set(value: CharacteristicValue): Promise<void> {
-    //this.service.updateCharacteristic(this.platform.Characteristic[typeof value === 'boolean' ? 'On' : 'Brightness'], value);
-    return new Promise((resolve, reject) => {
-      this.device.set(value as number | boolean).then(() => {
-        //this.service.updateCharacteristic(this.platform.Characteristic[typeof value === 'boolean' ? 'On' : 'Brightness'], value);
-        resolve();
-      }).catch(err => {
-        this.log('error', `Failed To Set ${typeof value === 'number' ? 'Brightness' : 'IsOn'} With Error:`, err);
-        reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
-      });
+  private async set(value: CharacteristicValue): Promise<void> {
+    await this.device.set(value as number | boolean).catch(err => {
+      this.log('error', `Failed To Set ${typeof value === 'number' ? 'Brightness' : 'IsOn'} With Error:`, err);
+      throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     });
   }
 
-  getBrightness(): CharacteristicValue {
+  private getBrightness(): CharacteristicValue {
     if (this.device.device.properties.level === undefined) {
       throw new this.StatusError(HAPStatus.RESOURCE_DOES_NOT_EXIST);
     }
     return this.device.device.properties.level;
   }
 
-  async notifyBrightnessChange(value: CharacteristicChange): Promise<void> {
+  private async notifyBrightnessChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(2, 'Set To ' + value.newValue);
     }

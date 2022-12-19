@@ -1,14 +1,14 @@
 import fs from 'fs';
 import { API, APIEvent, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
 import path from 'path';
-import XHome, { DryContact, Light, Motion, Panel } from 'xfinityhome';
+import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Unknown } from 'xfinityhome';
 
 import DryContactAccessory from './accessories/DryContactAccessory';
 import LightAccessory from './accessories/LightAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
 import PanelAccessory from './accessories/PanelAccessory';
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
-
+import UnknownAccessory from './accessories/UnknownAccessory';
+import { CONTEXT, PLATFORM_NAME, PLUGIN_NAME } from './settings';
 
 
 /**
@@ -23,11 +23,11 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
   private refreshToken?: string;
 
   /** this is used to track restored cached accessories */
-  private readonly cachedAccessories: PlatformAccessory[] = [];
+  private readonly cachedAccessories: PlatformAccessory<CONTEXT>[] = [];
   /** this is used to track which accessories have been restored from the cache */
-  private readonly restoredAccessories: PlatformAccessory[] = [];
+  private readonly restoredAccessories: PlatformAccessory<CONTEXT>[] = [];
   /** this is used to track which accessories have been added */
-  private readonly addedAccessories: PlatformAccessory[] = [];
+  private readonly addedAccessories: PlatformAccessory<CONTEXT>[] = [];
   /** this is used to track which accessories have been configured */
   //public readonly configuredAccessories: PlatformAccessory[] = [];
 
@@ -79,16 +79,11 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
    * This function is invoked when homebridge restores cached accessories from disk at startup.
    * It should be used to setup event handlers for characteristics and update respective values.
    */
-  configureAccessory(accessory: PlatformAccessory) {
+  configureAccessory(accessory: PlatformAccessory<CONTEXT>) {
     this.log.debug('Loading accessory from cache:', accessory.displayName);
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.cachedAccessories.push(accessory);
-    if (!this.refreshToken) {
-      //this.log.info('Loading Refresh Token From Cache');
-      this.refreshToken = accessory.context.refreshToken;
-      //this.log.info(this.refreshToken || 'ERROR LOADING TOKEN');
-    }
   }
 
   /**
@@ -106,7 +101,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       return;
     }
     try {
-      this.xhome = await XHome.init(this.refreshToken || this.config.refreshToken);
+      this.xhome = new XHome(this.refreshToken || this.config.refreshToken, true);
     } catch (err) {
       this.log.error('Failed To Login With Error:', err);
       const projectDir = path.join(this.api.user.storagePath(), 'XfinityHome');
@@ -131,13 +126,33 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
     this.log.info(
       `Loaded ${this.cachedAccessories.length} ${this.cachedAccessories.length === 1 ? 'Accessory' : 'Accessories'} From Cache`,
     );
-    for (const device of [...this.xhome.Panel, ...this.xhome.MotionSensors, ...this.xhome.DryContactSensors, ...this.xhome.Lights]) {
-      let success = true;
+    for (const device of await this.xhome.getDevices()) {
       const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
       const existingAccessory = this.cachedAccessories.find(accessory => accessory.UUID === uuid);
       if (existingAccessory) {
         this.log.debug('Restoring existing accessory from cache:', existingAccessory.displayName);
-        switch (device.device.deviceType) {
+        switch (device.constructor) {
+          case Panel:
+            new PanelAccessory(this, existingAccessory, device as Panel);
+            break;
+          case Light:
+            new LightAccessory(this, existingAccessory, device as Light);
+            break;
+          case Motion:
+            new MotionAccessory(this, existingAccessory, device as Motion);
+            break;
+          case DryContact:
+            new DryContactAccessory(this, existingAccessory, device as DryContact);
+            break;
+          case Keyfob:
+          case Keypad:
+          case Camera:
+            break;
+          default:
+            new UnknownAccessory(this, existingAccessory, device as Unknown);
+            break;
+        }
+        /*switch (device.device.deviceType) {
           case 'panel':
             new PanelAccessory(this, existingAccessory, device as Panel);
             break;
@@ -159,22 +174,37 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
               success = false;
             }
             break;
-        }
-        if (success) {
-          this.restoredAccessories.push(existingAccessory);
-        }
+        }*/
+        this.restoredAccessories.push(existingAccessory);
       } else {
         // the accessory does not yet exist, so we need to create it
         this.log.info('Adding new accessory:', device.device.name || 'Panel');
 
         // create a new accessory
-        const accessory = new this.api.platformAccessory(device.device.name || 'Panel', uuid);
+        const accessory = new this.api.platformAccessory<CONTEXT>(device.device.name || 'Panel', uuid);
 
         // store a copy of the device object in the `accessory.context`
         // the `context` property can be used to store any data about the accessory you may need
         accessory.context.device = device.device;
 
-        switch (device.device.deviceType) {
+        switch (device.constructor) {
+          case Panel:
+            new PanelAccessory(this, accessory, device as Panel);
+            break;
+          case Light:
+            new LightAccessory(this, accessory, device as Light);
+            break;
+          case Motion:
+            new MotionAccessory(this, accessory, device as Motion);
+            break;
+          case DryContact:
+            new DryContactAccessory(this, accessory, device as DryContact);
+            break;
+          default:
+            new UnknownAccessory(this, accessory, device as Unknown);
+            break;
+        }
+        /*switch (device.device.deviceType) {
           case 'panel':
             new PanelAccessory(this, accessory, device as Panel);
             break;
@@ -195,10 +225,8 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
               success = false;
             }
             break;
-        }
-        if (success) {
-          this.addedAccessories.push(accessory);
-        }
+        }*/
+        this.addedAccessories.push(accessory);
 
         // link the accessory to your platform
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);

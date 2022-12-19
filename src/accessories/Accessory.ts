@@ -1,9 +1,12 @@
+import fs from 'fs';
 //@ts-check
 import { CharacteristicChange, HAPStatus, HapStatusError, PlatformAccessory, Service } from 'homebridge';
-import { Panel, DryContact, Motion, Light } from 'xfinityhome';
-import { XfinityHomePlatform } from '../platform';
-import fs from 'fs';
 import path from 'path';
+import { Device, Light } from 'xfinityhome';
+
+import { XfinityHomePlatform } from '../platform';
+import { CONTEXT } from '../settings';
+
 
 export default class Accessory {
   protected temperatureService?: Service;
@@ -16,8 +19,8 @@ export default class Accessory {
 
   constructor(
     platform: XfinityHomePlatform,
-    accessory: PlatformAccessory,
-    device: Panel | DryContact | Motion | Light,
+    accessory: PlatformAccessory<CONTEXT>,
+    device: Device,
   ) {
     this.name = device.device.name || 'Panel';
     this.projectDir = path.join(platform.api.user.storagePath(), 'XfinityHome');
@@ -54,59 +57,54 @@ export default class Accessory {
       this.log(4, 'Server Stopped');
       accessory.context.logPath = this.logPath;
       accessory.context.device = device.device;
-      accessory.context.refreshToken = device.xhome.refreshToken;
+      accessory.context.refreshToken = platform.xhome.refreshToken;
       platform.api.updatePlatformAccessories([accessory]);
     });
 
+    const deviceInfo = device.device;
     // set accessory information
     accessory.getService(platform.Service.AccessoryInformation)!
-      .setCharacteristic(platform.Characteristic.Manufacturer, device.device.manufacturer)
-      .setCharacteristic(platform.Characteristic.SerialNumber, (device as Motion).device.serialNumber ?? accessory.UUID)
-      .setCharacteristic(platform.Characteristic.Model, device.device.model)
+      .setCharacteristic(platform.Characteristic.Manufacturer, deviceInfo.manufacturer)
+      .setCharacteristic(platform.Characteristic.SerialNumber, 'serialNumber' in deviceInfo ? deviceInfo.serialNumber : accessory.UUID)
+      .setCharacteristic(platform.Characteristic.Model, deviceInfo.model)
       .setCharacteristic(platform.Characteristic.Name, this.name)
-      .setCharacteristic(platform.Characteristic.FirmwareRevision, device.device.firmwareVersion)
-      .getCharacteristic(platform.Characteristic.ConfiguredName)
-      .onGet(() => device.device.name)
-      .onSet(name => {
-        return new Promise((resolve, reject) => {
-          if (typeof (device as DryContact | Motion | Light).label === 'function') {
-            (device as DryContact | Motion | Light).label(name as string)
-              .then(() => resolve())
-              .catch(err => {
-                this.log('error', 'Failed To Change Configured Name With Error:', err);
-                reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
-              });
-          } else {
-            this.log('error', 'Failed To Change Configured Name With Error:', 'READ_ONLY_CHARACTERISTIC');
-            reject(new this.StatusError(HAPStatus.READ_ONLY_CHARACTERISTIC));
-          }
-        });
-      }).on('change', (value) => {
+      .setCharacteristic(platform.Characteristic.FirmwareRevision, deviceInfo.firmwareVersion)
+      .getCharacteristic(platform.Characteristic.ConfiguredName).onGet(() => device.device.name).onSet(async name => {
+        if ('label' in device) {
+          await device.label(name as string).catch(err => {
+            this.log('error', 'Failed To Change Configured Name With Error:', err);
+            throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          });
+        } else {
+          this.log('error', 'Failed To Change Configured Name With Error:', 'READ_ONLY_CHARACTERISTIC');
+          throw new this.StatusError(HAPStatus.READ_ONLY_CHARACTERISTIC);
+        }
+      }).on('change', async (value) => {
         if (value.newValue !== value.oldValue) {
           this.log(3, `Configured Name Changed From ${value.oldValue} To ${value.newValue}`);
         }
       });
     accessory.getService(platform.Service.AccessoryInformation)!.getCharacteristic(platform.Characteristic.Identify).on('set', () => {
       this.log('info', 'Identifying Device:', device.device);
-      if (device.device.deviceType.startsWith('light')) {
-        let mode = (device as Light).device.properties.isOn;
+      if (device instanceof Light) {
+        let mode = device.device.properties.isOn;
         const startMode = mode;
         const interval = setInterval(() => {
-          (device as Light).set(!mode).catch(err => {
+          device.set(!mode).catch(err => {
             this.log('error', 'Failed To Toggle Light With Error:', err);
           });
           mode = !mode;
         }, 750);
         setTimeout(() => {
           clearInterval(interval);
-          (device as Light).set(startMode).catch(err => {
+          device.set(startMode).catch(err => {
             this.log('error', 'Failed To Toggle Light With Error:', err);
           });
         }, 5000);
       }
     });
 
-    if ((device.device.properties as { temperature?: number }).temperature && (platform.config.temperatureSensors ?? true)) {
+    if ('temperature' in device.device.properties && (platform.config.temperatureSensors ?? true)) {
       this.temperatureService = accessory.getService(platform.Service.TemperatureSensor);
       if (!this.temperatureService) {
         this.log('info', 'Adding Temperature Support');
@@ -117,7 +115,7 @@ export default class Accessory {
 
       this.temperatureService.getCharacteristic(platform.Characteristic.CurrentTemperature)
         .onGet((): number => {
-          return (device as DryContact | Motion).device.properties.temperature / 100;
+          return device.device.properties.temperature / 100;
           /*return new Promise((resolve, reject) => {
             device.get().then(device => resolve(device.properties.temperature / 100)).catch(err => {
               this.log('error', 'Failed To Fetch Temperature With Error:', err);

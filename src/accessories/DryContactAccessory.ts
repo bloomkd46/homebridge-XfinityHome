@@ -1,13 +1,16 @@
-import { Service, PlatformAccessory, CharacteristicValue, HAPStatus, CharacteristicChange, Perms } from 'homebridge';
-import { XfinityHomePlatform } from '../platform';
-import Accessory from './Accessory';
+import { CharacteristicChange, CharacteristicValue, HAPStatus, Perms, PlatformAccessory, Service } from 'homebridge';
 import { DryContact } from 'xfinityhome';
+
+import { XfinityHomePlatform } from '../platform';
+import { CONTEXT } from '../settings';
+import Accessory from './Accessory';
+
 
 export default class DryContactAccessory extends Accessory {
   private service: Service;
   constructor(
     private readonly platform: XfinityHomePlatform,
-    private readonly accessory: PlatformAccessory,
+    private readonly accessory: PlatformAccessory<CONTEXT>,
     private readonly device: DryContact,
   ) {
     super(platform, accessory, device);
@@ -18,56 +21,86 @@ export default class DryContactAccessory extends Accessory {
     this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
 
     this.service.getCharacteristic(this.platform.Characteristic.ContactSensorState)
-      .onGet(this.getContactDetected.bind(this))
+      .onGet(this.getContactDetected.bind(this, false))
       .on('change', this.notifyContactChange.bind(this));
-    this.service.getCharacteristic(this.platform.Characteristic.StatusActive)
-      .onGet(this.getActive.bind(this))
-      .on('change', this.notifyActiveChange.bind(this))
-      .onSet(this.setActive.bind(this)).setProps({
-        perms: [Perms.PAIRED_READ, Perms.PAIRED_WRITE, Perms.NOTIFY],
-      });
 
-    this.device.activityCallback = async () => {
-      this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, await this.getContactDetected());
+    this.service.getCharacteristic(this.platform.Characteristic.StatusActive)
+      .setProps({
+        perms: [Perms.PAIRED_READ, Perms.PAIRED_WRITE, Perms.NOTIFY],
+      })
+      .onGet(this.getActive.bind(this))
+      .onSet(this.setActive.bind(this))
+      .on('change', this.notifyActiveChange.bind(this));
+
+    this.service.getCharacteristic(this.platform.Characteristic.StatusTampered)
+      .onGet(this.getTampered.bind(this))
+      .on('change', this.notifyTamperedChange.bind(this));
+
+    this.device.onchange = async (_oldState, newState) => {
+      /** Normally not updated until AFTER `onchange` function execution */
+      this.device.device = newState;
+      this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
+      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, newState.properties.temperature / 100);
+
+      this.accessory.context.logPath = this.logPath;
+      this.accessory.context.device = newState;
+      this.accessory.context.refreshToken = this.platform.xhome.refreshToken;
+      this.platform.api.updatePlatformAccessories([this.accessory]);
+
+      if (this.device.device.trouble.length && !this.getTampered()) {
+        this.log('warn', 'Trouble detected!');
+        this.log('warn', 'Please open an issue about this.');
+        this.log('warn', JSON.stringify(this.device.device.trouble, null, 2));
+      }
     };
   }
 
-  async getContactDetected(): Promise<CharacteristicValue> {
-    return new Promise((resolve, reject) => {
-      this.device.get().then(device => {
-        this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
-        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
-          this.device.device.properties.temperature / 100);
-        resolve(device.properties.isFaulted ? 1 : 0);
-
-        this.accessory.context.logPath = this.logPath;
-        this.accessory.context.device = device;
-        this.accessory.context.refreshToken = this.device.xhome.refreshToken;
-        this.platform.api.updatePlatformAccessories([this.accessory]);
-      }).catch(err => {
+  private getContactDetected(skipUpdate?: boolean): CharacteristicValue {
+    if (skipUpdate !== true) {
+      this.device.get().catch(err => {
         this.log('error', 'Failed To Fetch Contact State With Error:', err);
-        reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+        throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       });
-    });
+    }
+    return this.device.device.properties.isFaulted ? 1 : 0;
   }
 
-  async notifyContactChange(value: CharacteristicChange): Promise<void> {
+  private async notifyContactChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(3, value.newValue === 0 ? 'Closed' : 'Opened');
     }
   }
 
-  getActive(): CharacteristicValue {
+  private getActive(): CharacteristicValue {
     return !this.device.device.properties.isBypassed;
   }
 
-  async setActive(value: CharacteristicValue): Promise<void> {
-    this.device.bypass(!value);
+  private async setActive(value: CharacteristicValue): Promise<void> {
+    await this.device.bypass(!value).catch(err => {
+      this.log('error', `Failed To ${!value ? 'Bypass' : 'Activate'} With Error:`, err);
+      throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+    });
   }
 
-  async notifyActiveChange(value: CharacteristicChange): Promise<void> {
+  private async notifyActiveChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(2, value.newValue ? 'Activated' : 'Bypassed');
+    }
+  }
+
+  private getTampered(): CharacteristicValue {
+    return this.device.device.trouble.find(trouble => trouble.name === 'senTamp') ? 1 : 0;
+  }
+
+  private async notifyTamperedChange(value: CharacteristicChange): Promise<void> {
+    if (value.newValue !== value.oldValue) {
+      if (value.newValue) {
+        this.log('warn', 'Tampered');
+      } else {
+        this.log(2, 'Fixed');
+      }
     }
   }
 }
