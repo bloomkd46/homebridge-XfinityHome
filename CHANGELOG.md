@@ -1,3 +1,9 @@
+### 3.0.0 Beta 1 
+* Full Rewrite
+* Performance Boost
+* Increased Device Compatibility
+
+
 ### 2.4.0 
 * Added faultAlarm status to panel
 
