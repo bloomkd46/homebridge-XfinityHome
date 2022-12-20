@@ -1,3 +1,9 @@
+### 3.0.0 Beta 9 
+* Fixed Xh-Auth token expiring
+* Improved status updates
+* Added energy usage data to light
+
+
 ### 3.0.0 Beta 8 
 * Better temperature initialization
 
