@@ -1,3 +1,7 @@
+### 3.0.0 Beta 12 
+* Changed hap-nodejs dependency to a developer dependency
+
+
 ### 3.0.0 Beta 11 
 * Assigned energy usage data directly to light service
 
