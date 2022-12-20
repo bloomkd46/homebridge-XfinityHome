@@ -35,6 +35,11 @@ export default class MotionAccessory extends Accessory {
       .onGet(this.getTampered.bind(this))
       .on('change', this.notifyTamperedChange.bind(this));
 
+    this.device.onevent = event => {
+      if (event.mediaType === 'event/zone' && event.name === 'isFaulted') {
+        this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, event.value === 'true');
+      }
+    };
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
