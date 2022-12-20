@@ -1,3 +1,7 @@
+### 3.0.0 Beta 16 
+* Improved device status updates algorithm
+
+
 ### 3.0.0 Beta 15 
 * Improved Energy Data Characteristic
 
