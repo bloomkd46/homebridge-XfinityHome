@@ -31,6 +31,14 @@ export default class PanelAccessory extends Accessory {
       .onGet(this.getTampered.bind(this))
       .on('change', this.notifyTamperedChange.bind(this));
 
+    this.device.onevent = event => {
+      if (event.mediaType === 'event/securityStateChange') {
+        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, event.metadata.status === 'arming' ?
+          this.armModes.indexOf('disarmed') : this.armModes.indexOf(event.metadata.armType || 'disarmed'));
+        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState,
+          this.armModes.indexOf(event.metadata.armType || 'disarmed'));
+      }
+    };
 
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
@@ -45,7 +53,7 @@ export default class PanelAccessory extends Accessory {
       this.platform.api.updatePlatformAccessories([this.accessory]);
 
       if (this.device.device.trouble.length && !this.getTampered()) {
-        this.log('warn', 'Trouble detected!');
+        this.log('warn', 'Unknown trouble detected!');
         this.log('warn', 'Please open an issue about this.');
         this.log('warn', JSON.stringify(this.device.device.trouble, null, 2));
       }

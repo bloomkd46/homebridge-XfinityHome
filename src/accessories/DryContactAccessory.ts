@@ -61,8 +61,20 @@ export default class DryContactAccessory extends Accessory {
       this.accessory.removeService(this.accessory.getService(this.platform.Service.TemperatureSensor)!);
     }
     this.device.onevent = event => {
-      if (event.mediaType === 'event/zone' && event.name === 'isFaulted') {
+      if ('sensorTemperature' in event.metadata) {
+        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
+          JSON.parse(event.metadata.sensorTemperature) / 100);
+      }
+      if (event.mediaType === 'event/zoneUpdated') {
+        this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, event.metadata.isBypassed === 'false');
+      }
+      if (event.name === 'isFaulted') {
         this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, event.value === 'true' ? 1 : 0);
+      }
+      if (event.name === 'trouble') {
+        if (event.value === 'senTamp' || event.value === 'senTampRes') {
+          this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, 1);
+        }
       }
     };
     this.device.onchange = async (_oldState, newState) => {
@@ -79,7 +91,7 @@ export default class DryContactAccessory extends Accessory {
       this.platform.api.updatePlatformAccessories([this.accessory]);
 
       if (this.device.device.trouble.length && !this.getTampered()) {
-        this.log('warn', 'Trouble detected!');
+        this.log('warn', 'Unknown trouble detected!');
         this.log('warn', 'Please open an issue about this.');
         this.log('warn', JSON.stringify(this.device.device.trouble, null, 2));
       }

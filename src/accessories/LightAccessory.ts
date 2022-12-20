@@ -2,12 +2,14 @@ import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory
 import { Light } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
+import { EnergyData, EnergyUsage } from '../services/EnergyData';
 import { CONTEXT } from '../settings';
 import Accessory from './Accessory';
 
 
 export default class LightAccessory extends Accessory {
   private service: Service;
+  private energyService?: Service;
   constructor(
     private readonly platform: XfinityHomePlatform,
     private readonly accessory: PlatformAccessory<CONTEXT>,
@@ -31,6 +33,33 @@ export default class LightAccessory extends Accessory {
         .onSet(this.set.bind(this))
         .on('change', this.notifyBrightnessChange.bind(this));
     }
+    if (this.device.device.properties.energyMgmtEnabled) {
+      this.energyService = this.accessory.getService(EnergyData);
+      if (!this.energyService) {
+        this.log('info', 'Adding Energy Management Support');
+        this.energyService = this.accessory.addService(EnergyData);
+      }
+
+      this.energyService.setCharacteristic(platform.Characteristic.Name, device.device.name + ' Energy Data');
+
+      this.energyService.getCharacteristic(EnergyUsage)
+        .onGet((): number => device.device.properties.energyUsage / 10)
+        .on('change', async (value: CharacteristicChange): Promise<void> => {
+          if (value.newValue !== value.oldValue) {
+            this.log(4, `Updating Energy Usage To ${value.newValue} Amps`);
+          }
+        });
+    }
+
+    this.device.onevent = event => {
+      if (event.mediaType === 'event/lighting') {
+        this.service.updateCharacteristic(this.platform.Characteristic.On, JSON.parse(event.metadata.isOn));
+        this.device.device.properties.dimAllowed ?
+          this.service.updateCharacteristic(this.platform.Characteristic.Brightness, JSON.parse(event.metadata.level)) : undefined;
+        this.device.device.properties.energyMgmtEnabled ?
+          this.service.updateCharacteristic(EnergyUsage, JSON.parse(event.metadata.energyUsage) / 10) : undefined;
+      }
+    };
 
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
@@ -45,7 +74,7 @@ export default class LightAccessory extends Accessory {
       this.platform.api.updatePlatformAccessories([this.accessory]);
 
       if (this.device.device.trouble.length) {
-        this.log('warn', 'Trouble detected!');
+        this.log('warn', 'Unknown trouble detected!');
         this.log('warn', 'Please open an issue about this.');
         this.log('warn', JSON.stringify(this.device.device.trouble, null, 2));
       }

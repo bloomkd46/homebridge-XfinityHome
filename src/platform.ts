@@ -104,7 +104,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       return;
     }
     try {
-      this.xhome = new XHome(this.refreshToken || this.config.refreshToken, true);
+      this.xhome = new XHome(this.refreshToken || this.config.refreshToken, { enabled: true, autoFetch: false });
     } catch (err) {
       this.log.error('Failed To Login With Error:', err);
       const projectDir = path.join(this.api.user.storagePath(), 'XfinityHome');
