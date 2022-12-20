@@ -130,66 +130,65 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       `Loaded ${this.cachedAccessories.length} ${this.cachedAccessories.length === 1 ? 'Accessory' : 'Accessories'} From Cache`,
     );
     for (const device of await this.xhome.getDevices()) {
-      const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
-      const existingAccessory = this.cachedAccessories.find(accessory => accessory.UUID === uuid);
-      if (existingAccessory) {
-        this.log.debug('Restoring existing accessory from cache:', existingAccessory.displayName);
-        this.restoredAccessories.push(existingAccessory);
-        switch (device.constructor) {
-          case Panel:
-            new PanelAccessory(this, existingAccessory, device as Panel);
-            break;
-          case Light:
-            new LightAccessory(this, existingAccessory, device as Light);
-            break;
-          case Motion:
-            new MotionAccessory(this, existingAccessory, device as Motion);
-            break;
-          case DryContact:
-            new DryContactAccessory(this, existingAccessory, device as DryContact);
-            break;
-          case Keyfob:
-          case Keypad:
-          case Camera:
-          case Router:
-            this.restoredAccessories.slice(-1);
-            break;
-          default:
-            new UnknownAccessory(this, existingAccessory, device as Unknown);
-            break;
-        }
-      } else {
-        if ([Keyfob, Keypad, Camera, Router].find(blockedAccessory => device instanceof blockedAccessory)) {
-          return;
-        }
-        // the accessory does not yet exist, so we need to create it
-        this.log.info('Adding new accessory:', device.device.name || 'Panel');
+      if ([Keyfob, Keypad, Camera, Router].find(blockedAccessory => device instanceof blockedAccessory) === undefined) {
+        const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
+        const existingAccessory = this.cachedAccessories.find(accessory => accessory.UUID === uuid);
+        if (existingAccessory) {
+          this.log.debug('Restoring existing accessory from cache:', existingAccessory.displayName);
+          this.restoredAccessories.push(existingAccessory);
+          switch (device.constructor) {
+            case Panel:
+              new PanelAccessory(this, existingAccessory, device as Panel);
+              break;
+            case Light:
+              new LightAccessory(this, existingAccessory, device as Light);
+              break;
+            case Motion:
+              new MotionAccessory(this, existingAccessory, device as Motion);
+              break;
+            case DryContact:
+              new DryContactAccessory(this, existingAccessory, device as DryContact);
+              break;
+            case Keyfob:
+            case Keypad:
+            case Camera:
+            case Router:
+              this.restoredAccessories.slice(-1);
+              break;
+            default:
+              new UnknownAccessory(this, existingAccessory, device as Unknown);
+              break;
+          }
+        } else {
+          // the accessory does not yet exist, so we need to create it
+          this.log.info('Adding new accessory:', device.device.name || 'Panel');
 
-        // create a new accessory
-        const accessory = new this.api.platformAccessory<CONTEXT>(
-          device instanceof Panel ? 'Panel' : device.device.name || device.device.model, uuid);
+          // create a new accessory
+          const accessory = new this.api.platformAccessory<CONTEXT>(
+            device instanceof Panel ? 'Panel' : device.device.name || device.device.model, uuid);
 
-        // store a copy of the device object in the `accessory.context`
-        // the `context` property can be used to store any data about the accessory you may need
-        accessory.context.device = device.device;
-        this.addedAccessories.push(accessory);
+          // store a copy of the device object in the `accessory.context`
+          // the `context` property can be used to store any data about the accessory you may need
+          accessory.context.device = device.device;
+          this.addedAccessories.push(accessory);
 
-        switch (device.constructor) {
-          case Panel:
-            new PanelAccessory(this, accessory, device as Panel);
-            break;
-          case Light:
-            new LightAccessory(this, accessory, device as Light);
-            break;
-          case Motion:
-            new MotionAccessory(this, accessory, device as Motion);
-            break;
-          case DryContact:
-            new DryContactAccessory(this, accessory, device as DryContact);
-            break;
-          default:
-            new UnknownAccessory(this, accessory, device as Unknown);
-            break;
+          switch (device.constructor) {
+            case Panel:
+              new PanelAccessory(this, accessory, device as Panel);
+              break;
+            case Light:
+              new LightAccessory(this, accessory, device as Light);
+              break;
+            case Motion:
+              new MotionAccessory(this, accessory, device as Motion);
+              break;
+            case DryContact:
+              new DryContactAccessory(this, accessory, device as DryContact);
+              break;
+            default:
+              new UnknownAccessory(this, accessory, device as Unknown);
+              break;
+          }
         }
       }
     }
