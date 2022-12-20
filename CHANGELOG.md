@@ -1,3 +1,7 @@
+### 3.0.0 Beta 8 
+* Better temperature initialization
+
+
 ### 3.0.0 Beta 7 
 * Fixed improper name being logged for nameless devices during initial setup
 
