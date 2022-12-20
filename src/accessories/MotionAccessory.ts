@@ -47,14 +47,11 @@ export default class MotionAccessory extends Accessory {
       this.temperatureService.setCharacteristic(platform.Characteristic.Name, device.device.name + ' Temperature');
 
       this.temperatureService.getCharacteristic(platform.Characteristic.CurrentTemperature)
-        .onGet((): number => device.device.properties.temperature / 100)
         .setProps({
           minStep: 0.01,
-        }).on('change', async (value: CharacteristicChange): Promise<void> => {
-          if (value.newValue !== value.oldValue) {
-            this.log(4, `Updating Temperature To ${value.newValue}°C`);
-          }
-        });
+        })
+        .onGet(this.getTemperature.bind(this))
+        .on('change', this.notifyTemperatureChange.bind(this));
     } else if (!(this.platform.config.temperatureSensors ?? true) && this.accessory.getService(this.platform.Service.TemperatureSensor)) {
       this.log('warn', 'Removing Temperature Support');
       this.accessory.removeService(this.accessory.getService(this.platform.Service.TemperatureSensor)!);
@@ -62,14 +59,16 @@ export default class MotionAccessory extends Accessory {
 
     this.device.onevent = event => {
       if ('sensorTemperature' in event.metadata) {
-        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature,
-          JSON.parse(event.metadata.sensorTemperature) / 100);
+        this.device.device.properties.temperature = JSON.parse(event.metadata.sensorTemperature);
+        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
       }
       if (event.mediaType === 'event/zoneUpdated') {
-        this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, event.metadata.isBypassed === 'false');
+        this.device.device.properties.isBypassed = event.metadata.isBypassed === 'true';
+        this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       }
       if (event.name === 'isFaulted') {
-        this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, event.value === 'true');
+        this.device.device.properties.isFaulted = event.value === 'true';
+        this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.getMotionDetected(true));
       }
       if (event.name === 'trouble') {
         if (event.value === 'senTamp' || event.value === 'senTampRes') {
@@ -83,7 +82,7 @@ export default class MotionAccessory extends Accessory {
       this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.getMotionDetected(true));
       this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
-      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, newState.properties.temperature / 100);
+      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
 
       this.accessory.context.logPath = this.logPath;
       this.accessory.context.device = newState;
@@ -142,6 +141,16 @@ export default class MotionAccessory extends Accessory {
       } else {
         this.log(2, 'Fixed');
       }
+    }
+  }
+
+  private getTemperature(): CharacteristicValue {
+    return this.device.device.properties.temperature / 100;
+  }
+
+  private async notifyTemperatureChange(value: CharacteristicChange): Promise<void> {
+    if (value.newValue !== value.oldValue) {
+      this.log(4, `Updating Temperature To ${value.newValue}°C`);
     }
   }
 }

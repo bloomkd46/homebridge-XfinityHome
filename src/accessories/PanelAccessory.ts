@@ -33,10 +33,10 @@ export default class PanelAccessory extends Accessory {
 
     this.device.onevent = event => {
       if (event.mediaType === 'event/securityStateChange') {
-        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, event.metadata.status === 'arming' ?
-          this.armModes.indexOf('disarmed') : this.armModes.indexOf(event.metadata.armType || 'disarmed'));
-        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState,
-          this.armModes.indexOf(event.metadata.armType || 'disarmed'));
+        this.device.device.properties.status = event.metadata.status;
+        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
+        event.metadata.armType !== null ? this.device.device.properties.armType = event.metadata.armType : undefined;
+        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
       }
     };
 

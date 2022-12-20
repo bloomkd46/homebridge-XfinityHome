@@ -37,21 +37,24 @@ export default class LightAccessory extends Accessory {
     }
     if (this.device.device.properties.energyMgmtEnabled) {
       this.service.getCharacteristic(EnergyUsage)
-        .onGet((): number => device.device.properties.energyUsage / 10)
-        .on('change', async (value: CharacteristicChange): Promise<void> => {
-          if (value.newValue !== value.oldValue) {
-            this.log(4, `Updating Energy Usage To ${value.newValue} Amps`);
-          }
-        });
+        .onGet(this.getEnergyUsage.bind(this))
+        .on('change', this.notifyEnergyUsageChange.bind(this));
     }
 
     this.device.onevent = event => {
       if (event.mediaType === 'event/lighting') {
-        this.service.updateCharacteristic(this.platform.Characteristic.On, JSON.parse(event.metadata.isOn));
-        this.device.device.properties.dimAllowed ?
-          this.service.updateCharacteristic(this.platform.Characteristic.Brightness, JSON.parse(event.metadata.level)) : undefined;
-        this.device.device.properties.energyMgmtEnabled ?
-          this.service.updateCharacteristic(EnergyUsage, JSON.parse(event.metadata.energyUsage) / 10) : undefined;
+        this.device.device.properties.isOn = JSON.parse(event.metadata.isOn);
+        this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
+
+        if (this.device.device.properties.dimAllowed) {
+          this.device.device.properties.level = JSON.parse(event.metadata.level);
+          this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness());
+        }
+
+        if (this.device.device.properties.energyMgmtEnabled) {
+          this.device.device.properties.energyUsage = JSON.parse(event.metadata.energyUsage);
+          this.service.updateCharacteristic(EnergyUsage, this.getEnergyUsage());
+        }
       }
     };
 
@@ -108,6 +111,19 @@ export default class LightAccessory extends Accessory {
   private async notifyBrightnessChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(2, 'Set To ' + value.newValue);
+    }
+  }
+
+  private getEnergyUsage(): CharacteristicValue {
+    if (this.device.device.properties.energyUsage === undefined) {
+      throw new this.StatusError(HAPStatus.RESOURCE_DOES_NOT_EXIST);
+    }
+    return this.device.device.properties.energyUsage / 10;
+  }
+
+  private async notifyEnergyUsageChange(value: CharacteristicChange): Promise<void> {
+    if (value.newValue !== value.oldValue) {
+      this.log(4, `Updating Energy Usage To ${value.newValue} Amps`);
     }
   }
 }
