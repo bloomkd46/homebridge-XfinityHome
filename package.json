@@ -35,7 +35,7 @@
     "@homebridge/plugin-ui-utils": "^0.0.19",
     "http-mitm-proxy": "^0.9.0",
     "qrcode": "^1.5.0",
-    "xfinityhome": "^2.1.2"
+    "xfinityhome": "^2.1.3"
   },
   "devDependencies": {
     "@types/node": "^16.10.9",

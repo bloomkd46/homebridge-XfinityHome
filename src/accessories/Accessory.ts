@@ -2,7 +2,7 @@ import fs from 'fs';
 //@ts-check
 import { CharacteristicChange, HAPStatus, HapStatusError, PlatformAccessory, Service } from 'homebridge';
 import path from 'path';
-import { Device, Light } from 'xfinityhome';
+import { Device, Light, Panel } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
 import { CONTEXT } from '../settings';
@@ -22,7 +22,7 @@ export default class Accessory {
     accessory: PlatformAccessory<CONTEXT>,
     device: Device,
   ) {
-    this.name = device.device.name || 'Panel';
+    this.name = device instanceof Panel ? 'Panel' : device.device.name || device.device.model;
     this.projectDir = path.join(platform.api.user.storagePath(), 'XfinityHome');
     this.logPath = path.join(this.projectDir, this.name + '.log');
     this.generalLogPath = path.join(this.projectDir, 'General.log');
