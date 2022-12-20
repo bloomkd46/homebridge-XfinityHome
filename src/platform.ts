@@ -3,6 +3,7 @@ import { API, APIEvent, Characteristic, DynamicPlatformPlugin, Logger, PlatformA
 import path from 'path';
 import { EventEmitter } from 'stream';
 import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Unknown } from 'xfinityhome';
+import { Router } from 'xfinityhome/dist/devices/Router';
 
 import DryContactAccessory from './accessories/DryContactAccessory';
 import LightAccessory from './accessories/LightAccessory';
@@ -133,6 +134,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       const existingAccessory = this.cachedAccessories.find(accessory => accessory.UUID === uuid);
       if (existingAccessory) {
         this.log.debug('Restoring existing accessory from cache:', existingAccessory.displayName);
+        this.restoredAccessories.push(existingAccessory);
         switch (device.constructor) {
           case Panel:
             new PanelAccessory(this, existingAccessory, device as Panel);
@@ -149,45 +151,28 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
           case Keyfob:
           case Keypad:
           case Camera:
+          case Router:
+            this.restoredAccessories.slice(-1);
             break;
           default:
             new UnknownAccessory(this, existingAccessory, device as Unknown);
             break;
         }
-        /*switch (device.device.deviceType) {
-          case 'panel':
-            new PanelAccessory(this, existingAccessory, device as Panel);
-            break;
-          case 'lightDimmer':
-            continue;
-          case 'lightSwitch':
-            new LightAccessory(this, existingAccessory, device as Light);
-            break;
-          case 'sensor':
-            if ((device as Motion | DryContact).device.properties.sensorType === 'dryContact') {
-              new DryContactAccessory(this, existingAccessory, device as DryContact);
-            } else if ((device as Motion | DryContact).device.properties.sensorType === 'motion') {
-              new MotionAccessory(this, existingAccessory, device as Motion);
-            } else {
-              this.log.error('Unknown Device Detected: ', device.device);
-              this.log.warn(
-                'Please open an issue at https://github.com/bloomkd46/homebridge-XfinityHome/issues/new/choose' +
-                ' using the info above so that I can add support for it');
-              success = false;
-            }
-            break;
-        }*/
-        this.restoredAccessories.push(existingAccessory);
       } else {
+        if ([Keyfob, Keypad, Camera, Router].find(blockedAccessory => device instanceof blockedAccessory)) {
+          return;
+        }
         // the accessory does not yet exist, so we need to create it
         this.log.info('Adding new accessory:', device.device.name || 'Panel');
 
         // create a new accessory
-        const accessory = new this.api.platformAccessory<CONTEXT>(device.device.name || 'Panel', uuid);
+        const accessory = new this.api.platformAccessory<CONTEXT>(
+          device instanceof Panel ? 'Panel' : device.device.name || device.device.model, uuid);
 
         // store a copy of the device object in the `accessory.context`
         // the `context` property can be used to store any data about the accessory you may need
         accessory.context.device = device.device;
+        this.addedAccessories.push(accessory);
 
         switch (device.constructor) {
           case Panel:
@@ -202,40 +187,10 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
           case DryContact:
             new DryContactAccessory(this, accessory, device as DryContact);
             break;
-          case Keyfob:
-          case Keypad:
-          case Camera:
-            break;
           default:
             new UnknownAccessory(this, accessory, device as Unknown);
             break;
         }
-        /*switch (device.device.deviceType) {
-          case 'panel':
-            new PanelAccessory(this, accessory, device as Panel);
-            break;
-          case 'lightDimmer':
-            continue;
-          case 'lightSwitch':
-            new LightAccessory(this, accessory, device as Light);
-            break;
-          case 'sensor':
-            if ((device as Motion | DryContact).device.properties.sensorType === 'dryContact') {
-              new DryContactAccessory(this, accessory, device as DryContact);
-            } else if ((device as Motion | DryContact).device.properties.sensorType === 'motion') {
-              new MotionAccessory(this, accessory, device as Motion);
-            } else {
-              this.log.error('Unknown Device Detected: ', device.device);
-              this.log.warn(
-                'Please open an issue at https://github.com/bloomkd46/homebridge-XfinityHome/issues/new/choose using the info above');
-              success = false;
-            }
-            break;
-        }*/
-        this.addedAccessories.push(accessory);
-
-        // link the accessory to your platform
-        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       }
     }
     const accessoriesToRemove = this.cachedAccessories.filter(cachedAccessory =>
@@ -253,5 +208,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
     this.log.info(
       `Removed ${accessoriesToRemove.length} ${accessoriesToRemove.length === 1 ? 'Accessory' : 'Accessories'}`,
     );
+    // link the accessories to your platform
+    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [...this.restoredAccessories, ...this.addedAccessories]);
   }
 }
