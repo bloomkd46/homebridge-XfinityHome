@@ -1,3 +1,7 @@
+### 3.0.0 Beta 15 
+* Improved Energy Data Characteristic
+
+
 ### 3.0.0 Beta 14 
 * Attempted to add EnergyUsage Characteristic
 
