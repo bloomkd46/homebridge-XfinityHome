@@ -1,15 +1,14 @@
-import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
+import { Characteristic, CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
 import { Light } from 'xfinityhome';
 
+import { createEnergyUsageCharacteristic } from '../characteristics/EnergyData';
 import { XfinityHomePlatform } from '../platform';
 import { CONTEXT } from '../settings';
 import Accessory from './Accessory';
 
 
-import EnergyUsage = require('../characteristics/EnergyData');
 export default class LightAccessory extends Accessory {
   private service: Service;
-  private EnergyUsage;
   constructor(
     private readonly platform: XfinityHomePlatform,
     private readonly accessory: PlatformAccessory<CONTEXT>,
@@ -17,11 +16,11 @@ export default class LightAccessory extends Accessory {
   ) {
     super(platform, accessory, device);
 
-    this.EnergyUsage = EnergyUsage(this.platform.api);
+    const EnergyUsage = createEnergyUsageCharacteristic(this.platform.api.hap);
 
     this.service = this.accessory.getService(this.platform.Service.Lightbulb) ||
       this.accessory.addService(this.platform.Service.Lightbulb);
-    this.service.addOptionalCharacteristic(this.EnergyUsage);
+    this.service.addOptionalCharacteristic(EnergyUsage);
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
 
@@ -37,7 +36,7 @@ export default class LightAccessory extends Accessory {
         .on('change', this.notifyBrightnessChange.bind(this));
     }
     if (this.device.device.properties.energyMgmtEnabled) {
-      this.service.getCharacteristic(this.EnergyUsage)
+      this.service.getCharacteristic(EnergyUsage)
         .onGet((): number => device.device.properties.energyUsage / 10)
         .on('change', async (value: CharacteristicChange): Promise<void> => {
           if (value.newValue !== value.oldValue) {
@@ -52,7 +51,7 @@ export default class LightAccessory extends Accessory {
         this.device.device.properties.dimAllowed ?
           this.service.updateCharacteristic(this.platform.Characteristic.Brightness, JSON.parse(event.metadata.level)) : undefined;
         this.device.device.properties.energyMgmtEnabled ?
-          this.service.updateCharacteristic(this.EnergyUsage, JSON.parse(event.metadata.energyUsage) / 10) : undefined;
+          this.service.updateCharacteristic(EnergyUsage, JSON.parse(event.metadata.energyUsage) / 10) : undefined;
       }
     };
 
