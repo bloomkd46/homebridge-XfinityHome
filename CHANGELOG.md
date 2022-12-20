@@ -1,3 +1,7 @@
+### 3.0.0 Beta 3 
+* Numerous tweaks
+
+
 ### 3.0.0 Beta 2 
 * Fixed api error
 
