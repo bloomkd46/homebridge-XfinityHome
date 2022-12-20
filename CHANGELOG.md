@@ -1,3 +1,7 @@
+### 3.0.0 Beta 11 
+* Assigned energy usage data directly to light service
+
+
 ### 3.0.0 Beta 10 
 * Added missing hap-nodejs dependency
 
