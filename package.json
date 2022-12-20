@@ -33,6 +33,7 @@
   ],
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^0.0.19",
+    "hap-nodejs": "^0.9.6",
     "http-mitm-proxy": "^0.9.0",
     "qrcode": "^1.5.0",
     "xfinityhome": "^2.3.0"
