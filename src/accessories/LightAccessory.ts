@@ -1,15 +1,14 @@
 import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
 import { Light } from 'xfinityhome';
 
+import { EnergyUsage } from '../characteristics/EnergyData';
 import { XfinityHomePlatform } from '../platform';
-import { EnergyData, EnergyUsage } from '../services/EnergyData';
 import { CONTEXT } from '../settings';
 import Accessory from './Accessory';
 
 
 export default class LightAccessory extends Accessory {
   private service: Service;
-  private energyService?: Service;
   constructor(
     private readonly platform: XfinityHomePlatform,
     private readonly accessory: PlatformAccessory<CONTEXT>,
@@ -19,6 +18,7 @@ export default class LightAccessory extends Accessory {
 
     this.service = this.accessory.getService(this.platform.Service.Lightbulb) ||
       this.accessory.addService(this.platform.Service.Lightbulb);
+    this.service.addOptionalCharacteristic(EnergyUsage);
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
 
@@ -34,15 +34,7 @@ export default class LightAccessory extends Accessory {
         .on('change', this.notifyBrightnessChange.bind(this));
     }
     if (this.device.device.properties.energyMgmtEnabled) {
-      this.energyService = this.accessory.getService(EnergyData);
-      if (!this.energyService) {
-        this.log('info', 'Adding Energy Management Support');
-        this.energyService = this.accessory.addService(EnergyData);
-      }
-
-      this.energyService.setCharacteristic(platform.Characteristic.Name, device.device.name + ' Energy Data');
-
-      this.energyService.getCharacteristic(EnergyUsage)
+      this.service.getCharacteristic(EnergyUsage)
         .onGet((): number => device.device.properties.energyUsage / 10)
         .on('change', async (value: CharacteristicChange): Promise<void> => {
           if (value.newValue !== value.oldValue) {
@@ -64,7 +56,7 @@ export default class LightAccessory extends Accessory {
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
-      this.service.updateCharacteristic(this.platform.Characteristic.On, await this.getIsOn(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
       this.device.device.properties.level ?
         this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness()) : undefined;
 
