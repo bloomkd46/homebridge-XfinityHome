@@ -1,3 +1,7 @@
+### 3.0.0 Beta 7 
+* Fixed improper name being logged for nameless devices during initial setup
+
+
 ### 3.0.0 Beta 6 
 * Fixed setup hanging when encountering ignored device
 
