@@ -1,3 +1,8 @@
+### 3.0.0-beta.5 
+* Better update speed
+* Fixed Accessory already linked error
+
+
 ### 3.0.0-beta.4 
 * Added Router
 
