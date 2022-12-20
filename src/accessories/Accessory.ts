@@ -1,6 +1,6 @@
 import fs from 'fs';
 //@ts-check
-import { CharacteristicChange, HAPStatus, HapStatusError, PlatformAccessory, Service } from 'homebridge';
+import { HAPStatus, HapStatusError, PlatformAccessory, Service } from 'homebridge';
 import path from 'path';
 import { Device, Light, Panel } from 'xfinityhome';
 
@@ -9,7 +9,6 @@ import { CONTEXT } from '../settings';
 
 
 export default class Accessory {
-  protected temperatureService?: Service;
   protected name: string;
   protected log: (type: 'info' | 'warn' | 'error' | 'debug' | 1 | 2 | 3 | 4, message: string, ...args: unknown[]) => void;
   protected StatusError: typeof HapStatusError;
@@ -106,37 +105,5 @@ export default class Accessory {
         }, 5000);
       }
     });
-
-    if ('temperature' in device.device.properties && (platform.config.temperatureSensors ?? true)) {
-      this.temperatureService = accessory.getService(platform.Service.TemperatureSensor);
-      if (!this.temperatureService) {
-        this.log('info', 'Adding Temperature Support');
-        this.temperatureService = accessory.addService(platform.Service.TemperatureSensor);
-      }
-
-      this.temperatureService.setCharacteristic(platform.Characteristic.Name, device.device.name + ' Temperature');
-
-      this.temperatureService.getCharacteristic(platform.Characteristic.CurrentTemperature)
-        .onGet((): number => {
-          return device.device.properties.temperature / 100;
-          /*return new Promise((resolve, reject) => {
-            device.get().then(device => resolve(device.properties.temperature / 100)).catch(err => {
-              this.log('error', 'Failed To Fetch Temperature With Error:', err);
-              reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
-            });
-          });*/
-        })
-        .setProps({
-          minStep: 0.01,
-        })
-        .on('change', async (value: CharacteristicChange): Promise<void> => {
-          if (value.newValue !== value.oldValue) {
-            this.log(4, `Updating Temperature To ${value.newValue}°C`);
-          }
-        });
-    } else if (!(platform.config.temperatureSensors ?? true) && accessory.getService(platform.Service.TemperatureSensor)) {
-      this.log('warn', 'Removing Temperature Support');
-      accessory.removeService(accessory.getService(platform.Service.TemperatureSensor)!);
-    }
   }
 }

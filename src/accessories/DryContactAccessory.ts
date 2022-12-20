@@ -8,6 +8,8 @@ import Accessory from './Accessory';
 
 export default class DryContactAccessory extends Accessory {
   private service: Service;
+  protected temperatureService?: Service;
+
   constructor(
     private readonly platform: XfinityHomePlatform,
     private readonly accessory: PlatformAccessory<CONTEXT>,
@@ -36,6 +38,28 @@ export default class DryContactAccessory extends Accessory {
       .onGet(this.getTampered.bind(this))
       .on('change', this.notifyTamperedChange.bind(this));
 
+    if ('temperature' in this.device.device.properties && (this.platform.config.temperatureSensors ?? true)) {
+      this.temperatureService = this.accessory.getService(platform.Service.TemperatureSensor);
+      if (!this.temperatureService) {
+        this.log('info', 'Adding Temperature Support');
+        this.temperatureService = this.accessory.addService(platform.Service.TemperatureSensor);
+      }
+
+      this.temperatureService.setCharacteristic(platform.Characteristic.Name, device.device.name + ' Temperature');
+
+      this.temperatureService.getCharacteristic(platform.Characteristic.CurrentTemperature)
+        .onGet((): number => device.device.properties.temperature / 100)
+        .setProps({
+          minStep: 0.01,
+        }).on('change', async (value: CharacteristicChange): Promise<void> => {
+          if (value.newValue !== value.oldValue) {
+            this.log(4, `Updating Temperature To ${value.newValue}°C`);
+          }
+        });
+    } else if (!(this.platform.config.temperatureSensors ?? true) && this.accessory.getService(this.platform.Service.TemperatureSensor)) {
+      this.log('warn', 'Removing Temperature Support');
+      this.accessory.removeService(this.accessory.getService(this.platform.Service.TemperatureSensor)!);
+    }
     this.device.onevent = event => {
       if (event.mediaType === 'event/zone' && event.name === 'isFaulted') {
         this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, event.value === 'true' ? 1 : 0);
