@@ -199,6 +199,8 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       this.log.warn('Removing Accessory: ', accessory.displayName);
       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
     }
+    // link the accessories to your platform
+    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [...this.addedAccessories]);
     this.log.info(
       `Restored ${this.restoredAccessories.length} ${this.restoredAccessories.length === 1 ? 'Accessory' : 'Accessories'}`,
     );
@@ -208,7 +210,5 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
     this.log.info(
       `Removed ${accessoriesToRemove.length} ${accessoriesToRemove.length === 1 ? 'Accessory' : 'Accessories'}`,
     );
-    // link the accessories to your platform
-    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [...this.restoredAccessories, ...this.addedAccessories]);
   }
 }
