@@ -202,6 +202,10 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
           case DryContact:
             new DryContactAccessory(this, accessory, device as DryContact);
             break;
+          case Keyfob:
+          case Keypad:
+          case Camera:
+            break;
           default:
             new UnknownAccessory(this, accessory, device as Unknown);
             break;
