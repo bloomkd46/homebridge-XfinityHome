@@ -38,7 +38,7 @@ export default class MotionAccessory extends Accessory {
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
-      this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getMotionDetected(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.getMotionDetected(true));
       this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, newState.properties.temperature / 100);

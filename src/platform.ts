@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { API, APIEvent, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
 import path from 'path';
+import { EventEmitter } from 'stream';
 import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Unknown } from 'xfinityhome';
 
 import DryContactAccessory from './accessories/DryContactAccessory';
@@ -37,6 +38,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
     public readonly config: PlatformConfig,
     public readonly api: API,
   ) {
+    (this.api as unknown as EventEmitter).setMaxListeners(0);
     this.log.debug('Finished initializing platform:', this.config.name);
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.

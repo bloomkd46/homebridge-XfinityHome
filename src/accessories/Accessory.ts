@@ -68,22 +68,25 @@ export default class Accessory {
       .setCharacteristic(platform.Characteristic.SerialNumber, 'serialNumber' in deviceInfo ? deviceInfo.serialNumber : accessory.UUID)
       .setCharacteristic(platform.Characteristic.Model, deviceInfo.model)
       .setCharacteristic(platform.Characteristic.Name, this.name)
-      .setCharacteristic(platform.Characteristic.FirmwareRevision, deviceInfo.firmwareVersion)
-      .getCharacteristic(platform.Characteristic.ConfiguredName).onGet(() => device.device.name).onSet(async name => {
-        if ('label' in device) {
-          await device.label(name as string).catch(err => {
-            this.log('error', 'Failed To Change Configured Name With Error:', err);
-            throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-          });
-        } else {
-          this.log('error', 'Failed To Change Configured Name With Error:', 'READ_ONLY_CHARACTERISTIC');
-          throw new this.StatusError(HAPStatus.READ_ONLY_CHARACTERISTIC);
-        }
-      }).on('change', async (value) => {
-        if (value.newValue !== value.oldValue) {
-          this.log(3, `Configured Name Changed From ${value.oldValue} To ${value.newValue}`);
-        }
-      });
+      .setCharacteristic(platform.Characteristic.FirmwareRevision, deviceInfo.firmwareVersion);
+    if ('label' in device) {
+      accessory.getService(platform.Service.AccessoryInformation)!
+        .getCharacteristic(platform.Characteristic.ConfiguredName).onGet(() => device.device.name).onSet(async name => {
+          if ('label' in device) {
+            await device.label(name as string).catch(err => {
+              this.log('error', 'Failed To Change Configured Name With Error:', err);
+              throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+            });
+          } else {
+            this.log('error', 'Failed To Change Configured Name With Error:', 'READ_ONLY_CHARACTERISTIC');
+            throw new this.StatusError(HAPStatus.READ_ONLY_CHARACTERISTIC);
+          }
+        }).on('change', async (value) => {
+          if (value.newValue !== value.oldValue) {
+            this.log(3, `Configured Name Changed From ${value.oldValue} To ${value.newValue}`);
+          }
+        });
+    }
     accessory.getService(platform.Service.AccessoryInformation)!.getCharacteristic(platform.Characteristic.Identify).on('set', () => {
       this.log('info', 'Identifying Device:', device.device);
       if (device instanceof Light) {
