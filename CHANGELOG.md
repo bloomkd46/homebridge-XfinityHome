@@ -1,3 +1,7 @@
+### 3.0.0 Beta 2 
+* Fixed api error
+
+
 ### 3.0.0 Beta 1 
 * Full Rewrite
 * Performance Boost
