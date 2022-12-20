@@ -1,3 +1,7 @@
+### 3.0.0-beta.4 
+* Added Router
+
+
 ### 3.0.0 Beta 3 
 * Numerous tweaks
 
