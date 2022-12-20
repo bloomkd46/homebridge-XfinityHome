@@ -1,3 +1,7 @@
+### 3.0.0 Beta 10 
+* Added missing hap-nodejs dependency
+
+
 ### 3.0.0 Beta 9 
 * Fixed Xh-Auth token expiring
 * Improved status updates
