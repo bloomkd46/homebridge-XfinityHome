@@ -1,3 +1,7 @@
+### 3.0.0 Beta 6 
+* Fixed setup hanging when encountering ignored device
+
+
 ### 3.0.0-beta.5 
 * Better update speed
 * Fixed Accessory already linked error
