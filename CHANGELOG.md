@@ -1,3 +1,7 @@
+### 3.0.0 Beta 13 
+* Attempting to add custom characteristic
+
+
 ### 3.0.0 Beta 12 
 * Changed hap-nodejs dependency to a developer dependency
 
