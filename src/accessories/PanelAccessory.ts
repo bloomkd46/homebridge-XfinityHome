@@ -19,6 +19,7 @@ export default class PanelAccessory extends Accessory {
 
     this.service = this.accessory.getService(this.platform.Service.SecuritySystem) ||
       this.accessory.addService(this.platform.Service.SecuritySystem);
+    this.service.addCharacteristic(this.platform.CustomCharacteristic.PanelStatus);
 
     this.service.getCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState)
       .onGet(this.getCurrentState.bind(this, false))
@@ -30,6 +31,9 @@ export default class PanelAccessory extends Accessory {
     this.service.getCharacteristic(this.platform.Characteristic.StatusTampered)
       .onGet(this.getTampered.bind(this))
       .on('change', this.notifyTamperedChange.bind(this));
+    this.service.getCharacteristic(this.platform.CustomCharacteristic.PanelStatus)
+      .onGet(this.getStatus.bind(this))
+      .on('change', this.notifyStatusChange.bind(this));
 
     this.device.onevent = event => {
       if (event.mediaType === 'event/securityStateChange') {
@@ -37,6 +41,7 @@ export default class PanelAccessory extends Accessory {
         this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
         event.metadata.armType !== null ? this.device.device.properties.armType = event.metadata.armType : undefined;
         this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
+        this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
       }
     };
 
@@ -46,6 +51,7 @@ export default class PanelAccessory extends Accessory {
       this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
       this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
+      this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
 
       this.accessory.context.logPath = this.logPath;
       this.accessory.context.device = newState;
@@ -140,6 +146,16 @@ export default class PanelAccessory extends Accessory {
       } else {
         this.log(2, 'Fixed');
       }
+    }
+  }
+
+  private getStatus(): CharacteristicValue {
+    return this.device.device.properties.status.charAt(0).toUpperCase() + this.device.device.properties.status.slice(1);
+  }
+
+  private async notifyStatusChange(value: CharacteristicChange): Promise<void> {
+    if (value.newValue !== value.oldValue) {
+      this.log(4, 'Status Changed To', value.newValue);
     }
   }
 }
