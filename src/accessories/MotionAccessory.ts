@@ -42,7 +42,6 @@ export default class MotionAccessory extends Accessory {
       if (!this.temperatureService) {
         this.log('info', 'Adding Temperature Support');
         this.temperatureService = this.accessory.addService(platform.Service.TemperatureSensor);
-        this.service.addLinkedService(this.temperatureService);
       }
 
       this.temperatureService.setCharacteristic(platform.Characteristic.Name, device.device.name + ' Temperature');
