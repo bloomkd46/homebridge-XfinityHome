@@ -48,8 +48,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions"
           git add --all
-          npm version ${{ github.event.release.tag_name }} || echo version not changed
-          git tag -d v${{ github.event.release.tag_name }}
+          (npm version ${{ github.event.release.tag_name }} && git tag -d v${{ github.event.release.tag_name }}) || echo version not changed
           
       - name: Push changes
         #if: steps.commit.outputs.push == 'true'
