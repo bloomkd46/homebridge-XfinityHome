@@ -19,7 +19,6 @@ export default class PanelAccessory extends Accessory {
 
     this.service = this.accessory.getService(this.platform.Service.SecuritySystem) ||
       this.accessory.addService(this.platform.Service.SecuritySystem);
-    this.service.addCharacteristic(this.platform.CustomCharacteristic.PanelStatus);
 
     this.service.getCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState)
       .onGet(this.getCurrentState.bind(this, false))
@@ -31,9 +30,10 @@ export default class PanelAccessory extends Accessory {
     this.service.getCharacteristic(this.platform.Characteristic.StatusTampered)
       .onGet(this.getTampered.bind(this))
       .on('change', this.notifyTamperedChange.bind(this));
-    this.service.getCharacteristic(this.platform.CustomCharacteristic.PanelStatus)
-      .onGet(this.getStatus.bind(this))
-      .on('change', this.notifyStatusChange.bind(this));
+    this.service.getCharacteristic(this.platform.CustomCharacteristic.PanelStatus) ||
+      this.service.addCharacteristic(this.platform.CustomCharacteristic.PanelStatus)
+        .onGet(this.getStatus.bind(this))
+        .on('change', this.notifyStatusChange.bind(this));
 
     this.device.onevent = event => {
       if (event.mediaType === 'event/securityStateChange') {
