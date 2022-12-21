@@ -80,7 +80,12 @@
       "warn"
     ],
     "@typescript-eslint/member-delimiter-style": [
-      "warn"
+      "warn",
+      {
+        "singleline": {
+          "requireLast": true
+        }
+      }
     ]
   }
 }

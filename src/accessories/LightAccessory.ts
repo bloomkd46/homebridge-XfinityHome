@@ -1,7 +1,6 @@
-import { Characteristic, CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
+import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
 import { Light } from 'xfinityhome';
 
-import { createEnergyUsageCharacteristic } from '../characteristics/EnergyData';
 import { XfinityHomePlatform } from '../platform';
 import { CONTEXT } from '../settings';
 import Accessory from './Accessory';
@@ -18,11 +17,9 @@ export default class LightAccessory extends Accessory {
   ) {
     super(platform, accessory, device);
 
-    const EnergyUsage = createEnergyUsageCharacteristic(this.platform.api.hap);
-
     this.service = this.accessory.getService(this.platform.Service.Lightbulb) ||
       this.accessory.addService(this.platform.Service.Lightbulb);
-    this.service.addOptionalCharacteristic(EnergyUsage);
+    this.service.addOptionalCharacteristic(this.platform.CustomCharacteristic.EnergyUsage);
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
 
@@ -38,7 +35,7 @@ export default class LightAccessory extends Accessory {
         .on('change', this.notifyBrightnessChange.bind(this));
     }
     if (this.device.device.properties.energyMgmtEnabled) {
-      this.service.getCharacteristic(EnergyUsage)
+      this.service.getCharacteristic(this.platform.CustomCharacteristic.EnergyUsage)
         .onGet(this.getEnergyUsage.bind(this))
         .on('change', this.notifyEnergyUsageChange.bind(this));
     }
@@ -56,7 +53,7 @@ export default class LightAccessory extends Accessory {
 
         if (this.device.device.properties.energyMgmtEnabled) {
           this.device.device.properties.energyUsage = JSON.parse(event.metadata.energyUsage);
-          this.service.updateCharacteristic(EnergyUsage, this.getEnergyUsage());
+          this.service.updateCharacteristic(this.platform.CustomCharacteristic.EnergyUsage, this.getEnergyUsage());
         }
       }
     };

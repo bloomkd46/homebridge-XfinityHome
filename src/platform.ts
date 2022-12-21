@@ -12,6 +12,7 @@ import LightAccessory from './accessories/LightAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
 import PanelAccessory from './accessories/PanelAccessory';
 import UnknownAccessory from './accessories/UnknownAccessory';
+import CustomCharacteristics from './CustomCharacteristics';
 import { CONFIG, CONTEXT, PLATFORM_NAME, PLUGIN_NAME } from './settings';
 
 
@@ -23,6 +24,7 @@ import { CONFIG, CONTEXT, PLATFORM_NAME, PLUGIN_NAME } from './settings';
 export class XfinityHomePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
+  public readonly CustomCharacteristic = CustomCharacteristics(this.api.hap);
   public xhome!: XHome;
   private refreshToken?: string;
 
