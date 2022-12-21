@@ -1,3 +1,9 @@
+### 3.0.0 Beta 21 
+* Experimenting with categories
+* Changed how panel status add to service
+* attempted to fix light
+
+
 ### 3.0.0 Beta 20 
 * (Hopefully 🤞) Fixed Panel
 
