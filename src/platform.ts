@@ -1,5 +1,7 @@
 import fs from 'fs';
-import { API, APIEvent, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
+import {
+  API, APIEvent, Categories, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service,
+} from 'homebridge';
 import path from 'path';
 import { EventEmitter } from 'stream';
 import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Unknown } from 'xfinityhome';
@@ -169,30 +171,34 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
           this.log.info('Adding new accessory:', name);
 
           // create a new accessory
-          const accessory = new this.api.platformAccessory<CONTEXT>(name, uuid);
+          let accessory: PlatformAccessory<CONTEXT>;
 
+          switch (device.constructor) {
+            case Panel:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SECURITY_SYSTEM);
+              new PanelAccessory(this, accessory, device as Panel);
+              break;
+            case Light:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.LIGHTBULB);
+              new LightAccessory(this, accessory, device as Light);
+              break;
+            case Motion:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+              new MotionAccessory(this, accessory, device as Motion);
+              break;
+            case DryContact:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+              new DryContactAccessory(this, accessory, device as DryContact);
+              break;
+            default:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid);
+              new UnknownAccessory(this, accessory, device as Unknown);
+              break;
+          }
           // store a copy of the device object in the `accessory.context`
           // the `context` property can be used to store any data about the accessory you may need
           accessory.context.device = device.device;
           this.addedAccessories.push(accessory);
-
-          switch (device.constructor) {
-            case Panel:
-              new PanelAccessory(this, accessory, device as Panel);
-              break;
-            case Light:
-              new LightAccessory(this, accessory, device as Light);
-              break;
-            case Motion:
-              new MotionAccessory(this, accessory, device as Motion);
-              break;
-            case DryContact:
-              new DryContactAccessory(this, accessory, device as DryContact);
-              break;
-            default:
-              new UnknownAccessory(this, accessory, device as Unknown);
-              break;
-          }
         }
       }
     }
