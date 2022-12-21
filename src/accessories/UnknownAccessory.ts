@@ -13,10 +13,11 @@ export default class UnknownAccessory extends Accessory {
     private readonly device: Unknown,
   ) {
     super(platform, accessory, device);
-    this.log('warn', 'Unknown accessory!');
-    this.log('warn', 'Please open an issue about this.');
-    this.log('warn', JSON.stringify(this.device.device, null, 2));
-
+    if (!this.platform.config.hideUnsupportedDeviceWarnings) {
+      this.log('warn', 'Unknown accessory!');
+      this.log('warn', 'Please open an issue about this.');
+      this.log('warn', JSON.stringify(this.device.device, null, 2));
+    }
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;

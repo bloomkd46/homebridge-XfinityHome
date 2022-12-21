@@ -38,6 +38,20 @@
         "maximum": 4,
         "default": 3,
         "description": "0: None, 1: Arm/Disarm Events, 2: On/Off/Bypass Events, 3: Open/Close/Motion, 4: Temperature Updates"
+      },
+      "hideUnsupportedDeviceWarnings": {
+        "title": "Hide Unsupported Device Warning",
+        "type": "boolean",
+        "required": false,
+        "placeholder": false,
+        "description": "Whether or Not To Hide Unsupported Device Warnings At Boot"
+      },
+      "logWatchdogErrors": {
+        "title": "Log Watchdog Errors",
+        "type": "boolean",
+        "required": false,
+        "placeholder": false,
+        "description": "For Debugging Purposes"
       }
     }
   }

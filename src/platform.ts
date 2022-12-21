@@ -10,7 +10,7 @@ import LightAccessory from './accessories/LightAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
 import PanelAccessory from './accessories/PanelAccessory';
 import UnknownAccessory from './accessories/UnknownAccessory';
-import { CONTEXT, PLATFORM_NAME, PLUGIN_NAME } from './settings';
+import { CONFIG, CONTEXT, PLATFORM_NAME, PLUGIN_NAME } from './settings';
 
 
 /**
@@ -36,7 +36,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
 
   constructor(
     public readonly log: Logger,
-    public readonly config: PlatformConfig,
+    public readonly config: PlatformConfig & CONFIG,
     public readonly api: API,
   ) {
     (this.api as unknown as EventEmitter).setMaxListeners(0);
@@ -104,7 +104,10 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       return;
     }
     try {
-      this.xhome = new XHome(this.refreshToken || this.config.refreshToken, { enabled: true, autoFetch: false });
+      this.xhome = new XHome(this.refreshToken || this.config.refreshToken, {
+        enabled: true, autoFetch: false,
+        errorHandler: this.config.logWatchdogErrors ? err => this.log.warn('Watchdog Error:', err) : undefined,
+      });
     } catch (err) {
       this.log.error('Failed To Login With Error:', err);
       const projectDir = path.join(this.api.user.storagePath(), 'XfinityHome');
