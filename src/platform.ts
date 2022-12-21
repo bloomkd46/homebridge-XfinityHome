@@ -33,12 +33,13 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
   /** this is used to track which accessories have been configured */
   //public readonly configuredAccessories: PlatformAccessory[] = [];
 
-
+  public config: PlatformConfig & CONFIG;
   constructor(
     public readonly log: Logger,
-    public readonly config: PlatformConfig & CONFIG,
+    config: PlatformConfig,
     public readonly api: API,
   ) {
+    this.config = config as unknown as PlatformConfig & CONFIG;
     (this.api as unknown as EventEmitter).setMaxListeners(0);
     this.log.debug('Finished initializing platform:', this.config.name);
 
