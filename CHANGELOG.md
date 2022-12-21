@@ -1,3 +1,7 @@
+### 3.0.0 Beta 22 
+* Increased Reliability
+
+
 ### 3.0.0 Beta 21 
 * Experimenting with categories
 * Changed how panel status add to service
