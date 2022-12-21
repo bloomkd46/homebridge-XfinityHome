@@ -1,3 +1,7 @@
+### 3.0.0 Beta 20 
+* (Hopefully 🤞) Fixed Panel
+
+
 ### 3.0.0 Beta 19 
 * Improved Panel Status
 * Added additional logs to light for debugging
