@@ -3,11 +3,6 @@
 * Applied Fix for lights glitchy appearance when flickering on and off
 
 
-### 3.0.0 Beta 17 
-* Better Logging
-* Applied Fix for lights glitchy appearance when flickering on and off
-
-
 ### 3.0.0 Beta 16 
 * Improved device status updates algorithm
 
@@ -54,12 +49,12 @@
 * Fixed setup hanging when encountering ignored device
 
 
-### 3.0.0-beta.5 
+### 3.0.0 Beta 5 
 * Better update speed
 * Fixed Accessory already linked error
 
 
-### 3.0.0-beta.4 
+### 3.0.0 Beta 4 
 * Added Router
 
 
