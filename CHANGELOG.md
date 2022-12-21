@@ -1,3 +1,9 @@
+### 3.0.0 Beta 18 
+* Added device categories when initializing device
+* Added status to Panel
+* Applied temporary fix to light
+
+
 ### 3.0.0 Beta 17 
 * Better Logging
 * Applied Fix for lights glitchy appearance when flickering on and off
