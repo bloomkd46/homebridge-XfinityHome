@@ -118,6 +118,7 @@ export default class DryContactAccessory extends Accessory {
   }
 
   private async setActive(value: CharacteristicValue): Promise<void> {
+    this.device.device.properties.isBypassed = !value;
     await this.device.bypass(!value).catch(err => {
       this.log('error', `Failed To ${!value ? 'Bypass' : 'Activate'} With Error:`, err);
       throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);

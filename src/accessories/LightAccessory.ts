@@ -39,7 +39,6 @@ export default class LightAccessory extends Accessory {
     }
 
     this.device.onevent = event => {
-      this.log(4, 'device.onevent');
       if (event.mediaType === 'event/lighting') {
         this.device.device.properties.isOn = JSON.parse(event.metadata.isOn);
         this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
@@ -56,7 +55,6 @@ export default class LightAccessory extends Accessory {
     };
 
     this.device.onchange = async (_oldState, newState) => {
-      this.log(4, 'device.onchange');
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
       this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
@@ -78,7 +76,6 @@ export default class LightAccessory extends Accessory {
 
   private getIsOn(skipUpdate?: boolean): CharacteristicValue {
     if (skipUpdate !== true) {
-      this.log(4, 'getIsOn');
       this.device.get().catch(err => {
         this.log('error', 'Failed To Fetch isOn State With Error:', err);
         throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);

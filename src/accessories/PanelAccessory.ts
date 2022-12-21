@@ -78,15 +78,20 @@ export default class PanelAccessory extends Accessory {
   private async setTargetState(state: CharacteristicValue): Promise<void> {
     if (this.platform.config.pin) {
       if (state === this.armModes.indexOf('disarmed')) {
+        this.device.device.properties.armType = '';
         await this.device.disarm(this.platform.config.pin).catch(err => {
           this.log('error', 'Failed To Disarm With Error:', err);
           throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
         });
       } else {
+        this.device.device.properties.armType = this.armModes[state as number] as 'stay' | 'away' | 'night';
         if (this.device.device.properties.status !== 'ready') {
+          await this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night').catch(err => {
+            this.log('error', 'Failed To Arm With Error:', 'NOT_READY');
+            this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
+          });
           /*this.log('warn', 'Failed To Arm With Error:', 'NOT_ALLOWED_IN_CURRENT_STATE');
           throw new this.StatusError(HAPStatus.NOT_ALLOWED_IN_CURRENT_STATE);*/
-          this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
         } else {
           await this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night').catch(err => {
             this.log('error', 'Failed To Arm With Error:', err);
