@@ -40,8 +40,8 @@ export default class LightAccessory extends Accessory {
 
     this.device.onevent = event => {
       if (event.mediaType === 'event/lighting') {
-        //this.device.device.properties.isOn = JSON.parse(event.metadata.isOn);
-        //this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
+        this.device.device.properties.isOn = JSON.parse(event.metadata.isOn);
+        this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
         if (this.device.device.properties.dimAllowed) {
           this.device.device.properties.level = JSON.parse(event.metadata.level);
           this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness());
