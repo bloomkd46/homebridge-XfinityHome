@@ -150,12 +150,13 @@ export default class PanelAccessory extends Accessory {
   }
 
   private getStatus(): CharacteristicValue {
-    return this.device.device.properties.status.charAt(0).toUpperCase() + this.device.device.properties.status.slice(1);
+    return this.device.device.properties.status.charAt(0).toUpperCase() +
+      this.device.device.properties.status.slice(1).replace(/([A-Z])/g, ' $1').trim();
   }
 
   private async notifyStatusChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
-      this.log(4, 'Status Changed To', value.newValue);
+      this.log(4, `Status Changed To ${value.newValue}`);
     }
   }
 }
