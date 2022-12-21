@@ -187,9 +187,10 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
             case Motion:
               accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
               new MotionAccessory(this, accessory, device as Motion);
-              break;
+              break; 'experiment';
             case DryContact:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid,
+                (device as DryContact).device.properties.type === 'door' ? Categories.DOOR : Categories.WINDOW);
               new DryContactAccessory(this, accessory, device as DryContact);
               break;
             default:
