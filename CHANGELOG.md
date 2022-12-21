@@ -1,3 +1,8 @@
+### 3.0.0 Beta 17 
+* Better Logging
+* Applied Fix for lights glitchy appearance when flickering on and off
+
+
 ### 3.0.0 Beta 16 
 * Improved device status updates algorithm
 
