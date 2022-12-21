@@ -1,3 +1,8 @@
+### 3.0.0 Beta 19 
+* Improved Panel Status
+* Added additional logs to light for debugging
+
+
 ### 3.0.0 Beta 18 
 * Added device categories when initializing device
 * Added status to Panel
