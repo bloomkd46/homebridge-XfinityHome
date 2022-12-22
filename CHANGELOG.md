@@ -1,3 +1,8 @@
+### 3.0.0 Beta 24 
+* Logging Tweaks
+* Added Configured Name Characteristic
+
+
 ### 3.0.0 Beta 23 
 * Testing out addLinkedService
 
