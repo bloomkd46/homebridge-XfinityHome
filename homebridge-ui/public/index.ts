@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import type { IHomebridgePluginUi } from '@homebridge/plugin-ui-utils/dist/ui.interface';
+import type { IHomebridgePluginUi } from './ui.interface';
 declare const homebridge: IHomebridgePluginUi;
 
 //Intro Elements
