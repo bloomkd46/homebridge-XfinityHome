@@ -1,5 +1,6 @@
 # Ignore compiled code
 dist
+homebridge-ui/*.js
 
 # ------------- Defaults ------------- #
 
@@ -87,7 +88,6 @@ web_modules/
 # Nuxt.js build / generate output
 .nuxt
 dist
-homebridge-ui/*.js
 
 # Gatsby files
 .cache/
