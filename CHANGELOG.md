@@ -1,3 +1,7 @@
+### 3.0.0 Beta 27 
+* Fixed compile errors for homebridge-ui server script
+
+
 ### 3.0.0 Beta 26 
 * Attempting to fix ui
 
