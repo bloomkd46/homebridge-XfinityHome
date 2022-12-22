@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "commonjs",
+    "lib": [
+      "DOM"
+    ]
+  },
+  "include": [
+    "index.ts"
+  ]
+}

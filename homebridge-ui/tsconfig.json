@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "esModuleInterop": true,
+    "target": "ES2018", // ~node10
+    "module": "commonjs"
+  },
+  "include": [
+    "server.ts"
+  ]
+}

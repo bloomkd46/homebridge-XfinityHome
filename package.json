@@ -19,7 +19,9 @@
   "scripts": {
     "lint": "eslint src/**.ts --max-warnings=0 --fix && eslint homebridge-ui/**.ts --max-warnings=0",
     "watch": "npm run build && npm link && nodemon",
-    "build": "(rimraf ./dist && tsc) ; (cd homebridge-ui && rimraf ./server.js && tsc --esModuleInterop --module commonjs --target es2016 server.ts) ; (cd homebridge-ui/public && rimraf index.js && tsc index.ts && browserify --outfile bundle.js index.js)",
+    "prebuild": "rimraf ./dist ./homebridge-ui/server.js ./homebridge-ui/public/bundle.js",
+    "build": "tsc --build && browserify --outfile ./homebridge-ui/public/bundle.js ./homebridge-ui/public/index.js",
+    "postbuild": "rimraf ./homebridge-ui/server.d.ts ./homebridge-ui/public/index.d.ts ./homebridge-ui/public/index.js ./homebridge-ui/tsconfig.tsbuildinfo ./homebridge-ui/public/tsconfig.tsbuildinfo",
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
@@ -38,7 +40,7 @@
     "xfinityhome": "^2.3.1"
   },
   "devDependencies": {
-    "@types/node": "^16.10.9",
+    "@types/node": "^16.18.10",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "browserify": "^17.0.0",
@@ -47,6 +49,6 @@
     "nodemon": "^2.0.13",
     "rimraf": "^3.0.2",
     "ts-node": "^10.3.0",
-    "typescript": "^4.4.4"
+    "typescript": "^4.9.4"
   }
 }
