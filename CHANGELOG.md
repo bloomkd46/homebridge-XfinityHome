@@ -1,3 +1,7 @@
+### 3.0.0 Beta 29 
+* Fixed custom ui
+
+
 ### 3.0.0 Beta 28 
 * Changed compile type for homebridge-ui
 
