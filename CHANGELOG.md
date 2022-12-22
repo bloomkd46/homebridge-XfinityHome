@@ -1,3 +1,7 @@
+### 3.0.0 Beta 28 
+* Changed compile type for homebridge-ui
+
+
 ### 3.0.0 Beta 27 
 * Fixed compile errors for homebridge-ui server script
 
