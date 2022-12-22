@@ -1,3 +1,7 @@
+### 3.0.0 Beta 26 
+* Attempting to fix ui
+
+
 ### 3.0.0 Beta 25 
 * Converted custom ui to typescript
 
