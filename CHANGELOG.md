@@ -1,3 +1,7 @@
+### 3.0.0 Beta 30 
+* Modified UI
+
+
 ### 3.0.0 Beta 29 
 * Fixed custom ui
 
