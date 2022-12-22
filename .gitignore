@@ -87,6 +87,7 @@ web_modules/
 # Nuxt.js build / generate output
 .nuxt
 dist
+homebridge-ui/*.js
 
 # Gatsby files
 .cache/
@@ -118,6 +119,5 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .pnp.*
-
 
 src/accessories/CameraAccessory.ts
