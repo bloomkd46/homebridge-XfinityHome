@@ -1,4 +1,4 @@
-import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
+import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory } from 'homebridge';
 import { Panel, status } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
@@ -7,7 +7,6 @@ import Accessory from './Accessory';
 
 
 export default class PanelAccessory extends Accessory {
-  private service: Service;
   private readonly armModes = ['stay', 'away', 'night', 'disarmed', 'triggered'] as const;
 
   constructor(
@@ -15,10 +14,9 @@ export default class PanelAccessory extends Accessory {
     private readonly accessory: PlatformAccessory<CONTEXT>,
     private readonly device: Panel,
   ) {
-    super(platform, accessory, device);
+    super(platform, accessory, device, accessory.getService(platform.Service.SecuritySystem) ||
+      accessory.addService(platform.Service.SecuritySystem));
 
-    this.service = this.accessory.getService(this.platform.Service.SecuritySystem) ||
-      this.accessory.addService(this.platform.Service.SecuritySystem);
     this.service.addOptionalCharacteristic(this.platform.CustomCharacteristic.PanelStatus);
 
     this.service.getCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState)
@@ -38,20 +36,21 @@ export default class PanelAccessory extends Accessory {
     this.device.onevent = event => {
       if (event.mediaType === 'event/securityStateChange') {
         this.device.device.properties.status = event.metadata.status;
-        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
-        event.metadata.armType !== null ? this.device.device.properties.armType = event.metadata.armType : undefined;
-        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
         this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
+        event.metadata.armType !== null ? this.device.device.properties.armType = event.metadata.armType : undefined;
+        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
+        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
       }
     };
 
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
-      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
-      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
+      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
+
 
       this.accessory.context.logPath = this.logPath;
       this.accessory.context.device = newState;
@@ -88,6 +87,7 @@ export default class PanelAccessory extends Accessory {
         if (this.device.device.properties.status !== 'ready') {
           await this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night').catch(err => {
             this.log('error', 'Failed To Arm With Error:', 'NOT_READY');
+            this.log('debug', err);
             this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
           });
           /*this.log('warn', 'Failed To Arm With Error:', 'NOT_ALLOWED_IN_CURRENT_STATE');

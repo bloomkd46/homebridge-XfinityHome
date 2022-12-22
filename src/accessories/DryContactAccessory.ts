@@ -7,7 +7,6 @@ import Accessory from './Accessory';
 
 
 export default class DryContactAccessory extends Accessory {
-  private service: Service;
   protected temperatureService?: Service;
 
   constructor(
@@ -15,10 +14,8 @@ export default class DryContactAccessory extends Accessory {
     private readonly accessory: PlatformAccessory<CONTEXT>,
     private readonly device: DryContact,
   ) {
-    super(platform, accessory, device);
-
-    this.service = this.accessory.getService(this.platform.Service.ContactSensor) ||
-      this.accessory.addService(this.platform.Service.ContactSensor);
+    super(platform, accessory, device, accessory.getService(platform.Service.ContactSensor) ||
+      accessory.addService(platform.Service.ContactSensor));
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
 
@@ -58,31 +55,34 @@ export default class DryContactAccessory extends Accessory {
       this.accessory.removeService(this.accessory.getService(this.platform.Service.TemperatureSensor)!);
     }
     this.device.onevent = event => {
-      if ('sensorTemperature' in event.metadata) {
-        this.device.device.properties.temperature = JSON.parse(event.metadata.sensorTemperature);
-        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
-      }
-      if (event.mediaType === 'event/zoneUpdated') {
-        this.device.device.properties.isBypassed = event.metadata.isBypassed === 'true';
-        this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
-      }
-      if (event.name === 'isFaulted') {
-        this.device.device.properties.isFaulted = event.value === 'true';
-        this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected());
-      }
       if (event.name === 'trouble') {
         if (event.value === 'senTamp' || event.value === 'senTampRes') {
           this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, 1);
         }
       }
+      if (event.name === 'isFaulted') {
+        this.device.device.properties.isFaulted = event.value === 'true';
+        this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected());
+      }
+      if (event.mediaType === 'event/zoneUpdated') {
+        this.device.device.properties.isBypassed = event.metadata.isBypassed === 'true';
+        this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
+        this.device.device.name = event.metadata.label;
+        this.service.updateCharacteristic(this.platform.CustomCharacteristic.ConfiguredName, this.device.device.name);
+      }
+      if ('sensorTemperature' in event.metadata) {
+        this.device.device.properties.temperature = JSON.parse(event.metadata.sensorTemperature);
+        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
+      }
     };
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected(true));
       this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
-      this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
+      this.service.updateCharacteristic(this.platform.CustomCharacteristic.ConfiguredName, this.device.device.name);
 
       this.accessory.context.logPath = this.logPath;
       this.accessory.context.device = newState;

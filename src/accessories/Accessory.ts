@@ -20,6 +20,7 @@ export default class Accessory {
     platform: XfinityHomePlatform,
     accessory: PlatformAccessory<CONTEXT>,
     device: Device,
+    protected service: Service,
   ) {
     this.name = device instanceof Panel ? 'Panel' : device.device.name || device.device.model;
     this.projectDir = path.join(platform.api.user.storagePath(), 'XfinityHome');
@@ -69,20 +70,19 @@ export default class Accessory {
       .setCharacteristic(platform.Characteristic.Name, this.name)
       .setCharacteristic(platform.Characteristic.FirmwareRevision, deviceInfo.firmwareVersion);
     if ('label' in device) {
-      accessory.getService(platform.Service.AccessoryInformation)!
-        .getCharacteristic(platform.Characteristic.ConfiguredName).onGet(() => device.device.name).onSet(async name => {
-          if ('label' in device) {
-            await device.label(name as string).catch(err => {
-              this.log('error', 'Failed To Change Configured Name With Error:', err);
-              throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-            });
-          } else {
-            this.log('error', 'Failed To Change Configured Name With Error:', 'READ_ONLY_CHARACTERISTIC');
-            throw new this.StatusError(HAPStatus.READ_ONLY_CHARACTERISTIC);
-          }
+      this.service.addOptionalCharacteristic(platform.CustomCharacteristic.ConfiguredName);
+
+      this.service.getCharacteristic(platform.CustomCharacteristic.ConfiguredName)
+        .onGet(() => device.device.name)
+        .onSet(async name => {
+          device.device.name = name as string;
+          await device.label(name as string).catch(err => {
+            this.log('error', 'Failed To Change Configured Name With Error:', err);
+            throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          });
         }).on('change', async (value) => {
           if (value.newValue !== value.oldValue) {
-            this.log(3, `Configured Name Changed From ${value.oldValue} To ${value.newValue}`);
+            this.log(3, `Configured Name Changed To ${value.newValue}`);
           }
         });
     }

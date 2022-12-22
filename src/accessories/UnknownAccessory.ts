@@ -12,7 +12,7 @@ export default class UnknownAccessory extends Accessory {
     private readonly accessory: PlatformAccessory<CONTEXT>,
     private readonly device: Unknown,
   ) {
-    super(platform, accessory, device);
+    super(platform, accessory, device, accessory.getService(platform.Service.AccessoryInformation)!);
     if (!this.platform.config.hideUnsupportedDeviceWarnings) {
       this.log('warn', 'Unknown accessory!');
       this.log('warn', 'Please open an issue about this.');

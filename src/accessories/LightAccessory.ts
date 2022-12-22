@@ -1,4 +1,4 @@
-import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
+import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory } from 'homebridge';
 import { Light } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
@@ -7,16 +7,14 @@ import Accessory from './Accessory';
 
 
 export default class LightAccessory extends Accessory {
-  private service: Service;
   constructor(
     private readonly platform: XfinityHomePlatform,
     private readonly accessory: PlatformAccessory<CONTEXT>,
     private readonly device: Light,
   ) {
-    super(platform, accessory, device);
+    super(platform, accessory, device, accessory.getService(platform.Service.Lightbulb) ||
+      accessory.addService(platform.Service.Lightbulb));
 
-    this.service = this.accessory.getService(this.platform.Service.Lightbulb) ||
-      this.accessory.addService(this.platform.Service.Lightbulb);
     this.service.addOptionalCharacteristic(this.platform.CustomCharacteristic.EnergyUsage);
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
@@ -46,7 +44,6 @@ export default class LightAccessory extends Accessory {
           this.device.device.properties.level = JSON.parse(event.metadata.level);
           this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness());
         }
-
         if (this.device.device.properties.energyMgmtEnabled) {
           this.device.device.properties.energyUsage = JSON.parse(event.metadata.energyUsage);
           this.service.updateCharacteristic(this.platform.CustomCharacteristic.EnergyUsage, this.getEnergyUsage());
@@ -58,8 +55,11 @@ export default class LightAccessory extends Accessory {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
       this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
-      this.device.device.properties.level ?
+      this.device.device.properties.dimAllowed ?
         this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness()) : undefined;
+      this.device.device.properties.energyMgmtEnabled ?
+        this.service.updateCharacteristic(this.platform.CustomCharacteristic.EnergyUsage, this.getEnergyUsage()) : undefined;
+      this.service.updateCharacteristic(this.platform.CustomCharacteristic.ConfiguredName, this.device.device.name);
 
       this.accessory.context.logPath = this.logPath;
       this.accessory.context.device = device;
