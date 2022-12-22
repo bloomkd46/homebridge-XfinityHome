@@ -19,7 +19,7 @@
   "scripts": {
     "lint": "eslint src/**.ts --max-warnings=0 --fix && eslint homebridge-ui/**.ts --max-warnings=0",
     "watch": "npm run build && npm link && nodemon",
-    "build": "(rimraf ./dist && tsc) ; (cd homebridge-ui && rimraf ./server.js && tsc --esModuleInterop --module commonjs --target es2016 server.ts) ; (cd homebridge-ui/public && rimraf index.js && tsc --module es6 --target es5 index.ts && (sed '$d' index.js || sed -i '' -e '$ d' index.js) > foo.txt && (rimraf index.js && cp foo.txt index.js && rimraf foo.txt))",
+    "build": "(rimraf ./dist && tsc) ; (cd homebridge-ui && rimraf ./server.js && tsc --esModuleInterop --module commonjs --target es2016 server.ts) ; (cd homebridge-ui/public && rimraf index.js && tsc --module es2015 --target es2015 --moduleResolution node index.ts)",
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
