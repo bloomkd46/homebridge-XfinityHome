@@ -19,7 +19,7 @@
   "scripts": {
     "lint": "eslint src/**.ts --max-warnings=0 --fix && eslint homebridge-ui/**.ts --max-warnings=0",
     "watch": "npm run build && npm link && nodemon",
-    "build": "(rimraf ./dist && tsc) ; (cd homebridge-ui && rimraf ./server.js && tsc --esModuleInterop server.ts) ; (cd homebridge-ui/public && rimraf index.js && tsc index.ts)",
+    "build": "(rimraf ./dist && tsc) ; (cd homebridge-ui && rimraf ./server.js && tsc --esModuleInterop --module commonjs --target es2016 server.ts) ; (cd homebridge-ui/public && rimraf index.js && tsc index.ts)",
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
