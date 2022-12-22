@@ -1,3 +1,7 @@
+### 3.0.0 Beta 31 
+* Added browserify dependency to fix ui
+
+
 ### 3.0.0 Beta 30 
 * Modified UI
 
