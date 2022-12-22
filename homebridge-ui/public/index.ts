@@ -139,8 +139,8 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
         option.text = 'No Devices';
         deviceSelect.add(option);
         deviceSelect.disabled = true;
+        homebridge.hideSpinner();
       }
-      homebridge.hideSpinner();
     };
     const showConfigTool = async () => {
       homebridge.showSpinner();
