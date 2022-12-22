@@ -59,7 +59,6 @@ export default class LightAccessory extends Accessory {
         this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness()) : undefined;
       this.device.device.properties.energyMgmtEnabled ?
         this.service.updateCharacteristic(this.platform.CustomCharacteristic.EnergyUsage, this.getEnergyUsage()) : undefined;
-      this.service.updateCharacteristic(this.platform.CustomCharacteristic.ConfiguredName, this.device.device.name);
 
       this.accessory.context.logPath = this.logPath;
       this.accessory.context.device = device;

@@ -1,6 +1,6 @@
 import fs from 'fs';
 //@ts-check
-import { HAPStatus, HapStatusError, PlatformAccessory, Service } from 'homebridge';
+import { HapStatusError, PlatformAccessory, Service } from 'homebridge';
 import path from 'path';
 import { Device, Light, Panel } from 'xfinityhome';
 
@@ -69,23 +69,6 @@ export default class Accessory {
       .setCharacteristic(platform.Characteristic.Model, deviceInfo.model)
       .setCharacteristic(platform.Characteristic.Name, this.name)
       .setCharacteristic(platform.Characteristic.FirmwareRevision, deviceInfo.firmwareVersion);
-    if ('label' in device) {
-      this.service.addOptionalCharacteristic(platform.CustomCharacteristic.ConfiguredName);
-
-      this.service.getCharacteristic(platform.CustomCharacteristic.ConfiguredName)
-        .onGet(() => device.device.name)
-        .onSet(async name => {
-          device.device.name = name as string;
-          await device.label(name as string).catch(err => {
-            this.log('error', 'Failed To Change Configured Name With Error:', err);
-            throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-          });
-        }).on('change', async (value) => {
-          if (value.newValue !== value.oldValue) {
-            this.log(3, `Configured Name Changed To ${value.newValue}`);
-          }
-        });
-    }
     accessory.getService(platform.Service.AccessoryInformation)!.getCharacteristic(platform.Characteristic.Identify).on('set', () => {
       this.log('info', 'Identifying Device:', device.device);
       if (device instanceof Light) {

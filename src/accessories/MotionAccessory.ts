@@ -66,8 +66,6 @@ export default class MotionAccessory extends Accessory {
       } if (event.mediaType === 'event/zoneUpdated') {
         this.device.device.properties.isBypassed = event.metadata.isBypassed === 'true';
         this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
-        this.device.device.name = event.metadata.label;
-        this.service.updateCharacteristic(this.platform.CustomCharacteristic.ConfiguredName, this.device.device.name);
       }
       if ('sensorTemperature' in event.metadata) {
         this.device.device.properties.temperature = JSON.parse(event.metadata.sensorTemperature);
@@ -81,7 +79,6 @@ export default class MotionAccessory extends Accessory {
       this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.getMotionDetected(true));
       this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
-      this.service.updateCharacteristic(this.platform.CustomCharacteristic.ConfiguredName, this.device.device.name);
 
       this.accessory.context.logPath = this.logPath;
       this.accessory.context.device = newState;
