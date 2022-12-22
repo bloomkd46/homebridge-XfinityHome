@@ -1,3 +1,7 @@
+### 3.0.0 Beta 25 
+* Converted custom ui to typescript
+
+
 ### 3.0.0 Beta 24 
 * Logging Tweaks
 * Added Configured Name Characteristic
