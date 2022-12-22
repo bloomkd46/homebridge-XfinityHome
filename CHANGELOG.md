@@ -1,3 +1,9 @@
+### 3.0.0 Beta 32 
+* Fixed Spinner in custom UI
+* Re-structured project
+* Added browserify from custom ui compiling
+
+
 ### 3.0.0 Beta 31 
 * Added browserify dependency to fix ui
 
