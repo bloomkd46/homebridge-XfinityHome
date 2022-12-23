@@ -70,60 +70,34 @@ class PluginUiServer extends HomebridgePluginUiServer {
         return err;
       }
     });
-    this.onRequest('/watchLog', async (payload) => {
-      return new Promise((resolve, reject) => {
-        if (!existsSync(payload.path)) {
-          reject('File does not exist: ' + payload.path);
-          return;
-        }
-        try {
-          const aborter = new AbortController();
-          const watcher = watch(payload.path, { signal: aborter.signal });
-          watcher.once('change', () => {
-            aborter.abort();
-            resolve(readFileSync(payload.path));
-          });
-          watcher.once('error', err => {
-            console.error(err);
-            aborter.abort();
-            watchFile(payload.path, () => {
-              unwatchFile(payload.path);
-              resolve(readFileSync(payload.path));
-            });
-          });
-        } catch {
-          watchFile(payload.path, () => {
-            unwatchFile(payload.path);
-            resolve(readFileSync(payload.path));
-          });
-        }
-      });
+    this.onRequest('/watchLog', (payload) => {
+      return watchFilePromise(payload.logPath);
     });
-    const watchAccessory = async accessory => {
+    const watchFilePromise = async (file: string) => {
       return new Promise((resolve, reject) => {
-        if (!existsSync(cachedAccessoriesDir)) {
-          reject('File does not exist: ' + cachedAccessoriesDir);
+        if (!existsSync(file)) {
+          reject('File does not exist: ' + file);
           return;
         }
         try {
           const aborter = new AbortController();
-          const watcher = watch(cachedAccessoriesDir, { signal: aborter.signal });
+          const watcher = watch(file, { signal: aborter.signal });
           watcher.once('change', () => {
             aborter.abort();
-            resolve(readFileSync(cachedAccessoriesDir));
+            resolve(readFileSync(file));
           });
           watcher.once('error', err => {
             console.error(err);
             aborter.abort();
-            watchFile(cachedAccessoriesDir, () => {
-              unwatchFile(cachedAccessoriesDir);
-              resolve(readFileSync(cachedAccessoriesDir));
+            watchFile(file, () => {
+              unwatchFile(file);
+              resolve(readFileSync(file));
             });
           });
         } catch {
-          watchFile(cachedAccessoriesDir, () => {
-            unwatchFile(cachedAccessoriesDir);
-            resolve(readFileSync(cachedAccessoriesDir));
+          watchFile(file, () => {
+            unwatchFile(file);
+            resolve(readFileSync(file));
           });
         }
       });
@@ -132,7 +106,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       const loop = async () => {
         const oldFile: PlatformAccessory<CONTEXT>[] =
           JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
-        await watchAccessory(payload.accessory);
+        await watchFilePromise(cachedAccessoriesDir);
         const newFile: PlatformAccessory<CONTEXT>[]
           = JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
         const oldAccessory = oldFile.find(accessory => accessory.UUID === payload.accessory.UUID);
