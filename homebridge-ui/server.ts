@@ -71,8 +71,12 @@ class PluginUiServer extends HomebridgePluginUiServer {
         return err;
       }
     });
-    this.onRequest('/watchLog', (payload) => {
-      return watchFilePromise(payload.path);
+    this.onRequest('/watchLog', async (payload) => {
+      try {
+        return await watchFilePromise(payload.path);
+      } catch (err) {
+        return Promise.reject(err);
+      }
     });
     const watchFilePromise = async (file: string) => {
       return new Promise((resolve, reject) => {
