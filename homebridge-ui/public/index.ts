@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import type { IHomebridgePluginUi } from '@homebridge/plugin-ui-utils/dist/ui.interface';
 declare const homebridge: IHomebridgePluginUi;
-
 //Intro Elements
 const pageIntro = document.getElementById('pageIntro') as HTMLDivElement;
 const introContinue = document.getElementById('introContinue') as HTMLButtonElement;
@@ -34,6 +33,7 @@ const logZone = document.getElementById('logZone') as HTMLDivElement;
 const deviceInfo = document.getElementById('deviceInfo') as HTMLButtonElement;
 const deviceName = document.getElementById('deviceName') as HTMLHeadingElement;
 const deviceDetailsTable = document.getElementById('deviceDetailsTable') as HTMLTableSectionElement;
+const modal = $('#deviceDetails');
 //Miscellaneous Elements
 const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
 (async () => {
@@ -81,11 +81,11 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
           deviceSelect.add(option);
         }
       });
-      const showDeviceLog = async logPath => {
+      const showDeviceLog = async (logPath: string, logs?: string) => {
         currentLogPath = logPath;
         homebridge.showSpinner();
-        const logs = await homebridge.request('/getLogs', { logPath: logPath });
-        currentLog = `data:text/plain;base64,${btoa(logs.split('<br>').join('\n'))}`;
+        logs = logs ?? await homebridge.request('/getLogs', { logPath: logPath });
+        currentLog = `data:text/plain;base64,${Buffer.from(logs.split('<br>').join('\n'), 'base64url')}`;
         logDownload.href = currentLog;
         logDownload.download = logPath.split('/').pop();
 
@@ -95,16 +95,9 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
 
         homebridge.hideSpinner();
 
-        homebridge.request('/watchLog', { path: logPath }).then(() => {
+        homebridge.request('/watchLog', { path: logPath }).then((newLogs) => {
           if (logPath === currentLogPath) {
-            showDeviceLog(logPath);
-            /*setTimeout(async () => {
-              if (logPath === currentLogPath) {
-                cachedAccessories = await homebridge.request('/getCachedAccessories');
-
-                showDeviceLog(logPath);
-              }
-            }, 1500);*/
+            showDeviceLog(logPath, newLogs);
           }
         }).catch(err => {
           console.error(err);
@@ -126,6 +119,29 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
         deviceSelect.disabled = true;
         homebridge.hideSpinner();
       }
+    };
+    modal.modal({ backdrop: false, show: false });
+    const showDeviceInfo = async (device) => {
+      homebridge.showSpinner();
+      cachedAccessories = await homebridge.request('/getCachedAccessories');
+      device = device ?? cachedAccessories.find(x => x.context.logPath === currentLogPath);
+      deviceName.innerHTML = device.displayName;
+      let deviceHTML = '';
+      Object.keys(device.context.device).forEach(key => {
+        deviceHTML +=
+          `<tr>
+              <th scope="row">${key}</th>
+              <td><pre style="color: inherit;">${JSON.stringify(device.context.device[key], null, 2)}</pre></td>
+          </tr>`;
+      });
+      deviceDetailsTable.innerHTML = deviceHTML;
+      modal.modal('show');
+      homebridge.hideSpinner();
+      homebridge.request('/watchAccessory', { accessory: device }).then(newDevice => {
+        if (device.logPath === currentLogPath) {
+          showDeviceInfo(newDevice);
+        }
+      });
     };
     const showConfigTool = async () => {
       homebridge.showSpinner();
@@ -188,10 +204,11 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       homebridge.showSchemaForm();
       homebridge.hideSpinner();
     };
-    menuSettings.addEventListener('click', () => showSettings());
-    menuLogs.addEventListener('click', () => showLogs());
-    menuConfigTool.addEventListener('click', () => showConfigTool());
+    menuSettings.addEventListener('click', showSettings);
+    menuLogs.addEventListener('click', showLogs);
+    menuConfigTool.addEventListener('click', showConfigTool);
     exitConfigTool.addEventListener('click', async () => {
+      homebridge.showSpinner();
       await homebridge.request('/stopProxy');
       menuWrapper.style.display = 'inline-flex';
       showSettings();
@@ -203,23 +220,7 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       logZone.innerHTML = 'successfully deleted log file at ' + currentLogPath;
       homebridge.hideSpinner();
     });
-    deviceInfo.addEventListener('click', async () => {
-      homebridge.showSpinner();
-      cachedAccessories = await homebridge.request('/getCachedAccessories');
-      const device = cachedAccessories.find(x => x.context.logPath === currentLogPath);
-      deviceName.innerHTML = device.displayName;
-      let deviceHTML = '';
-      Object.keys(device.context.device).forEach(key => {
-        deviceHTML +=
-          `<tr>
-              <th scope="row">${key}</th>
-              <td><pre style="color: inherit;">${JSON.stringify(device.context.device[key], null, 2)}</pre></td>
-          </tr>`;
-      });
-      deviceDetailsTable.innerHTML = deviceHTML;
-      $('#deviceDetails').modal({ backdrop: false });
-      homebridge.hideSpinner();
-    });
+    deviceInfo.addEventListener('click', showDeviceInfo);
     if (currentConfig.length) {
       menuWrapper.style.display = 'inline-flex';
       showSettings();

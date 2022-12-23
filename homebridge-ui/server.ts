@@ -10,6 +10,15 @@ import qrcode from 'qrcode';
 import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 
 
+import type { PlatformAccessory } from 'homebridge';
+import type { Device } from 'xfinityhome';
+type CONTEXT = {
+  device: Device['device'];
+  logPath?: string;
+  refreshToken?: string;
+};
+
+
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor() {
     const events = new EventEmitter();
@@ -25,15 +34,12 @@ class PluginUiServer extends HomebridgePluginUiServer {
       A native method getCachedAccessories() was introduced in config-ui-x v4.37.0
       The following is for users who have a lower version of config-ui-x
     */
-    let cachedAccessoriesDir;
+    const cachedAccessoriesDir = path.join(storagePath, '/accessories/cachedAccessories') +
+      (config._bridge?.username ? ('.' + config._bridge?.username?.split(':').join('')) : '');
     this.onRequest('/getCachedAccessories', async () => {
       try {
         // Define the plugin and create the array to return
-        if (cachedAccessoriesDir && existsSync(cachedAccessoriesDir)) {
-          return JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
-        } else if (!cachedAccessoriesDir) {
-          cachedAccessoriesDir = path.join(storagePath, '/accessories/cachedAccessories') +
-            (config._bridge?.username ? ('.' + config._bridge?.username?.split(':').join('')) : '');
+        if (existsSync(cachedAccessoriesDir)) {
           return JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
         } else {
           return [];
@@ -75,23 +81,69 @@ class PluginUiServer extends HomebridgePluginUiServer {
           const watcher = watch(payload.path, { signal: aborter.signal });
           watcher.once('change', () => {
             aborter.abort();
-            resolve('');
+            resolve(readFileSync(payload.path));
           });
           watcher.once('error', err => {
             console.error(err);
             aborter.abort();
             watchFile(payload.path, () => {
               unwatchFile(payload.path);
-              resolve('');
+              resolve(readFileSync(payload.path));
             });
           });
         } catch {
           watchFile(payload.path, () => {
             unwatchFile(payload.path);
-            resolve('');
+            resolve(readFileSync(payload.path));
           });
         }
       });
+    });
+    const watchAccessory = async accessory => {
+      return new Promise((resolve, reject) => {
+        if (!existsSync(cachedAccessoriesDir)) {
+          reject('File does not exist: ' + cachedAccessoriesDir);
+          return;
+        }
+        try {
+          const aborter = new AbortController();
+          const watcher = watch(cachedAccessoriesDir, { signal: aborter.signal });
+          watcher.once('change', () => {
+            aborter.abort();
+            resolve(readFileSync(cachedAccessoriesDir));
+          });
+          watcher.once('error', err => {
+            console.error(err);
+            aborter.abort();
+            watchFile(cachedAccessoriesDir, () => {
+              unwatchFile(cachedAccessoriesDir);
+              resolve(readFileSync(cachedAccessoriesDir));
+            });
+          });
+        } catch {
+          watchFile(cachedAccessoriesDir, () => {
+            unwatchFile(cachedAccessoriesDir);
+            resolve(readFileSync(cachedAccessoriesDir));
+          });
+        }
+      });
+    };
+    this.onRequest('/watchAccessory', async payload => {
+      const loop = async () => {
+        const oldFile: PlatformAccessory<CONTEXT>[] =
+          JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
+        await watchAccessory(payload.accessory);
+        const newFile: PlatformAccessory<CONTEXT>[]
+          = JSON.parse(readFileSync(cachedAccessoriesDir, 'utf-8')).filter(accessory => accessory.plugin === plugin);
+        const oldAccessory = oldFile.find(accessory => accessory.UUID === payload.accessory.UUID);
+        const newAccessory = newFile.find(accessory => accessory.UUID === payload.accessory.UUID);
+        if (JSON.stringify(oldAccessory) !== JSON.stringify(newAccessory)) {
+          return newAccessory;
+        } else {
+          loop();
+        }
+      };
+      return loop();
     });
 
     this.onRequest('/proxyActive', async () => {
