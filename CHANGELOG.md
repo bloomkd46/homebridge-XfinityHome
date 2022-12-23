@@ -1,3 +1,7 @@
+### 3.0.0 Beta 35 
+* Fixed Custom UI Server Script Compilation Errors
+
+
 ### 3.0.0 Beta 34 
 * Added watch function for accessories in custom ui
 
