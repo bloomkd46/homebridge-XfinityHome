@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "composite": true,
-    "module": "commonjs",
     "lib": [
       "DOM"
     ]

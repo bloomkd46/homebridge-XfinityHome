@@ -212,9 +212,9 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       Object.keys(device.context.device).forEach(key => {
         deviceHTML +=
           `<tr>
-                    <th scope="row">${key}</th>
-                    <td><pre style="color: inherit;">${JSON.stringify(device.context.device[key], null, 2)}</pre></td>
-                  </tr>`;
+              <th scope="row">${key}</th>
+              <td><pre style="color: inherit;">${JSON.stringify(device.context.device[key], null, 2)}</pre></td>
+          </tr>`;
       });
       deviceDetailsTable.innerHTML = deviceHTML;
       $('#deviceDetails').modal({ backdrop: false });
