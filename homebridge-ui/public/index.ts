@@ -85,7 +85,7 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
         currentLogPath = logPath;
         homebridge.showSpinner();
         logs = logs ?? await homebridge.request('/getLogs', { logPath: logPath });
-        currentLog = `data:text/plain;base64,${Buffer.from(logs.split('<br>').join('\n'), 'utf-8').toString('base64')}`;
+        currentLog = `data:text/plain;base64,${Buffer.from(logs.replace(/<br>/g, '\n'), 'utf-8').toString('base64')}`;
         logDownload.href = currentLog;
         logDownload.download = logPath.split('/').pop();
 
