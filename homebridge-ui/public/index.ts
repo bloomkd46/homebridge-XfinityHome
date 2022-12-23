@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import type { PlatformAccessory } from 'homebridge';
 import type { IHomebridgePluginUi } from '@homebridge/plugin-ui-utils/dist/ui.interface';
 declare const homebridge: IHomebridgePluginUi;
 //Intro Elements
@@ -41,7 +42,7 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
     homebridge.showSpinner();
     let currentLogPath = '';
     let currentLog = '';
-    let cachedAccessories = await homebridge.request('/getCachedAccessories');
+    let cachedAccessories: PlatformAccessory[] = await homebridge.request('/getCachedAccessories');
     const currentConfig = await homebridge.getPluginConfig();
     const showIntro = () => {
       introContinue.addEventListener('click', () => {
@@ -84,7 +85,7 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       const showDeviceLog = async (logPath: string, logs?: string) => {
         currentLogPath = logPath;
         homebridge.showSpinner();
-        logs = logs !== undefined ? logs : await homebridge.request('/getLogs', { logPath: logPath });
+        logs = logs ?? await homebridge.request('/getLogs', { logPath: logPath });
         currentLog = `data:text/plain;base64,${Buffer.from(logs.replace(/<br>/g, '\n'), 'utf-8').toString('base64')}`;
         logDownload.href = currentLog;
         logDownload.download = logPath.split('/').pop();
@@ -121,10 +122,10 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       }
     };
     modal.modal({ backdrop: false, show: false });
-    const showDeviceInfo = async (device) => {
+    const showDeviceInfo = async (device?: PlatformAccessory) => {
       homebridge.showSpinner();
       cachedAccessories = await homebridge.request('/getCachedAccessories');
-      device = device !== undefined ? device : cachedAccessories.find(x => x.context.logPath === currentLogPath);
+      device = device ?? cachedAccessories.find(x => x.context.logPath === currentLogPath);
       deviceName.innerHTML = device.displayName;
       let deviceHTML = '';
       Object.keys(device.context.device).forEach(key => {
@@ -138,7 +139,7 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       modal.modal('show');
       homebridge.hideSpinner();
       homebridge.request('/watchAccessory', { accessory: device }).then(newDevice => {
-        if (device.logPath === currentLogPath) {
+        if (device.context.logPath === currentLogPath) {
           showDeviceInfo(newDevice);
         }
       });
@@ -220,7 +221,7 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       logZone.innerHTML = 'successfully deleted log file at ' + currentLogPath;
       homebridge.hideSpinner();
     });
-    deviceInfo.addEventListener('click', showDeviceInfo);
+    deviceInfo.addEventListener('click', () => showDeviceInfo());
     if (currentConfig.length) {
       menuWrapper.style.display = 'inline-flex';
       showSettings();
