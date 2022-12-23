@@ -2,6 +2,10 @@
 * UI Tweaks
 
 
+### 3.0.0 Beta 33 
+* UI Tweaks
+
+
 ### 3.0.0 Beta 32 
 * Fixed Spinner in custom UI
 * Re-structured project
