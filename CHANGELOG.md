@@ -1,3 +1,7 @@
+### 3.0.0 Beta 36 
+* UI Tweaks
+
+
 ### 3.0.0 Beta 35 
 * Fixed Custom UI Server Script Compilation Errors
 
