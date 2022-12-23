@@ -38,8 +38,10 @@ const deviceDetailsTable = document.getElementById('deviceDetailsTable') as HTML
 const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
 (async () => {
   try {
+    homebridge.showSpinner();
     let currentLogPath = '';
     let currentLog = '';
+    let cachedAccessories = await homebridge.request('/getCachedAccessories');
     const currentConfig = await homebridge.getPluginConfig();
     const showIntro = () => {
       introContinue.addEventListener('click', () => {
@@ -61,7 +63,6 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       menuSettings.classList.add('btn-primary');
       pageConfigTool.style.display = 'none';
       pageLogs.style.display = 'block';
-      let cachedAccessories = await homebridge.request('/getCachedAccessories');
       if (cachedAccessories.length > 0) {
         cachedAccessories.sort((a, b) => {
           return a.displayName.toLowerCase() > b.displayName.toLowerCase()
@@ -90,36 +91,20 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
 
         logZone.innerHTML = logs;
         logZone.scrollTo(0, logZone.scrollHeight);
-
-        const device = cachedAccessories.find(x => x.context.logPath === logPath);
-        if (device) {
-          deviceInfo.style.display = 'inline';
-          deviceName.innerHTML = device.displayName;
-          let deviceHTML = '';
-          Object.keys(device.context.device).forEach(key => {
-            deviceHTML +=
-              `<tr>
-                    <th scope="row">${key}</th>
-                    <td><pre style="color: inherit;">${JSON.stringify(device.context.device[key], null, 1)}</pre></td>
-                  </tr>`;
-          });
-          deviceDetailsTable.innerHTML = deviceHTML;
-        } else {
-          deviceInfo.style.display = 'none';
-        }
+        deviceInfo.style.display = cachedAccessories.find(x => x.context.logPath === logPath) !== undefined ? 'inline' : 'none';
 
         homebridge.hideSpinner();
 
-        homebridge.request('/watchForChanges', { path: logPath }).then(() => {
+        homebridge.request('/watchLog', { path: logPath }).then(() => {
           if (logPath === currentLogPath) {
             showDeviceLog(logPath);
-            setTimeout(async () => {
+            /*setTimeout(async () => {
               if (logPath === currentLogPath) {
                 cachedAccessories = await homebridge.request('/getCachedAccessories');
 
                 showDeviceLog(logPath);
               }
-            }, 1500);
+            }, 1500);*/
           }
         }).catch(err => {
           console.error(err);
@@ -218,6 +203,23 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       logZone.innerHTML = 'successfully deleted log file at ' + currentLogPath;
       homebridge.hideSpinner();
     });
+    deviceInfo.addEventListener('click', async () => {
+      homebridge.showSpinner();
+      cachedAccessories = await homebridge.request('/getCachedAccessories');
+      const device = cachedAccessories.find(x => x.context.logPath === currentLogPath);
+      deviceName.innerHTML = device.displayName;
+      let deviceHTML = '';
+      Object.keys(device.context.device).forEach(key => {
+        deviceHTML +=
+          `<tr>
+                    <th scope="row">${key}</th>
+                    <td><pre style="color: inherit;">${JSON.stringify(device.context.device[key], null, 2)}</pre></td>
+                  </tr>`;
+      });
+      deviceDetailsTable.innerHTML = deviceHTML;
+      $('#deviceDetails').modal({ backdrop: false });
+      homebridge.hideSpinner();
+    });
     if (currentConfig.length) {
       menuWrapper.style.display = 'inline-flex';
       showSettings();
@@ -226,9 +228,9 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       await homebridge.updatePluginConfig(currentConfig);
       showIntro();
     }
-  } catch (err: any) {
-    homebridge.toast.error(err.message, 'Error');
-    console.log(err);
+  } catch (err) {
+    homebridge.toast.error(err, 'Error');
+    console.error(err);
     homebridge.closeSettings();
   } finally {
     homebridge.hideSpinner();

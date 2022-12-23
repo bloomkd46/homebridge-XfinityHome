@@ -49,7 +49,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     });
     this.onRequest('/getLogs', async (payload) => {
       try {
-        return readFileSync(payload.logPath).toString().split('\n').join('<br>');
+        return readFileSync(payload.logPath).toString().replace(/\n/g, '<br>');
       } catch (err) {
         return `Failed To Load Logs From ${payload.logPath}`;
       }
@@ -64,7 +64,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         return err;
       }
     });
-    this.onRequest('/watchForChanges', async (payload) => {
+    this.onRequest('/watchLog', async (payload) => {
       return new Promise((resolve, reject) => {
         if (!existsSync(payload.path)) {
           reject('File does not exist: ' + payload.path);
