@@ -23,14 +23,6 @@
 * Added watch function for accessories in custom ui
 
 
-### 3.0.0 Beta 34 
-* Added watch function for accessories in custom ui
-
-
-### 3.0.0 Beta 33 
-* UI Tweaks
-
-
 ### 3.0.0 Beta 33 
 * UI Tweaks
 
