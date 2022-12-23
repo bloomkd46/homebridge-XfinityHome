@@ -1,3 +1,7 @@
+### 3.0.0 Beta 39 
+* Fixed device info modal
+
+
 ### 3.0.0 Beta 38 
 * Tweaks
 
