@@ -84,8 +84,8 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
       const showDeviceLog = async (logPath: string, logs?: string) => {
         currentLogPath = logPath;
         homebridge.showSpinner();
-        logs = logs ?? await homebridge.request('/getLogs', { logPath: logPath });
-        currentLog = `data:text/plain;base64,${Buffer.from(logs.replace(/<br>/g, '\n'), 'utf-8').toString('base64url')}`;
+        logs = logs !== undefined ? logs : await homebridge.request('/getLogs', { logPath: logPath });
+        currentLog = `data:text/plain;base64,${Buffer.from(logs.replace(/<br>/g, '\n'), 'utf-8').toString('base64')}`;
         logDownload.href = currentLog;
         logDownload.download = logPath.split('/').pop();
 
@@ -124,7 +124,7 @@ const menuWrapper = document.getElementById('menuWrapper') as HTMLDivElement;
     const showDeviceInfo = async (device) => {
       homebridge.showSpinner();
       cachedAccessories = await homebridge.request('/getCachedAccessories');
-      device = device ?? cachedAccessories.find(x => x.context.logPath === currentLogPath);
+      device = device !== undefined ? device : cachedAccessories.find(x => x.context.logPath === currentLogPath);
       deviceName.innerHTML = device.displayName;
       let deviceHTML = '';
       Object.keys(device.context.device).forEach(key => {
