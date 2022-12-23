@@ -1,3 +1,7 @@
+### 3.0.0 Beta 38 
+* Tweaks
+
+
 ### 3.0.0 Beta 37 
 * Added source map for server.ts
 * Fixed watch function crashing on non-existent file
