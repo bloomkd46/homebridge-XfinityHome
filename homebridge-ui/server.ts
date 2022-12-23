@@ -21,8 +21,9 @@ type CONTEXT = {
 
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor() {
-    const events = new EventEmitter();
     super();
+
+    const events = new EventEmitter();
 
     const plugin = 'homebridge-xfinityhome';
     const platform = 'XfinityHomePlatform';
