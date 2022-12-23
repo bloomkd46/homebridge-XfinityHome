@@ -1,3 +1,15 @@
+### 3.0.0 
+* Performance Rewrite
+* Added Energy Usage To Light
+* Added Tampered Status
+* Added Panel Status Characteristic
+* Fixed Glitchy Light Behavior
+* Converted Custom UI To Typescript
+* UI Improvements
+
+**Full Changelog**: https://github.com/bloomkd46/homebridge-XfinityHome/compare/2.4.0...3.0.0
+
+
 ### 3.0.0 Beta 39 
 * Fixed device info modal
 
