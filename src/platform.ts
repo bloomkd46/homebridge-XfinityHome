@@ -138,7 +138,8 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       `Loaded ${this.cachedAccessories.length} ${this.cachedAccessories.length === 1 ? 'Accessory' : 'Accessories'} From Cache`,
     );
     for (const device of await this.xhome.getDevices()) {
-      if ([Keyfob, Keypad, Camera, Router].find(blockedAccessory => device instanceof blockedAccessory) === undefined) {
+      if ([Keyfob, Keypad, Camera, Router].find(blockedAccessory => device instanceof blockedAccessory ||
+        (device instanceof Unknown && device.device.model === 'TCHU1AL0')) === undefined) {
         const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
         const existingAccessory = this.cachedAccessories.find(accessory => accessory.UUID === uuid);
         if (existingAccessory) {
@@ -164,7 +165,13 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
               this.restoredAccessories.slice(-1);
               break;
             default:
-              new UnknownAccessory(this, existingAccessory, device as Unknown);
+              switch (device.device.model) {
+                case 'TCHU1AL0':
+                  break;
+                default:
+                  new UnknownAccessory(this, existingAccessory, device as Unknown);
+                  break;
+              }
               break;
           }
         } else {
