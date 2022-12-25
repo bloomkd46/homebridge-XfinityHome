@@ -1,3 +1,7 @@
+### 3.0.1 
+* Added unknown device with model: TCHU1AL0 to blacklist
+
+
 ### 3.0.0 
 * Performance Rewrite
 * Added Energy Usage To Light
