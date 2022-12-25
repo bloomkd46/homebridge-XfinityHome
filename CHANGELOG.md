@@ -1,5 +1,5 @@
 ### 3.0.1 
-* Added unknown device with model: TCHU1AL0 to blacklist
+* Added unknown device with model: TCHU1AL0 to blacklist to address issue #12
 
 
 ### 3.0.0 
