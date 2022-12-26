@@ -24,7 +24,7 @@ export default class Accessory {
   ) {
     this.name = device instanceof Panel ? 'Panel' : device.device.name || device.device.model;
     this.projectDir = path.join(platform.api.user.storagePath(), 'XfinityHome');
-    this.logPath = path.join(this.projectDir, this.name + '.log');
+    this.logPath = path.join(this.projectDir, this.name.replace(/\//g, '-') + '.log');
     this.generalLogPath = path.join(this.projectDir, 'General.log');
 
     if (!fs.existsSync(this.projectDir)) {
