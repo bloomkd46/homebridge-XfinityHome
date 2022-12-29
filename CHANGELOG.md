@@ -1,3 +1,7 @@
+### 3.0.3 
+* Tweaked Custom UI
+
+
 ### 3.0.2 
 * Fixed server crash if a / existed in the accessory name
 
