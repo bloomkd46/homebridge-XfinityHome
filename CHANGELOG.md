@@ -1,3 +1,7 @@
+### 3.0.4 
+* Fixed trash icon not showing in custom ui
+
+
 ### 3.0.3 
 * Tweaked Custom UI
 
