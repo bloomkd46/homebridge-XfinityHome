@@ -36,7 +36,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       The following is for users who have a lower version of config-ui-x
     */
     const cachedAccessoriesDir = path.join(storagePath, '/accessories/cachedAccessories') +
-      (config?._bridge?.username ? ('.' + config._bridge?.username?.split(':').join('')) : '');
+      (config?._bridge?.username ? ('.' + config?._bridge?.username?.split(':').join('')) : '');
     this.onRequest('/getCachedAccessories', async () => {
       try {
         // Define the plugin and create the array to return
