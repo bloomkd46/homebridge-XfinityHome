@@ -1,3 +1,7 @@
+### 3.0.5 
+* (hopefully 🤞) fixed ui crash if config non-existent when opened
+
+
 ### 3.0.4 
 * Fixed trash icon not showing in custom ui
 
