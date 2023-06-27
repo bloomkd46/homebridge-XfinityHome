@@ -1,5 +1,5 @@
 import { CharacteristicChange, CharacteristicValue, HAPStatus, Perms, PlatformAccessory, Service } from 'homebridge';
-import { DryContact } from 'xfinityhome';
+import XHome, { DryContact } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
 import { CONTEXT } from '../settings';
@@ -8,6 +8,7 @@ import Accessory from './Accessory';
 
 export default class DryContactAccessory extends Accessory {
   protected temperatureService?: Service;
+  loggingService: any;
 
   constructor(
     private readonly platform: XfinityHomePlatform,
@@ -92,6 +93,7 @@ export default class DryContactAccessory extends Accessory {
         this.log('warn', JSON.stringify(this.device.device.trouble, null, 2));
       }
     };
+    this.loggingService = new platform.History('door', accessory, { log: platform.log });
   }
 
   private getContactDetected(skipUpdate?: boolean): CharacteristicValue {
@@ -107,6 +109,7 @@ export default class DryContactAccessory extends Accessory {
   private async notifyContactChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(3, value.newValue === 0 ? 'Closed' : 'Opened');
+      this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), status: value.newValue });
     }
   }
 
@@ -149,6 +152,7 @@ export default class DryContactAccessory extends Accessory {
   private async notifyTemperatureChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(4, `Updating Temperature To ${value.newValue}°C`);
+      this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), temp: value.newValue });
     }
   }
 }
