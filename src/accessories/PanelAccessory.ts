@@ -123,7 +123,7 @@ export default class PanelAccessory extends Accessory {
     }
     return this.device.device.properties.status === 'arming' ?
       this.armModes.indexOf('disarmed') :
-      (this.device.device.properties.status === 'entryDelay') ?
+      (this.device.device.properties.status === 'entryDelay' || this.device.device.properties.status === 'alarm') ?
         this.armModes.indexOf('triggered') : this.armModes.indexOf(this.device.device.properties.armType || 'disarmed');
   }
 
