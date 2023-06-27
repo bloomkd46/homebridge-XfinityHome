@@ -1,7 +1,3 @@
-### 3.1.0 Beta 1 
-* Added Eve history support for contact sensors
-
-
 ### 3.0.6 
 * Added missing alarm status for splaying triggered state for panel
 
