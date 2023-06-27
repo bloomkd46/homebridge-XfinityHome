@@ -1,4 +1,3 @@
-import fakegato from 'fakegato-history';
 import fs from 'fs';
 import {
   API, APIEvent, Categories, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service,
@@ -26,7 +25,6 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
   public readonly CustomCharacteristic = CustomCharacteristics(this.api.hap);
-  public readonly History = fakegato(this.api);
   public xhome!: XHome;
   private refreshToken?: string;
 
