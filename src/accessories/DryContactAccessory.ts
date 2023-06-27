@@ -55,9 +55,6 @@ export default class DryContactAccessory extends Accessory {
       this.log('warn', 'Removing Temperature Support');
       this.accessory.removeService(this.accessory.getService(this.platform.Service.TemperatureSensor)!);
     }
-    this.loggingService = new platform.History('custom', accessory, { log: platform.log });
-    this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), contact: this.device.device.properties.isFaulted ? 1 : 0 });
-    this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), temp: this.device.device.properties.temperature });
     this.device.onevent = event => {
       if (event.name === 'trouble') {
         if (event.value === 'senTamp' || event.value === 'senTampRes') {
@@ -67,7 +64,6 @@ export default class DryContactAccessory extends Accessory {
       if (event.name === 'isFaulted') {
         this.device.device.properties.isFaulted = event.value === 'true';
         this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected());
-        this.loggingService.addEntry({ time: Math.round(event.timestamp / 1000), contact: this.device.device.properties.isFaulted ? 1 : 0 });
       }
       if (event.mediaType === 'event/zoneUpdated') {
         this.device.device.properties.isBypassed = event.metadata.isBypassed === 'true';
@@ -75,8 +71,7 @@ export default class DryContactAccessory extends Accessory {
       }
       if ('sensorTemperature' in event.metadata) {
         this.device.device.properties.temperature = JSON.parse(event.metadata.sensorTemperature);
-        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature()) ?
-          this.loggingService.addEntry({ time: Math.round(event.timestamp / 1000), temp: this.device.device.properties.temperature }) : undefined;
+        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
       }
     };
     this.device.onchange = async (_oldState, newState) => {
@@ -98,7 +93,7 @@ export default class DryContactAccessory extends Accessory {
         this.log('warn', JSON.stringify(this.device.device.trouble, null, 2));
       }
     };
-
+    this.loggingService = new platform.History('door', accessory, { log: platform.log });
   }
 
   private getContactDetected(skipUpdate?: boolean): CharacteristicValue {
@@ -114,6 +109,7 @@ export default class DryContactAccessory extends Accessory {
   private async notifyContactChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(3, value.newValue === 0 ? 'Closed' : 'Opened');
+      this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), status: value.newValue });
     }
   }
 
@@ -156,6 +152,7 @@ export default class DryContactAccessory extends Accessory {
   private async notifyTemperatureChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(4, `Updating Temperature To ${value.newValue}°C`);
+      this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), temp: value.newValue });
     }
   }
 }

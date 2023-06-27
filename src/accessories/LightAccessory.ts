@@ -7,7 +7,6 @@ import Accessory from './Accessory';
 
 
 export default class LightAccessory extends Accessory {
-  loggingService: any;
   constructor(
     private readonly platform: XfinityHomePlatform,
     private readonly accessory: PlatformAccessory<CONTEXT>,
@@ -31,19 +30,16 @@ export default class LightAccessory extends Accessory {
         .onSet(this.set.bind(this))
         .on('change', this.notifyBrightnessChange.bind(this));
     }
-    this.loggingService = new platform.History('custom', accessory, { log: platform.log });
-    this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), status: this.device.device.properties.isOn ? 1 : 0 });
     if (this.device.device.properties.energyMgmtEnabled) {
       this.service.getCharacteristic(this.platform.CustomCharacteristic.EnergyUsage)
         .onGet(this.getEnergyUsage.bind(this))
         .on('change', this.notifyEnergyUsageChange.bind(this));
-      this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), power: this.device.device.properties.energyUsage });
     }
+
     this.device.onevent = event => {
       if (event.mediaType === 'event/lighting') {
         this.device.device.properties.isOn = JSON.parse(event.metadata.isOn);
         this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
-        this.loggingService.addEntry({ time: Math.round(event.timestamp / 1000), status: this.device.device.properties.isOn ? 1 : 0 });
         if (this.device.device.properties.dimAllowed) {
           this.device.device.properties.level = JSON.parse(event.metadata.level);
           this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness());
@@ -51,7 +47,6 @@ export default class LightAccessory extends Accessory {
         if (this.device.device.properties.energyMgmtEnabled) {
           this.device.device.properties.energyUsage = JSON.parse(event.metadata.energyUsage);
           this.service.updateCharacteristic(this.platform.CustomCharacteristic.EnergyUsage, this.getEnergyUsage());
-          this.loggingService.addEntry({ time: Math.round(event.timestamp / 1000), power: this.device.device.properties.energyUsage });
         }
       }
     };

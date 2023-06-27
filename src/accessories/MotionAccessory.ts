@@ -8,7 +8,6 @@ import Accessory from './Accessory';
 
 export default class MotionAccessory extends Accessory {
   protected temperatureService?: Service;
-  loggingService: any;
 
   constructor(
     private readonly platform: XfinityHomePlatform,
@@ -54,9 +53,6 @@ export default class MotionAccessory extends Accessory {
       this.log('warn', 'Removing Temperature Support');
       this.accessory.removeService(this.accessory.getService(this.platform.Service.TemperatureSensor)!);
     }
-    this.loggingService = new platform.History('custom', accessory, { log: platform.log });
-    this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), motion: this.device.device.properties.isFaulted ? 1 : 0 });
-    this.loggingService.addEntry({ time: Math.round(new Date().valueOf() / 1000), temp: this.device.device.properties.temperature });
 
     this.device.onevent = event => {
       if (event.name === 'trouble') {
@@ -67,15 +63,13 @@ export default class MotionAccessory extends Accessory {
       if (event.name === 'isFaulted') {
         this.device.device.properties.isFaulted = event.value === 'true';
         this.service.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.getMotionDetected(true));
-        this.loggingService.addEntry({ time: Math.round(event.timestamp / 1000), contact: this.device.device.properties.isFaulted ? 1 : 0 });
       } if (event.mediaType === 'event/zoneUpdated') {
         this.device.device.properties.isBypassed = event.metadata.isBypassed === 'true';
         this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       }
       if ('sensorTemperature' in event.metadata) {
         this.device.device.properties.temperature = JSON.parse(event.metadata.sensorTemperature);
-        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature()) ?
-          this.loggingService.addEntry({ time: Math.round(event.timestamp / 1000), temp: this.device.device.properties.temperature }) : undefined;
+        this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
       }
     };
     this.device.onchange = async (_oldState, newState) => {
