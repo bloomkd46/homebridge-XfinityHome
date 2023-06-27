@@ -38,7 +38,7 @@ export default class Accessory {
         `${date.getHours() > 12 ? 'PM' : 'AM'}`;
 
       //if (typeof type === 'number') {
-      if (type < 4 || typeof type === 'string') {
+      if (typeof type === 'string' || type < 4) {
         fs.appendFileSync(this.generalLogPath, `[${time}] ${this.name}: ${message} ${parsedArgs.join(' ')}\n`);
       }
       fs.appendFileSync(this.logPath, `[${time}] ${message} ${parsedArgs.join(' ')}\n`);
