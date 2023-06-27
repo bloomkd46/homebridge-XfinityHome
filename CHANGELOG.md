@@ -1,7 +1,3 @@
-### 3.0.6 
-* Added missing alarm status for splaying triggered state for panel
-
-
 ### 3.0.5 
 * (hopefully 🤞) fixed ui crash if config non-existent when opened
 
