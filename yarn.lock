@@ -2926,10 +2926,10 @@ ws@^3.3.3:
     safe-buffer "~5.1.0"
     ultron "~1.1.0"
 
-xfinityhome@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/xfinityhome/-/xfinityhome-2.3.1.tgz#65e25dc6ca1326ce4fe3405503b64974c01cfb4a"
-  integrity sha512-qLnxbVd/kGBXRa26POkQ6q+YRAJzt/0Tyo8BiKWKeBrVFH8eiaiThK0gA31yI1lPdQct2YU5kBF2pYlEviKPVQ==
+xfinityhome@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/xfinityhome/-/xfinityhome-2.4.0.tgz#e5e0262d3e698502d26b3699998241782c825a06"
+  integrity sha512-ROOXlkRQH3wzLJkliDtI6f6E0SMj/TW/DVrIXM5VoKf7+7d8WBIRAMY4f0Yx2G1CkVCPh4dbT5mEkxyYlrq9qg==
   dependencies:
     axios "^0.26.1"
 
