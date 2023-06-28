@@ -22,7 +22,7 @@ export default class Accessory {
     device: Device,
     protected service: Service,
   ) {
-    this.name = device instanceof Panel ? 'Panel' : device.device.name || device.device.model;
+    this.name = device instanceof Panel ? 'Panel' : device.device.name || ('model' in device.device ? device.device.model : 'Unknown');
     this.projectDir = path.join(platform.api.user.storagePath(), 'XfinityHome');
     this.logPath = path.join(this.projectDir, this.name.replace(/\//g, '-') + '.log');
     this.generalLogPath = path.join(this.projectDir, 'General.log');
@@ -64,11 +64,12 @@ export default class Accessory {
     const deviceInfo = device.device;
     // set accessory information
     accessory.getService(platform.Service.AccessoryInformation)!
-      .setCharacteristic(platform.Characteristic.Manufacturer, deviceInfo.manufacturer)
+      .setCharacteristic(platform.Characteristic.Manufacturer, 'manufacturer' in deviceInfo ? deviceInfo.manufacturer : 'Unknown')
       .setCharacteristic(platform.Characteristic.SerialNumber, 'serialNumber' in deviceInfo ? deviceInfo.serialNumber : accessory.UUID)
-      .setCharacteristic(platform.Characteristic.Model, deviceInfo.model)
+      .setCharacteristic(platform.Characteristic.Model, 'model' in deviceInfo ? deviceInfo.model : 'Unknown')
       .setCharacteristic(platform.Characteristic.Name, this.name)
-      .setCharacteristic(platform.Characteristic.FirmwareRevision, deviceInfo.firmwareVersion);
+      .setCharacteristic(platform.Characteristic.FirmwareRevision,
+        'firmwareVersion' in deviceInfo ? deviceInfo.firmwareVersion : 'Unknown');
     accessory.getService(platform.Service.AccessoryInformation)!.getCharacteristic(platform.Characteristic.Identify).on('set', () => {
       this.log('info', 'Identifying Device:', device.device);
       if (device instanceof Light) {

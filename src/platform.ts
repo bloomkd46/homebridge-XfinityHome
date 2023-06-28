@@ -5,9 +5,11 @@ import {
 import path from 'path';
 import { EventEmitter } from 'stream';
 import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Unknown } from 'xfinityhome';
+import { LegacyDryContact } from 'xfinityhome/dist/devices/LegacyDryContact';
 import { Router } from 'xfinityhome/dist/devices/Router';
 
 import DryContactAccessory from './accessories/DryContactAccessory';
+import LegacyDryContactAccessory from './accessories/LegacyDryContactAccessory';
 import LightAccessory from './accessories/LightAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
 import PanelAccessory from './accessories/PanelAccessory';
@@ -158,6 +160,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
             case DryContact:
               new DryContactAccessory(this, existingAccessory, device as DryContact);
               break;
+            case LegacyDryContact:
+              new LegacyDryContactAccessory(this, existingAccessory, device as LegacyDryContact);
+              break;
             case Keyfob:
             case Keypad:
             case Camera:
@@ -165,7 +170,7 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
               this.restoredAccessories.slice(-1);
               break;
             default:
-              switch (device.device.model) {
+              switch ('model' in device.device ? device.device.model : '') {
                 case 'TCHU1AL0':
                   break;
                 default:
@@ -175,7 +180,8 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
               break;
           }
         } else {
-          const name = device instanceof Panel ? 'Panel' : device.device.name || device.device.model;
+          const name = device instanceof Panel ? 'Panel' : device.device.name ||
+            ('model' in device.device ? device.device.model : 'unknown');
           // the accessory does not yet exist, so we need to create it
           this.log.info('Adding new accessory:', name);
 
