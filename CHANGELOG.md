@@ -1,3 +1,8 @@
+### 3.4.0 
+* Added Low Battery Support
+  * Thanks @home-automate with issue #28 
+
+
 ### 3.3.0 
 * Added support for leak sensors
 
