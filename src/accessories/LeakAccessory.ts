@@ -1,27 +1,27 @@
 import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
-import { Smoke } from 'xfinityhome';
+import { Water } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
 import { CONTEXT } from '../settings';
 import Accessory from './Accessory';
 
 
-export default class SmokeAccessory extends Accessory {
+export default class LeakAccessory extends Accessory {
   protected temperatureService?: Service;
 
   constructor(
     private readonly platform: XfinityHomePlatform,
     private readonly accessory: PlatformAccessory<CONTEXT>,
-    private readonly device: Smoke,
+    private readonly device: Water,
   ) {
-    super(platform, accessory, device, accessory.getService(platform.Service.SmokeSensor) ||
-      accessory.addService(platform.Service.SmokeSensor));
+    super(platform, accessory, device, accessory.getService(platform.Service.LeakSensor) ||
+      accessory.addService(platform.Service.LeakSensor));
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, this.device.device.name);
 
-    this.service.getCharacteristic(this.platform.Characteristic.SmokeDetected)
-      .onGet(this.getSmokeDetected.bind(this, false))
-      .on('change', this.notifySmokeChange.bind(this));
+    this.service.getCharacteristic(this.platform.Characteristic.LeakDetected)
+      .onGet(this.getLeakDetected.bind(this, false))
+      .on('change', this.notifyLeakChange.bind(this));
 
     this.service.getCharacteristic(this.platform.Characteristic.StatusTampered)
       .onGet(this.getTampered.bind(this))
@@ -54,7 +54,7 @@ export default class SmokeAccessory extends Accessory {
       }
       if (event.name === 'isFaulted') {
         this.device.device.properties.isFaulted = event.value === 'true';
-        this.service.updateCharacteristic(this.platform.Characteristic.SmokeDetected, this.getSmokeDetected());
+        this.service.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.getLeakDetected());
       }
       if ('sensorTemperature' in event.metadata) {
         this.device.device.properties.temperature = JSON.parse(event.metadata.sensorTemperature);
@@ -65,7 +65,7 @@ export default class SmokeAccessory extends Accessory {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
-      this.service.updateCharacteristic(this.platform.Characteristic.SmokeDetected, this.getSmokeDetected(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.getLeakDetected(true));
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
 
       this.accessory.context.logPath = this.logPath;
@@ -81,17 +81,17 @@ export default class SmokeAccessory extends Accessory {
     };
   }
 
-  private getSmokeDetected(skipUpdate?: boolean): CharacteristicValue {
+  private getLeakDetected(skipUpdate?: boolean): CharacteristicValue {
     if (skipUpdate !== true) {
       this.device.get().catch(err => {
-        this.log('error', 'Failed To Fetch Smoke State With Error:', err);
+        this.log('error', 'Failed To Fetch Leak State With Error:', err);
         throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       });
     }
     return this.device.device.properties.isFaulted ? 1 : 0;
   }
 
-  private async notifySmokeChange(value: CharacteristicChange): Promise<void> {
+  private async notifyLeakChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(3, value.newValue === 0 ? 'Closed' : 'Opened');
     }

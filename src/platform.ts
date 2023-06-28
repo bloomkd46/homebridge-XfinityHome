@@ -4,11 +4,12 @@ import {
 } from 'homebridge';
 import path from 'path';
 import { EventEmitter } from 'stream';
-import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Smoke, Unknown } from 'xfinityhome';
+import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Smoke, Unknown, Water } from 'xfinityhome';
 import { LegacyDryContact } from 'xfinityhome/dist/devices/LegacyDryContact';
 import { Router } from 'xfinityhome/dist/devices/Router';
 
 import DryContactAccessory from './accessories/DryContactAccessory';
+import LeakAccessory from './accessories/LeakAccessory';
 import LegacyDryContactAccessory from './accessories/LegacyDryContactAccessory';
 import LightAccessory from './accessories/LightAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
@@ -161,6 +162,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
             case Smoke:
               new SmokeAccessory(this, existingAccessory, device as Smoke);
               break;
+            case Water:
+              new LeakAccessory(this, existingAccessory, device as Water);
+              break;
             case DryContact:
               new DryContactAccessory(this, existingAccessory, device as DryContact);
               break;
@@ -208,6 +212,10 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
             case Smoke:
               accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
               new SmokeAccessory(this, accessory, device as Smoke);
+              break;
+            case Water:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+              new LeakAccessory(this, accessory, device as Water);
               break;
             case DryContact:
               accessory = new this.api.platformAccessory<CONTEXT>(name, uuid,
