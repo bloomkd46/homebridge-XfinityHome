@@ -32,11 +32,20 @@ export default class LegacyDryContactAccessory extends Accessory {
     this.service.getCharacteristic(this.platform.Characteristic.StatusTampered)
       .onGet(this.getTampered.bind(this))
       .on('change', this.notifyTamperedChange.bind(this));
+    this.service.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
+      .onGet(this.getLowBattery.bind(this))
+      .on('change', this.notifyLowBatteryChange.bind(this));
+
 
     this.device.onevent = event => {
       if (event.name === 'trouble') {
-        if (event.value === 'senTamp' || event.value === 'senTampRes') {
+        if (event.value === 'senTamp') {
           this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, 1);
+        } else if (event.value === 'senTampRes') {
+          this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, 0);
+        }
+        if (event.value === 'senPreLowBat' || event.value === 'senLowBat') {
+          this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, 1);
         }
       }
       if (event.name === 'isFaulted') {
@@ -44,7 +53,7 @@ export default class LegacyDryContactAccessory extends Accessory {
         this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected());
       }
       if (event.mediaType === 'event/zoneUpdated') {
-        this.device.device.properties.isBypassed = event.metadata.isBypassed === 'true';
+        this.device.device.properties.isBypassed = event.metadata!.isBypassed === 'true';
         this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       }
     };
@@ -52,6 +61,7 @@ export default class LegacyDryContactAccessory extends Accessory {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.getLowBattery());
       this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected(true));
       this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
 
@@ -60,7 +70,7 @@ export default class LegacyDryContactAccessory extends Accessory {
       this.accessory.context.refreshToken = this.platform.xhome.refreshToken;
       this.platform.api.updatePlatformAccessories([this.accessory]);
 
-      if (this.device.device.trouble.length && !this.getTampered()) {
+      if (this.device.device.trouble.length && (!this.getTampered() && !this.getLowBattery())) {
         this.log('warn', 'Unknown trouble detected!');
         this.log('warn', 'Please open an issue about this.');
         this.log('warn', JSON.stringify(this.device.device.trouble, null, 2));
@@ -110,6 +120,28 @@ export default class LegacyDryContactAccessory extends Accessory {
     if (value.newValue !== value.oldValue) {
       if (value.newValue) {
         this.log('warn', 'Tampered');
+      } else {
+        this.log(2, 'Fixed');
+      }
+    }
+  }
+
+  private getLowBattery(): CharacteristicValue {
+    return this.device.device.trouble.find(trouble => trouble.name === 'senPreLowBat' || trouble.name === 'senLowBat') ? 1 : 0;
+  }
+
+  private async notifyLowBatteryChange(value: CharacteristicChange): Promise<void> {
+    if (value.newValue !== value.oldValue) {
+      if (value.newValue) {
+        this.device.device.trouble.forEach(trouble => {
+          if (trouble.name === 'senPreLowBat') {
+            this.log(1, 'Low Battery');
+          }
+          if (trouble.name === 'senLowBat') {
+            this.log('warn', 'Critically Low Battery');
+          }
+        });
+        this.log('warn', this.device.device.trouble[0].name === 'senPreLowBat' ? 'Low' : 'Critically Low', 'Battery');
       } else {
         this.log(2, 'Fixed');
       }
