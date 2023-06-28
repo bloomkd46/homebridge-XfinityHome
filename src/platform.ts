@@ -4,7 +4,7 @@ import {
 } from 'homebridge';
 import path from 'path';
 import { EventEmitter } from 'stream';
-import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Unknown } from 'xfinityhome';
+import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Smoke, Unknown } from 'xfinityhome';
 import { LegacyDryContact } from 'xfinityhome/dist/devices/LegacyDryContact';
 import { Router } from 'xfinityhome/dist/devices/Router';
 
@@ -13,6 +13,7 @@ import LegacyDryContactAccessory from './accessories/LegacyDryContactAccessory';
 import LightAccessory from './accessories/LightAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
 import PanelAccessory from './accessories/PanelAccessory';
+import SmokeAccessory from './accessories/SmokeAccessory';
 import UnknownAccessory from './accessories/UnknownAccessory';
 import CustomCharacteristics from './CustomCharacteristics';
 import { CONFIG, CONTEXT, PLATFORM_NAME, PLUGIN_NAME } from './settings';
@@ -157,6 +158,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
             case Motion:
               new MotionAccessory(this, existingAccessory, device as Motion);
               break;
+            case Smoke:
+              new SmokeAccessory(this, existingAccessory, device as Smoke);
+              break;
             case DryContact:
               new DryContactAccessory(this, existingAccessory, device as DryContact);
               break;
@@ -194,17 +198,26 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
               new PanelAccessory(this, accessory, device as Panel);
               break;
             case Light:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.LIGHTBULB);
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.OUTLET);
               new LightAccessory(this, accessory, device as Light);
               break;
             case Motion:
               accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
               new MotionAccessory(this, accessory, device as Motion);
               break;
+            case Smoke:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+              new SmokeAccessory(this, accessory, device as Smoke);
+              break;
             case DryContact:
               accessory = new this.api.platformAccessory<CONTEXT>(name, uuid,
                 (device as DryContact).device.properties.type === 'door' ? Categories.DOOR : Categories.WINDOW);
               new DryContactAccessory(this, accessory, device as DryContact);
+              break;
+            case LegacyDryContact:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid,
+                (device as LegacyDryContact).device.properties.type === 'door' ? Categories.DOOR : Categories.WINDOW);
+              new LegacyDryContactAccessory(this, accessory, device as LegacyDryContact);
               break;
             default:
               accessory = new this.api.platformAccessory<CONTEXT>(name, uuid);
