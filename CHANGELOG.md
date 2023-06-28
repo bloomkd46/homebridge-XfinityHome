@@ -1,3 +1,7 @@
+### 3.3.0 
+* Added support for leak sensors
+
+
 ### 3.2.0 
 * Added Smoke Detector Support to address issue #17 
 * Added support for legacy devices to address issues #15, #16, #18, #19, and #26
