@@ -1,3 +1,7 @@
+### 3.4.1 
+* Addressed issue #30
+
+
 ### 3.4.0 
 * Added Low Battery Support
   * Thanks @home-automate with issue #28 
