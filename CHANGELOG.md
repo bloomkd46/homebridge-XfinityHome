@@ -1,3 +1,8 @@
+### 3.2.0 
+* Added Smoke Detector Support to address issue #17 
+* Added support for legacy devices to address issues #15, #16, #18, #19, and #26
+
+
 ### 3.0.6 
 * Added missing alarm status for splaying triggered state for panel
 
