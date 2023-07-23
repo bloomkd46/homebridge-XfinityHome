@@ -4,13 +4,14 @@ import {
 } from 'homebridge';
 import path from 'path';
 import { EventEmitter } from 'stream';
-import XHome, { Camera, DryContact, Keyfob, Keypad, Light, Motion, Panel, Smoke, Unknown, Water } from 'xfinityhome';
+import XHome, { Camera, DryContact, Keyfob, Keypad, LegacyMotion, Light, Motion, Panel, Smoke, Unknown, Water } from 'xfinityhome';
 import { LegacyDryContact } from 'xfinityhome/dist/devices/LegacyDryContact';
 import { Router } from 'xfinityhome/dist/devices/Router';
 
 import DryContactAccessory from './accessories/DryContactAccessory';
 import LeakAccessory from './accessories/LeakAccessory';
 import LegacyDryContactAccessory from './accessories/LegacyDryContactAccessory';
+import LegacyMotionAccessory from './accessories/LegacyMotionAccessory';
 import LightAccessory from './accessories/LightAccessory';
 import MotionAccessory from './accessories/MotionAccessory';
 import PanelAccessory from './accessories/PanelAccessory';
@@ -159,6 +160,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
             case Motion:
               new MotionAccessory(this, existingAccessory, device as Motion);
               break;
+            case LegacyMotion:
+              new LegacyMotionAccessory(this, existingAccessory, device as LegacyMotion);
+              break;
             case Smoke:
               new SmokeAccessory(this, existingAccessory, device as Smoke);
               break;
@@ -208,6 +212,10 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
             case Motion:
               accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
               new MotionAccessory(this, accessory, device as Motion);
+              break;
+            case LegacyMotion:
+              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+              new LegacyMotionAccessory(this, accessory, device as LegacyMotion);
               break;
             case Smoke:
               accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
