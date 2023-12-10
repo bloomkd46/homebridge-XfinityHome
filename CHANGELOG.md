@@ -1,3 +1,7 @@
+### 3.4.2 Beta 1 
+* Updated http-mitm-proxy to 1.1.0 to hopefully address proxy issues
+
+
 ### 3.4.1 
 * Addressed issue #30
 
