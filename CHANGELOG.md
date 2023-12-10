@@ -1,3 +1,7 @@
+### 3.4.2-beta.2 
+* Un-bumped XHome dependency to latest version 2.7.2 (was set to 2.8.0)
+
+
 ### 3.4.2 Beta 1 
 * Updated http-mitm-proxy to 1.1.0 to hopefully address proxy issues
 
