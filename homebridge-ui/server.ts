@@ -2,7 +2,7 @@
 import debug from 'debug';
 import { EventEmitter } from 'events';
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, unwatchFile, watch, watchFile } from 'fs';
-import Proxy from 'http-mitm-proxy';
+import { Proxy } from 'http-mitm-proxy';
 import os from 'os';
 import path from 'path';
 import qrcode from 'qrcode';
@@ -169,7 +169,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
 
 
 
-      const proxy = Proxy();
+      const proxy = new Proxy();
       const localIPPorts = localIPs.map(ip => `${ip}:${585}`);
 
       proxy.onError((ctx, err) => {
