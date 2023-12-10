@@ -1,3 +1,7 @@
+### 3.4.2 Beta 3 
+* Dependency fixes
+
+
 ### 3.4.2-beta.2 
 * Un-bumped XHome dependency to latest version 2.7.2 (was set to 2.8.0)
 
