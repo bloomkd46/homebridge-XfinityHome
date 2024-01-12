@@ -270,7 +270,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         return '';
       });
       return new Promise((resolve) => {
-        proxy.listen({ port: 585, sslCaDir: ROOT }, async err => {
+        proxy.listen({ host: '::', port: 585, sslCaDir: ROOT }, async err => {
           if (err) {
             console.error('Error starting proxy: ' + err);
           }
