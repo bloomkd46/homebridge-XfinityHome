@@ -1,3 +1,8 @@
+### 3.4.2 Beta 4 
+* Added Safari not to address Feature Request: #27 
+* Set proxy to use ipv4 address
+
+
 ### 3.4.2 Beta 3 
 * Dependency fixes
 
