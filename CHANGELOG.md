@@ -1,3 +1,7 @@
+### 3.4.2 Beta 6 
+I accidentally pushed the previous beta as latest. This version represents 3.4.2 Beta 5
+
+
 ### 3.4.2 Beta 5 
 * Updated Watchdog to not pause status queries on socket hang-up
 * Fixed where errors are handled during boot
