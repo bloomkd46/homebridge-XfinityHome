@@ -113,13 +113,119 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
       this.log.error('No Refresh Token Found');
       return;
     }
-    try {
-      this.xhome = new XHome(this.refreshToken || this.config.refreshToken, {
-        enabled: true, autoFetch: false,
-        errorHandler: this.config.logWatchdogErrors ? err => this.log.warn('Watchdog Error:', err) : undefined,
-      });
+    this.xhome = new XHome(this.refreshToken || this.config.refreshToken, {
+      enabled: true, autoFetch: false,
+      errorHandler: this.config.logWatchdogErrors ? err => this.log.warn('Watchdog Error:', err) : undefined,
+    }); this.log.info(
+      `Loaded ${this.cachedAccessories.length} ${this.cachedAccessories.length === 1 ? 'Accessory' : 'Accessories'} From Cache`,
+    ); try {
+      for (const device of await this.xhome.getDevices()) {
+        if ([Keyfob, Keypad, Camera, Router].find(blockedAccessory => device instanceof blockedAccessory ||
+          (device instanceof Unknown && device.device.model === 'TCHU1AL0')) === undefined) {
+          const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
+          const existingAccessory = this.cachedAccessories.find(accessory => accessory.UUID === uuid);
+          if (existingAccessory) {
+            this.log.debug('Restoring existing accessory from cache:', existingAccessory.displayName);
+            this.restoredAccessories.push(existingAccessory);
+            switch (device.constructor) {
+              case Panel:
+                new PanelAccessory(this, existingAccessory, device as Panel);
+                break;
+              case Light:
+                new LightAccessory(this, existingAccessory, device as Light);
+                break;
+              case Motion:
+                new MotionAccessory(this, existingAccessory, device as Motion);
+                break;
+              case LegacyMotion:
+                new LegacyMotionAccessory(this, existingAccessory, device as LegacyMotion);
+                break;
+              case Smoke:
+                new SmokeAccessory(this, existingAccessory, device as Smoke);
+                break;
+              case Water:
+                new LeakAccessory(this, existingAccessory, device as Water);
+                break;
+              case DryContact:
+                new DryContactAccessory(this, existingAccessory, device as DryContact);
+                break;
+              case LegacyDryContact:
+                new LegacyDryContactAccessory(this, existingAccessory, device as LegacyDryContact);
+                break;
+              case Keyfob:
+              case Keypad:
+              case Camera:
+              case Router:
+                this.restoredAccessories.slice(-1);
+                break;
+              default:
+                switch ('model' in device.device ? device.device.model : '') {
+                  case 'TCHU1AL0':
+                    break;
+                  default:
+                    new UnknownAccessory(this, existingAccessory, device as Unknown);
+                    break;
+                }
+                break;
+            }
+          } else {
+            const name = device instanceof Panel ? 'Panel' : device.device.name ||
+              ('model' in device.device ? device.device.model : 'unknown');
+            // the accessory does not yet exist, so we need to create it
+            this.log.info('Adding new accessory:', name);
+
+            // create a new accessory
+            let accessory: PlatformAccessory<CONTEXT>;
+
+            switch (device.constructor) {
+              case Panel:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SECURITY_SYSTEM);
+                new PanelAccessory(this, accessory, device as Panel);
+                break;
+              case Light:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.OUTLET);
+                new LightAccessory(this, accessory, device as Light);
+                break;
+              case Motion:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+                new MotionAccessory(this, accessory, device as Motion);
+                break;
+              case LegacyMotion:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+                new LegacyMotionAccessory(this, accessory, device as LegacyMotion);
+                break;
+              case Smoke:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+                new SmokeAccessory(this, accessory, device as Smoke);
+                break;
+              case Water:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
+                new LeakAccessory(this, accessory, device as Water);
+                break;
+              case DryContact:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid,
+                  (device as DryContact).device.properties.type === 'door' ? Categories.DOOR : Categories.WINDOW);
+                new DryContactAccessory(this, accessory, device as DryContact);
+                break;
+              case LegacyDryContact:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid,
+                  (device as LegacyDryContact).device.properties.type === 'door' ? Categories.DOOR : Categories.WINDOW);
+                new LegacyDryContactAccessory(this, accessory, device as LegacyDryContact);
+                break;
+              default:
+                accessory = new this.api.platformAccessory<CONTEXT>(name, uuid);
+                new UnknownAccessory(this, accessory, device as Unknown);
+                break;
+            }
+            // store a copy of the device object in the `accessory.context`
+            // the `context` property can be used to store any data about the accessory you may need
+            accessory.context.device = device.device;
+            this.addedAccessories.push(accessory);
+          }
+        }
+      }
     } catch (err) {
-      this.log.error('Failed To Login With Error:', err);
+      this.log.error('Failed To Login With Error:', (typeof err === 'object' && err && 'message' in err) ? err.message : err);
       const projectDir = path.join(this.api.user.storagePath(), 'XfinityHome');
       const generalLogPath = path.join(projectDir, 'General.log');
       if (!fs.existsSync(projectDir)) {
@@ -135,118 +241,21 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
         this.refreshToken = undefined;
         this.discoverDevices();
       } else {
-        throw 'Setup Failed';
+        const error = (err && typeof err === 'object' && 'isAxiosError' in err) ?
+          err as { response?: { code?: number; }; isAxiosError: true; } : undefined;
+        if (error) {
+          if (error.response?.code === 400) {
+            this.log.warn('Refresh Token is Invalid');
+            this.log.warn('Xfinity May Have Reset Your Account Password');
+            this.log.warn('See https://assets.xfinity.com/assets/dotcom/learn/Data-Incident.pdf For More Details');
+          }
+        }
+        this.log.error('Plugin Setup Failed, Will Not Restart');
       }
       return;
     }
-    this.log.info(
-      `Loaded ${this.cachedAccessories.length} ${this.cachedAccessories.length === 1 ? 'Accessory' : 'Accessories'} From Cache`,
-    );
-    for (const device of await this.xhome.getDevices()) {
-      if ([Keyfob, Keypad, Camera, Router].find(blockedAccessory => device instanceof blockedAccessory ||
-        (device instanceof Unknown && device.device.model === 'TCHU1AL0')) === undefined) {
-        const uuid = this.api.hap.uuid.generate(device.device.hardwareId);
-        const existingAccessory = this.cachedAccessories.find(accessory => accessory.UUID === uuid);
-        if (existingAccessory) {
-          this.log.debug('Restoring existing accessory from cache:', existingAccessory.displayName);
-          this.restoredAccessories.push(existingAccessory);
-          switch (device.constructor) {
-            case Panel:
-              new PanelAccessory(this, existingAccessory, device as Panel);
-              break;
-            case Light:
-              new LightAccessory(this, existingAccessory, device as Light);
-              break;
-            case Motion:
-              new MotionAccessory(this, existingAccessory, device as Motion);
-              break;
-            case LegacyMotion:
-              new LegacyMotionAccessory(this, existingAccessory, device as LegacyMotion);
-              break;
-            case Smoke:
-              new SmokeAccessory(this, existingAccessory, device as Smoke);
-              break;
-            case Water:
-              new LeakAccessory(this, existingAccessory, device as Water);
-              break;
-            case DryContact:
-              new DryContactAccessory(this, existingAccessory, device as DryContact);
-              break;
-            case LegacyDryContact:
-              new LegacyDryContactAccessory(this, existingAccessory, device as LegacyDryContact);
-              break;
-            case Keyfob:
-            case Keypad:
-            case Camera:
-            case Router:
-              this.restoredAccessories.slice(-1);
-              break;
-            default:
-              switch ('model' in device.device ? device.device.model : '') {
-                case 'TCHU1AL0':
-                  break;
-                default:
-                  new UnknownAccessory(this, existingAccessory, device as Unknown);
-                  break;
-              }
-              break;
-          }
-        } else {
-          const name = device instanceof Panel ? 'Panel' : device.device.name ||
-            ('model' in device.device ? device.device.model : 'unknown');
-          // the accessory does not yet exist, so we need to create it
-          this.log.info('Adding new accessory:', name);
 
-          // create a new accessory
-          let accessory: PlatformAccessory<CONTEXT>;
 
-          switch (device.constructor) {
-            case Panel:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SECURITY_SYSTEM);
-              new PanelAccessory(this, accessory, device as Panel);
-              break;
-            case Light:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.OUTLET);
-              new LightAccessory(this, accessory, device as Light);
-              break;
-            case Motion:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
-              new MotionAccessory(this, accessory, device as Motion);
-              break;
-            case LegacyMotion:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
-              new LegacyMotionAccessory(this, accessory, device as LegacyMotion);
-              break;
-            case Smoke:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
-              new SmokeAccessory(this, accessory, device as Smoke);
-              break;
-            case Water:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid, Categories.SENSOR);
-              new LeakAccessory(this, accessory, device as Water);
-              break;
-            case DryContact:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid,
-                (device as DryContact).device.properties.type === 'door' ? Categories.DOOR : Categories.WINDOW);
-              new DryContactAccessory(this, accessory, device as DryContact);
-              break;
-            case LegacyDryContact:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid,
-                (device as LegacyDryContact).device.properties.type === 'door' ? Categories.DOOR : Categories.WINDOW);
-              new LegacyDryContactAccessory(this, accessory, device as LegacyDryContact);
-              break;
-            default:
-              accessory = new this.api.platformAccessory<CONTEXT>(name, uuid);
-              new UnknownAccessory(this, accessory, device as Unknown);
-              break;
-          }
-          // store a copy of the device object in the `accessory.context`
-          // the `context` property can be used to store any data about the accessory you may need
-          accessory.context.device = device.device;
-          this.addedAccessories.push(accessory);
-        }
-      }
-    }
     const accessoriesToRemove = this.cachedAccessories.filter(cachedAccessory =>
       !this.restoredAccessories.find(restoredAccessory => restoredAccessory.UUID === cachedAccessory.UUID));
     for (const accessory of accessoriesToRemove) {
