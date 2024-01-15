@@ -2918,10 +2918,10 @@ ws@^8.14.2:
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.15.0.tgz#db080a279260c5f532fc668d461b8346efdfcf86"
   integrity sha512-H/Z3H55mrcrgjFwI+5jKavgXvwQLtfPCUEp6pi35VhoB0pfcHnSoyuTzkBEZpzq49g1193CUEwIvmsjcotenYw==
 
-xfinityhome@^2.8.1:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/xfinityhome/-/xfinityhome-2.8.1.tgz#1541ed7397aecb26be71a501fe54b2561dd889a2"
-  integrity sha512-KIpUJP0SFYAMcoUG+NK02nBgRMsBAAtBf4oHxGXQMZI7CiE2X6nLi8k9OM5X3XZk1IMshWK1sc7uEjzt8e+1VA==
+xfinityhome@^2.8.2:
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/xfinityhome/-/xfinityhome-2.8.2.tgz#ee1e0191a9ec44081da13243793ae1ff69fde9cd"
+  integrity sha512-618T4tobdDRsWRNUyEw5DtF6zfbDGUem738enAVYr11/c2sTuBtU9KxCq4ocFrrvguaUXO71bema6b6YAOhn6Q==
   dependencies:
     axios "^0.26.1"
 
