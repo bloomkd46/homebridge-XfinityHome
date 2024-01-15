@@ -1,3 +1,8 @@
+### 3.4.2 Beta 5 
+* Updated Watchdog to not pause status queries on socket hang-up
+* Fixed where errors are handled during boot
+
+
 ### 3.4.2 Beta 4 
 * Added Safari not to address Feature Request: #27 
 * Set proxy to use ipv4 address
