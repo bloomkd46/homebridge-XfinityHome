@@ -1,3 +1,7 @@
+### 3.5.0 Beta 1 
+* Reprogrammed sensors so that they appear as faulted if their battery’s get critically low
+
+
 ### 3.4.2 
 * Updates to proxy dependency
 * Added note to use Safari when downloading proxy profile
