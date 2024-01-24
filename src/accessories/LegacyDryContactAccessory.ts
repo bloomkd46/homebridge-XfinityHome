@@ -35,7 +35,9 @@ export default class LegacyDryContactAccessory extends Accessory {
     this.service.getCharacteristic(this.platform.Characteristic.StatusLowBattery)
       .onGet(this.getLowBattery.bind(this))
       .on('change', this.notifyLowBatteryChange.bind(this));
-
+    this.service.getCharacteristic(this.platform.Characteristic.StatusFault)
+      .onGet(this.getFaulted.bind(this))
+      .on('change', this.notifyFaultedChange.bind(this));
 
     this.device.onevent = event => {
       if (event.name === 'trouble') {
@@ -46,6 +48,11 @@ export default class LegacyDryContactAccessory extends Accessory {
         }
         if (event.value === 'senPreLowBat' || event.value === 'senLowBat') {
           this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, 1);
+          if (event.value === 'senLowBat') {
+            this.service.updateCharacteristic(this.platform.Characteristic.StatusFault, 1);
+          } else {
+            this.service.updateCharacteristic(this.platform.Characteristic.StatusFault, 0);
+          }
         }
       }
       if (event.name === 'isFaulted') {
@@ -61,6 +68,7 @@ export default class LegacyDryContactAccessory extends Accessory {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusFault, this.getFaulted());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.getLowBattery());
       this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected(true));
       this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
@@ -122,6 +130,20 @@ export default class LegacyDryContactAccessory extends Accessory {
         this.log('warn', 'Tampered');
       } else {
         this.log(2, 'Fixed');
+      }
+    }
+  }
+
+  private getFaulted(): CharacteristicValue {
+    return this.device.device.trouble.find(trouble => trouble.name === 'senLowBat') ? 1 : 0;
+  }
+
+  private async notifyFaultedChange(value: CharacteristicChange): Promise<void> {
+    if (value.newValue !== value.oldValue) {
+      if (value.newValue) {
+        this.log('warn', 'Faulted (Battery Level Is Very Low)');
+      } else {
+        this.log(2, 'Fault Restored');
       }
     }
   }
