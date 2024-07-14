@@ -1,3 +1,8 @@
+### 3.5.1 
+* Sensors now appear as faulty if their batteries are low
+* Updated the XHome dependency to fix a potential login bug
+
+
 ### 3.5.0 Beta 1 
 * Reprogrammed sensors so that they appear as faulted if their battery’s get critically low
 
