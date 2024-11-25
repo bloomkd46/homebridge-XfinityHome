@@ -77,7 +77,7 @@ export default class LightAccessory extends Accessory {
     if (skipUpdate !== true) {
       this.device.get().catch(err => {
         this.log('error', 'Failed To Fetch isOn State With Error:', err);
-        throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+        //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       });
     }
     return this.device.device.properties.isOn;
@@ -93,7 +93,7 @@ export default class LightAccessory extends Accessory {
     typeof value === 'boolean' ? this.device.device.properties.isOn = value : undefined;
     await this.device.set(value as number | boolean).catch(err => {
       this.log('error', `Failed To Set ${typeof value === 'number' ? 'Brightness' : 'IsOn'} With Error:`, err);
-      throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+      //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     });
   }
 

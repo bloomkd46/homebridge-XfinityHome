@@ -80,7 +80,7 @@ export default class PanelAccessory extends Accessory {
         this.device.device.properties.armType = '';
         await this.device.disarm(this.platform.config.pin).catch(err => {
           this.log('error', 'Failed To Disarm With Error:', err);
-          throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
         });
       } else {
         this.device.device.properties.armType = this.armModes[state as number] as 'stay' | 'away' | 'night';
@@ -95,14 +95,14 @@ export default class PanelAccessory extends Accessory {
         } else {
           await this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night').catch(err => {
             this.log('error', 'Failed To Arm With Error:', err);
-            throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+            //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
           });
         }
       }
     } else {
       this.log('warn',
         `Failed To ${state === this.armModes.indexOf('disarmed') ? 'Disarm' : 'Arm'} With Error:`, 'No Pin Configured');
-      throw new this.StatusError(HAPStatus.INSUFFICIENT_AUTHORIZATION);
+      return Promise.reject(new this.StatusError(HAPStatus.INSUFFICIENT_AUTHORIZATION));
     }
   }
 
@@ -118,7 +118,7 @@ export default class PanelAccessory extends Accessory {
     if (skipUpdate !== true) {
       this.device.get().catch(err => {
         this.log('error', 'Failed To Fetch Current State With Error:', err);
-        throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+        // throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       });
     }
     return this.device.device.properties.status === 'arming' ?

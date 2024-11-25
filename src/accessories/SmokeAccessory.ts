@@ -1,4 +1,4 @@
-import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
+import { CharacteristicChange, CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { Smoke } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
@@ -103,7 +103,7 @@ export default class SmokeAccessory extends Accessory {
     if (skipUpdate !== true) {
       this.device.get().catch(err => {
         this.log('error', 'Failed To Fetch Smoke State With Error:', err);
-        throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+        // throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       });
     }
     return this.device.device.properties.isFaulted ? 1 : 0;

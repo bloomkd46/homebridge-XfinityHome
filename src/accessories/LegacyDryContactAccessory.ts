@@ -1,4 +1,4 @@
-import { CharacteristicChange, CharacteristicValue, HAPStatus, Perms, PlatformAccessory } from 'homebridge';
+import { CharacteristicChange, CharacteristicValue, Perms, PlatformAccessory } from 'homebridge';
 import { LegacyDryContact } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
@@ -90,7 +90,7 @@ export default class LegacyDryContactAccessory extends Accessory {
     if (skipUpdate !== true) {
       this.device.get().catch(err => {
         this.log('error', 'Failed To Fetch Contact State With Error:', err);
-        throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+        //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
       });
     }
     return this.device.device.properties.isFaulted ? 1 : 0;
@@ -110,7 +110,7 @@ export default class LegacyDryContactAccessory extends Accessory {
     this.device.device.properties.isBypassed = !value;
     await this.device.bypass(!value).catch(err => {
       this.log('error', `Failed To ${!value ? 'Bypass' : 'Activate'} With Error:`, err);
-      throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+      //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     });
   }
 
