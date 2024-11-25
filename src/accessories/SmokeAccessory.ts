@@ -1,4 +1,4 @@
-import { CharacteristicChange, CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
+import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory, Service } from 'homebridge';
 import { Smoke } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
@@ -52,7 +52,7 @@ export default class SmokeAccessory extends Accessory {
       this.log('warn', 'Removing Temperature Support');
       this.accessory.removeService(this.accessory.getService(this.platform.Service.TemperatureSensor)!);
     }
-    this.device.onevent = event => {
+    this.device.onevent = async event => {
       if (event.name === 'trouble') {
         if (event.value === 'senTamp') {
           this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, 1);
@@ -70,7 +70,7 @@ export default class SmokeAccessory extends Accessory {
       }
       if (event.name === 'isFaulted') {
         this.device.device.properties.isFaulted = event.value === 'true';
-        this.service.updateCharacteristic(this.platform.Characteristic.SmokeDetected, this.getSmokeDetected());
+        this.service.updateCharacteristic(this.platform.Characteristic.SmokeDetected, await this.getSmokeDetected(true));
       }
       if ('sensorTemperature' in event.metadata) {
         this.device.device.properties.temperature = JSON.parse(event.metadata.sensorTemperature);
@@ -83,7 +83,7 @@ export default class SmokeAccessory extends Accessory {
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusFault, this.getFaulted());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.getLowBattery());
-      this.service.updateCharacteristic(this.platform.Characteristic.SmokeDetected, this.getSmokeDetected(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.SmokeDetected, await this.getSmokeDetected(true));
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
 
       this.accessory.context.logPath = this.logPath;
@@ -99,12 +99,24 @@ export default class SmokeAccessory extends Accessory {
     };
   }
 
-  private getSmokeDetected(skipUpdate?: boolean): CharacteristicValue {
+  private async getSmokeDetected(skipUpdate?: boolean): Promise<CharacteristicValue> {
     if (skipUpdate !== true) {
-      this.device.get().catch(err => {
-        this.log('error', 'Failed To Fetch Smoke State With Error:', err);
-        // throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-      });
+      if (this.platform.config.lazyUpdates) {
+        process.nextTick(() => {
+          this.device.get().catch(err => {
+            this.log('error', 'Failed To Fetch Smoke State With Error:', err);
+            // throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          });
+        });
+      } else {
+        try {
+          const device = await this.device.get();
+          return device.properties.isFaulted ? 1 : 0;
+        } catch (err) {
+          this.log('error', 'Failed To Fetch Smoke State With Error:', err);
+          return Promise.reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+        }
+      }
     }
     return this.device.device.properties.isFaulted ? 1 : 0;
   }

@@ -33,12 +33,12 @@ export default class PanelAccessory extends Accessory {
       .onGet(this.getStatus.bind(this))
       .on('change', this.notifyStatusChange.bind(this));
 
-    this.device.onevent = event => {
+    this.device.onevent = async event => {
       if (event.mediaType === 'event/securityStateChange') {
         this.device.device.properties.status = event.metadata.status;
         this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
         event.metadata.armType !== null ? this.device.device.properties.armType = event.metadata.armType : undefined;
-        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
+        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, await this.getCurrentState(true));
         this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
       }
     };
@@ -48,7 +48,7 @@ export default class PanelAccessory extends Accessory {
       this.device.device = newState;
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
-      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, this.getCurrentState(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, await this.getCurrentState(true));
       this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
 
 
@@ -78,25 +78,31 @@ export default class PanelAccessory extends Accessory {
     if (this.platform.config.pin) {
       if (state === this.armModes.indexOf('disarmed')) {
         this.device.device.properties.armType = '';
-        await this.device.disarm(this.platform.config.pin).catch(err => {
+        try {
+          await this.device.disarm(this.platform.config.pin);
+        } catch (err) {
           this.log('error', 'Failed To Disarm With Error:', err);
-          //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-        });
+          return Promise.reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+        }
       } else {
         this.device.device.properties.armType = this.armModes[state as number] as 'stay' | 'away' | 'night';
         if (this.device.device.properties.status !== 'ready') {
-          await this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night').catch(err => {
+          try {
+            await this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night');
+          } catch (err) {
             this.log('error', 'Failed To Arm With Error:', 'NOT_READY');
-            this.log('debug', err);
+            this.log('debug', err as string);
             this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
-          });
+          }
           /*this.log('warn', 'Failed To Arm With Error:', 'NOT_ALLOWED_IN_CURRENT_STATE');
           throw new this.StatusError(HAPStatus.NOT_ALLOWED_IN_CURRENT_STATE);*/
         } else {
-          await this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night').catch(err => {
+          try {
+            await this.device.arm(this.platform.config.pin, this.armModes[state as number] as 'stay' | 'away' | 'night');
+          } catch (err) {
             this.log('error', 'Failed To Arm With Error:', err);
-            //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-          });
+            return Promise.reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+          }
         }
       }
     } else {
@@ -114,12 +120,27 @@ export default class PanelAccessory extends Accessory {
   }
 
 
-  private getCurrentState(skipUpdate?: boolean): CharacteristicValue {
+  private async getCurrentState(skipUpdate?: boolean): Promise<CharacteristicValue> {
     if (skipUpdate !== true) {
-      this.device.get().catch(err => {
-        this.log('error', 'Failed To Fetch Current State With Error:', err);
-        // throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-      });
+      if (this.platform.config.lazyUpdates) {
+        process.nextTick(() => {
+          this.device.get().catch(err => {
+            this.log('error', 'Failed To Fetch Current State With Error:', err);
+            // throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          });
+        });
+      } else {
+        try {
+          const device = await this.device.get();
+          return device.properties.status === 'arming' ?
+            this.armModes.indexOf('disarmed') :
+            (device.properties.status === 'entryDelay' || device.properties.status === 'alarm') ?
+              this.armModes.indexOf('triggered') : this.armModes.indexOf(device.properties.armType || 'disarmed');
+        } catch (err) {
+          this.log('error', 'Failed To Fetch Current State With Error:', err);
+          return Promise.reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+        }
+      }
     }
     return this.device.device.properties.status === 'arming' ?
       this.armModes.indexOf('disarmed') :

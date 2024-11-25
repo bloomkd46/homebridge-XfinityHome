@@ -31,6 +31,13 @@
         "placeholder": true,
         "description": "Whether Or Not To Include Temperature Sensors When Possible"
       },
+      "lazyUpdates": {
+        "title": "Lazy Updates",
+        "type": "boolean",
+        "required": false,
+        "placeholder": false,
+        "description": "Only enable this if homebridge logs warnings that this plugin is taking too long to respond"
+      },
       "logLevel": {
         "title": "Log Level",
         "type": "number",

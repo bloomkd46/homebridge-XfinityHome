@@ -22,6 +22,7 @@ export type CONFIG = {
   refreshToken: string;
   pin: string;
   temperatureSensors: boolean;
+  lazyUpdates: boolean;
   logLevel: 0 | 1 | 2 | 3 | 4;
   logWatchdogErrors?: boolean;
   hideUnsupportedDeviceWarnings?: boolean;

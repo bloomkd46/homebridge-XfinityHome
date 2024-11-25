@@ -1,4 +1,4 @@
-import { CharacteristicChange, CharacteristicValue, Perms, PlatformAccessory, Service } from 'homebridge';
+import { CharacteristicChange, CharacteristicValue, HAPStatus, Perms, PlatformAccessory, Service } from 'homebridge';
 import { DryContact } from 'xfinityhome';
 
 import { XfinityHomePlatform } from '../platform';
@@ -60,7 +60,7 @@ export default class DryContactAccessory extends Accessory {
       this.log('warn', 'Removing Temperature Support');
       this.accessory.removeService(this.accessory.getService(this.platform.Service.TemperatureSensor)!);
     }
-    this.device.onevent = event => {
+    this.device.onevent = async event => {
       if (event.name === 'trouble') {
         if (event.value === 'senTamp') {
           this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, 1);
@@ -78,7 +78,7 @@ export default class DryContactAccessory extends Accessory {
       }
       if (event.name === 'isFaulted') {
         this.device.device.properties.isFaulted = event.value === 'true';
-        this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected());
+        this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, await this.getContactDetected(true));
       }
       if (event.mediaType === 'event/zoneUpdated') {
         this.device.device.properties.isBypassed = event.metadata.isBypassed === 'true';
@@ -95,7 +95,7 @@ export default class DryContactAccessory extends Accessory {
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusFault, this.getFaulted());
       this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.getLowBattery());
-      this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, this.getContactDetected(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.ContactSensorState, await this.getContactDetected(true));
       this.service.updateCharacteristic(this.platform.Characteristic.StatusActive, this.getActive());
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.getTemperature());
 
@@ -112,12 +112,25 @@ export default class DryContactAccessory extends Accessory {
     };
   }
 
-  private getContactDetected(skipUpdate?: boolean): CharacteristicValue {
+  private async getContactDetected(skipUpdate?: boolean): Promise<CharacteristicValue> {
     if (skipUpdate !== true) {
-      this.device.get().catch(err => {
-        this.log('error', 'Failed To Fetch Contact State With Error:', err);
-        //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-      });
+      if (this.platform.config.lazyUpdates) {
+        process.nextTick(() => {
+          this.device.get().catch(err => {
+            this.log('error', 'Failed To Fetch Contact State With Error:', err);
+            //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          });
+        });
+      } else {
+        try {
+          const device = await this.device.get();
+          return device.properties.isFaulted ? 1 : 0;
+        } catch (err) {
+          this.log('error', 'Failed To Fetch Contact State With Error:', err);
+          return Promise.reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+        }
+      }
+
     }
     return this.device.device.properties.isFaulted ? 1 : 0;
   }
@@ -134,10 +147,12 @@ export default class DryContactAccessory extends Accessory {
 
   private async setActive(value: CharacteristicValue): Promise<void> {
     this.device.device.properties.isBypassed = !value;
-    await this.device.bypass(!value).catch(err => {
+    try {
+      await this.device.bypass(!value);
+    } catch (err) {
       this.log('error', `Failed To ${!value ? 'Bypass' : 'Activate'} With Error:`, err);
-      //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-    });
+      return Promise.reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+    }
   }
 
   private async notifyActiveChange(value: CharacteristicChange): Promise<void> {

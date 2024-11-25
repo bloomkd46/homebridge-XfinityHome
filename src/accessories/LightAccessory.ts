@@ -36,10 +36,10 @@ export default class LightAccessory extends Accessory {
         .on('change', this.notifyEnergyUsageChange.bind(this));
     }
 
-    this.device.onevent = event => {
+    this.device.onevent = async event => {
       if (event.mediaType === 'event/lighting') {
         this.device.device.properties.isOn = JSON.parse(event.metadata.isOn);
-        this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
+        this.service.updateCharacteristic(this.platform.Characteristic.On, await this.getIsOn(true));
         if (this.device.device.properties.dimAllowed) {
           this.device.device.properties.level = JSON.parse(event.metadata.level);
           this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness());
@@ -54,7 +54,7 @@ export default class LightAccessory extends Accessory {
     this.device.onchange = async (_oldState, newState) => {
       /** Normally not updated until AFTER `onchange` function execution */
       this.device.device = newState;
-      this.service.updateCharacteristic(this.platform.Characteristic.On, this.getIsOn(true));
+      this.service.updateCharacteristic(this.platform.Characteristic.On, await this.getIsOn(true));
       this.device.device.properties.dimAllowed ?
         this.service.updateCharacteristic(this.platform.Characteristic.Brightness, this.getBrightness()) : undefined;
       this.device.device.properties.energyMgmtEnabled ?
@@ -73,12 +73,24 @@ export default class LightAccessory extends Accessory {
     };
   }
 
-  private getIsOn(skipUpdate?: boolean): CharacteristicValue {
+  private async getIsOn(skipUpdate?: boolean): Promise<CharacteristicValue> {
     if (skipUpdate !== true) {
-      this.device.get().catch(err => {
-        this.log('error', 'Failed To Fetch isOn State With Error:', err);
-        //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-      });
+      if (this.platform.config.lazyUpdates) {
+        process.nextTick(() => {
+          this.device.get().catch(err => {
+            this.log('error', 'Failed To Fetch isOn State With Error:', err);
+            //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+          });
+        });
+      } else {
+        try {
+          const device = await this.device.get();
+          return device.properties.isOn;
+        } catch (err) {
+          this.log('error', 'Failed To Fetch isOn State With Error:', err);
+          return Promise.reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+        }
+      }
     }
     return this.device.device.properties.isOn;
   }
@@ -91,10 +103,12 @@ export default class LightAccessory extends Accessory {
 
   private async set(value: CharacteristicValue): Promise<void> {
     typeof value === 'boolean' ? this.device.device.properties.isOn = value : undefined;
-    await this.device.set(value as number | boolean).catch(err => {
+    try {
+      await this.device.set(value as number | boolean);
+    } catch (err) {
       this.log('error', `Failed To Set ${typeof value === 'number' ? 'Brightness' : 'IsOn'} With Error:`, err);
-      //throw new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-    });
+      return Promise.reject(new this.StatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE));
+    }
   }
 
   private getBrightness(): CharacteristicValue {
