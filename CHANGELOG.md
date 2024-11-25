@@ -1,3 +1,7 @@
+### 3.6.0 Beta 1 
+* Redesigned the plugin to be more responsive
+
+
 ### 3.5.2 
 * Fixed a bug that would cause the program to crash when Xfinity’s systems are offline
 
