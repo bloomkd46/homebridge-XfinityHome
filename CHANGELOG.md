@@ -1,3 +1,7 @@
+### 3.5.2 
+* Fixed a bug that would cause the program to crash when Xfinity’s systems are offline
+
+
 ### 3.5.1 
 * Sensors now appear as faulty if their batteries are low
 * Updated the XHome dependency to fix a potential login bug
