@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Xfinity Home",
   "name": "homebridge-xfinityhome",
-  "version": "3.6.0-beta.1",
+  "version": "3.6.0-beta.2",
   "description": "A homebridge plugin to control your Xfinity Home security system.",
   "license": "Apache-2.0",
   "repository": {
@@ -37,7 +37,7 @@
     "@homebridge/plugin-ui-utils": "^0.0.19",
     "http-mitm-proxy": "^1.1.0",
     "qrcode": "^1.5.0",
-    "xfinityhome": "^2.8.3"
+    "xfinityhome": "^2.8.4"
   },
   "devDependencies": {
     "@types/bootstrap": "^4.6.1",
