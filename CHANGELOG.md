@@ -1,3 +1,8 @@
+### 3.6.0 Beta 2 
+* Updated Home dependency
+  * This introduces a 8-second timeout when synchronously fetching accessory states (homebridge requires responses within 9 seconds)
+
+
 ### 3.6.0 Beta 1 
 * Redesigned the plugin to be more responsive
 
