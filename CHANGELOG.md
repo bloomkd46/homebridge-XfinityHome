@@ -1,3 +1,7 @@
+### 3.6.0 Beta 3 
+* Updated the XHome dependency to remove some watchdog warnings
+
+
 ### 3.6.0 Beta 2 
 * Updated Home dependency
   * This introduces a 8-second timeout when synchronously fetching accessory states (homebridge requires responses within 9 seconds)
