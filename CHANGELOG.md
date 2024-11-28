@@ -1,3 +1,7 @@
+### 3.6.0 Beta 4 
+* Updated XHome dependency to fix a potential bug that would cause requests to hang indefinitely 
+
+
 ### 3.6.0 Beta 3 
 * Updated the XHome dependency to remove some watchdog warnings
 
