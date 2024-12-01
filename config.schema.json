@@ -36,7 +36,7 @@
         "type": "boolean",
         "required": false,
         "placeholder": false,
-        "description": "Only enable this if homebridge logs warnings that this plugin is taking too long to respond"
+        "description": "Only Enable This If Homebridge Logs Warnings That This Plugin Is Taking Too Long To Respond"
       },
       "logLevel": {
         "title": "Log Level",
