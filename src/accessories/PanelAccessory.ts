@@ -134,7 +134,8 @@ export default class PanelAccessory extends Accessory {
           const device = await this.device.get();
           return device.properties.status === 'arming' ?
             this.armModes.indexOf('disarmed') :
-            (device.properties.status === 'entryDelay' || device.properties.status === 'alarm') ?
+            ((device.properties.status === 'entryDelay' && this.platform.config.entryTrigger !== false) ||
+              device.properties.status === 'alarm') ?
               this.armModes.indexOf('triggered') : this.armModes.indexOf(device.properties.armType || 'disarmed');
         } catch (err) {
           this.log('error', 'Failed To Fetch Current State With Error:', err);

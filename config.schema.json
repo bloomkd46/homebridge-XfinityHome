@@ -31,6 +31,13 @@
         "placeholder": true,
         "description": "Whether Or Not To Include Temperature Sensors When Possible"
       },
+      "entryTrigger": {
+        "title": "Triggered on Entry",
+        "type": "boolean",
+        "required": false,
+        "placeholder": true,
+        "description": "Wether or not the alarm will show as triggered during the entry delay"
+      },
       "lazyUpdates": {
         "title": "Lazy Updates",
         "type": "boolean",
