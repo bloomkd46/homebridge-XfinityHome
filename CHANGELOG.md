@@ -1,3 +1,7 @@
+### 3.6.1 Beta 1 
+* Added option for panel to not show as triggered during the entry delay
+
+
 ### 3.6.0 
 This is a long-overdue update and I’ll do my best to recap it
 * First, a major rewrite of how device statuses are fetched
