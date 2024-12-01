@@ -1,3 +1,16 @@
+### 3.6.0 
+This is a long-overdue update and I’ll do my best to recap it
+* First, a major rewrite of how device statuses are fetched
+  * They are now synchronous by default, allowing for HomeKit to always display the latest status when opened
+    * This behavior can be reverted by enabling 'Lazy Updates' - but I only recommend this if homebridge is frequently logging that 'This plugin was slow to respond' (typically caused by having a lot of devices or a slow network)
+  * Accessories are now properly reported as offline, as opposed to previously where the plugin would crash
+  * Fixed a lot of bugs that would cause the plugin to simply hang and not respond at all
+* Secondly, I did go ahead and add some donate links
+  * On that note, if you had an issue open and I never got back to you, please add another comment. I acknowledge that I kind of dropped the ball on this plugin for the past several months, but I’ll do my best to respond to new comments for issues still applicable after this update.
+
+Thank you all for your continued use of this plugin!
+
+
 ### 3.6.0 Beta 4 
 * Updated XHome dependency to fix a potential bug that would cause requests to hang indefinitely 
 
