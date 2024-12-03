@@ -1,3 +1,7 @@
+### 3.6.1 Beta 2 
+* Fixed panel still showing up as Triggered
+
+
 ### 3.6.2 Beta 1 
 * (Hopefully 🤞) fixed a bug causing legacy contact and motion sensors not to be recognized
 
