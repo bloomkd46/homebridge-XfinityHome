@@ -1,3 +1,7 @@
+### 3.6.2 Beta 1 
+* (Hopefully 🤞) fixed a bug causing legacy contact and motion sensors not to be recognized
+
+
 ### 3.6.1 Beta 1 
 * Added option for panel to not show as triggered during the entry delay
 
