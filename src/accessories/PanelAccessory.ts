@@ -194,8 +194,8 @@ export default class PanelAccessory extends Accessory {
   }
 
   private getArmType(): CharacteristicValue {
-    return this.device.device.properties.armType.charAt(0).toUpperCase() +
-      this.device.device.properties.armType.slice(1).replace(/([A-Z])/g, ' $1').trim();
+    return (this.device.device.properties.armType.charAt(0).toUpperCase() +
+      this.device.device.properties.armType.slice(1).replace(/([A-Z])/g, ' $1').trim()) || '(Disarmed)';
   }
 
   private async notifyArmTypeChange(value: CharacteristicChange): Promise<void> {
