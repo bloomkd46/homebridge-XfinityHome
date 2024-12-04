@@ -1,3 +1,7 @@
+### 3.6.1 Beta 3 
+* Added another log to help identify why the panel is going Unknown when disarmed by the keypad
+
+
 ### 3.6.1 Beta 2 
 * Fixed panel still showing up as Triggered
 
