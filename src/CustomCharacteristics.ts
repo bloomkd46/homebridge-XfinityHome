@@ -3,7 +3,7 @@ import { Formats, Perms } from 'homebridge';
 
 import type { HAP } from 'homebridge';
 
-export default function CustomCharacteristics(hap: HAP): { EnergyUsage; PanelStatus; } {
+export default function CustomCharacteristics(hap: HAP): { EnergyUsage; PanelStatus; PanelArmType; } {
   const Characteristic = hap.Characteristic;
   class EnergyUsage extends Characteristic {
     static readonly UUID: string = '00000101-0000-0000-0000-000000000000';
@@ -29,5 +29,15 @@ export default function CustomCharacteristics(hap: HAP): { EnergyUsage; PanelSta
       this.value = this.getDefaultValue();
     }
   }
-  return { EnergyUsage, PanelStatus };
+  class PanelArmType extends Characteristic {
+    static readonly UUID: string = '00000103-0000-0000-0000-000000000000';
+    constructor() {
+      super('Arm Type', PanelArmType.UUID, {
+        format: Formats.STRING,
+        perms: [Perms.PAIRED_READ, Perms.NOTIFY],
+      });
+      this.value = this.getDefaultValue();
+    }
+  }
+  return { EnergyUsage, PanelStatus, PanelArmType };
 }

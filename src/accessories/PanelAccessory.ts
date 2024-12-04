@@ -32,12 +32,16 @@ export default class PanelAccessory extends Accessory {
     this.service.getCharacteristic(this.platform.CustomCharacteristic.PanelStatus)
       .onGet(this.getStatus.bind(this))
       .on('change', this.notifyStatusChange.bind(this));
+    this.service.getCharacteristic(this.platform.CustomCharacteristic.PanelArmType)
+      .onGet(this.getArmType.bind(this))
+      .on('change', this.notifyArmTypeChange.bind(this));
 
     this.device.onevent = async event => {
       if (event.mediaType === 'event/securityStateChange') {
         this.device.device.properties.status = event.metadata.status;
         this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
         event.metadata.armType !== null ? this.device.device.properties.armType = event.metadata.armType : undefined;
+        this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelArmType, this.getArmType());
         this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, await this.getCurrentState(true));
         this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
       }
@@ -48,6 +52,7 @@ export default class PanelAccessory extends Accessory {
       this.device.device = newState;
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
+      this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelArmType, this.getArmType());
       this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, await this.getCurrentState(true));
       this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
 
@@ -185,6 +190,17 @@ export default class PanelAccessory extends Accessory {
   private async notifyStatusChange(value: CharacteristicChange): Promise<void> {
     if (value.newValue !== value.oldValue) {
       this.log(4, `Status Changed To ${value.newValue}`);
+    }
+  }
+
+  private getArmType(): CharacteristicValue {
+    return this.device.device.properties.armType.charAt(0).toUpperCase() +
+      this.device.device.properties.armType.slice(1).replace(/([A-Z])/g, ' $1').trim();
+  }
+
+  private async notifyArmTypeChange(value: CharacteristicChange): Promise<void> {
+    if (value.newValue !== value.oldValue) {
+      this.log(4, `Arm Type Changed To ${value.newValue}`);
     }
   }
 }
