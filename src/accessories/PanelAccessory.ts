@@ -42,8 +42,8 @@ export default class PanelAccessory extends Accessory {
         this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
         event.metadata.armType !== null ? this.device.device.properties.armType = event.metadata.armType : undefined;
         this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelArmType, this.getArmType());
-        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, await this.getCurrentState(true));
         this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
+        this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, await this.getCurrentState(true));
       }
     };
 
@@ -53,8 +53,8 @@ export default class PanelAccessory extends Accessory {
       this.service.updateCharacteristic(this.platform.Characteristic.StatusTampered, this.getTampered());
       this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelStatus, this.getStatus());
       this.service.updateCharacteristic(this.platform.CustomCharacteristic.PanelArmType, this.getArmType());
-      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, await this.getCurrentState(true));
       this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemTargetState, this.getTargetState());
+      this.service.updateCharacteristic(this.platform.Characteristic.SecuritySystemCurrentState, await this.getCurrentState(true));
 
 
       this.accessory.context.logPath = this.logPath;
