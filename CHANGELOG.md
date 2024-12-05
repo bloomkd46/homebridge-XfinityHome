@@ -1,3 +1,7 @@
+### 3.6.1 Beta 4 
+* When pushing statuses to HomeKit, the panels target state is now sent before the current state to hopefully help with the activity history
+
+
 ### 3.6.1 Beta 3 
 * Added another log to help identify why the panel is going Unknown when disarmed by the keypad
 
