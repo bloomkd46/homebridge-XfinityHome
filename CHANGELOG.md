@@ -1,3 +1,7 @@
+### 3.6.2 
+* Fixed some bugs related to the status of the panel in HomeKit when the alarm is triggered
+
+
 ### 3.6.1 Beta 4 
 * When pushing statuses to HomeKit, the panels target state is now sent before the current state to hopefully help with the activity history
 
