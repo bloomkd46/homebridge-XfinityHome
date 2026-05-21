@@ -64,6 +64,7 @@
         "title": "Log Watchdog Errors",
         "type": "boolean",
         "required": false,
+        "default": false,
         "placeholder": false,
         "description": "For Debugging Purposes"
       }
