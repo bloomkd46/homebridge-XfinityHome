@@ -1,11 +1,11 @@
 import fs from 'fs';
 //@ts-check
-import { HapStatusError, PlatformAccessory, Service } from 'homebridge';
+import type { HapStatusError, PlatformAccessory, Service } from 'homebridge';
 import path from 'path';
 import { Device, Light, Panel } from 'xfinityhome';
 
-import { XfinityHomePlatform } from '../platform';
-import { CONTEXT } from '../settings';
+import type { XfinityHomePlatform } from '../platform.js';
+import type { CONTEXT } from '../settings.js';
 
 
 export default class Accessory {

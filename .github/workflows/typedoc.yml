@@ -21,12 +21,13 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: '24.x'
+          cache: npm
 
       - name: Remove Old Documentation
         run: rm -r docs
@@ -52,12 +53,12 @@ jobs:
 
           if [ -z "$(git status --porcelain)" ]; then 
 
-             echo "::set-output name=push::false"
+             echo "push=false" >> "$GITHUB_OUTPUT"
 
           else
 
              git commit -m "Updated API Documentation Using Typedoc" -a
-             echo "::set-output name=push::true"
+             echo "push=true" >> "$GITHUB_OUTPUT"
 
           fi
 

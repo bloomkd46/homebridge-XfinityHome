@@ -56,7 +56,7 @@ Homebridge plugin to integrate Xfinity Home Devices into HomeKit
 
 ### Prerequisites
 
-- To use this plugin, you will need to already have [Homebridge](https://homebridge.io) (at least v1.3.5) or [HOOBS](https://hoobs.org) (at least v4) installed. Refer to the links for more information and installation instructions.
+- To use this plugin, you will need to already have [Homebridge](https://homebridge.io) v1.6.0 or later, including Homebridge 2.x, running on Node.js 22.12.0 or 24.x. Refer to the link for more information and installation instructions.
 
 ### Setup
 

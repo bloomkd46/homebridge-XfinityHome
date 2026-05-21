@@ -1,9 +1,10 @@
-import { CharacteristicChange, CharacteristicValue, HAPStatus, Perms, PlatformAccessory, Service } from 'homebridge';
+import { HAPStatus, Perms } from 'homebridge';
+import type { CharacteristicChange, CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { DryContact } from 'xfinityhome';
 
-import { XfinityHomePlatform } from '../platform';
-import { CONTEXT } from '../settings';
-import Accessory from './Accessory';
+import type { XfinityHomePlatform } from '../platform.js';
+import type { CONTEXT } from '../settings.js';
+import Accessory from './Accessory.js';
 
 
 export default class DryContactAccessory extends Accessory {

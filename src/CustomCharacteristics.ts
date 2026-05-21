@@ -1,9 +1,15 @@
 import { Formats, Perms } from 'homebridge';
 
 
-import type { HAP } from 'homebridge';
+import type { Characteristic, HAP, WithUUID } from 'homebridge';
 
-export default function CustomCharacteristics(hap: HAP): { EnergyUsage; PanelStatus; PanelArmType; } {
+type CustomCharacteristic = WithUUID<new () => Characteristic>;
+
+export default function CustomCharacteristics(hap: HAP): {
+  EnergyUsage: CustomCharacteristic;
+  PanelStatus: CustomCharacteristic;
+  PanelArmType: CustomCharacteristic;
+} {
   const Characteristic = hap.Characteristic;
   class EnergyUsage extends Characteristic {
     static readonly UUID: string = '00000101-0000-0000-0000-000000000000';

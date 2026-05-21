@@ -3,6 +3,7 @@ import debug from 'debug';
 import { EventEmitter } from 'events';
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, unwatchFile, watch, watchFile } from 'fs';
 import { Proxy } from 'http-mitm-proxy';
+import { fileURLToPath } from 'url';
 import os from 'os';
 import path from 'path';
 import qrcode from 'qrcode';
@@ -17,6 +18,8 @@ type CONTEXT = {
   logPath?: string;
   refreshToken?: string;
 };
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 class PluginUiServer extends HomebridgePluginUiServer {
@@ -57,7 +60,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/getLogs', async (payload) => {
       try {
         return readFileSync(payload.logPath).toString().replace(/\n/g, '<br>');
-      } catch (err) {
+      } catch {
         return `Failed To Load Logs From ${payload.logPath}`;
       }
     });
@@ -145,7 +148,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       // Disable debug messages from the proxy
       try {
         debug.disable();
-      } catch (err) {
+      } catch {
         //Do nothing
       }
       const ROOT = path.join(storagePath, 'XfinityHome');
