@@ -1,9 +1,9 @@
-import { PlatformAccessory } from 'homebridge';
+import type { PlatformAccessory } from 'homebridge';
 import { Unknown } from 'xfinityhome';
 
-import { XfinityHomePlatform } from '../platform';
-import { CONTEXT } from '../settings';
-import Accessory from './Accessory';
+import type { XfinityHomePlatform } from '../platform.js';
+import type { CONTEXT } from '../settings.js';
+import Accessory from './Accessory.js';
 
 
 export default class UnknownAccessory extends Accessory {

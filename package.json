@@ -3,6 +3,7 @@
   "name": "homebridge-xfinityhome",
   "version": "3.6.2",
   "description": "A homebridge plugin to control your Xfinity Home security system.",
+  "type": "module",
   "license": "Apache-2.0",
   "funding": {
     "type": "Venmo",
@@ -16,12 +17,13 @@
     "url": "https://github.com/bloomkd46/homebridge-XfinityHome/issues"
   },
   "engines": {
-    "node": ">=14.18.1",
-    "homebridge": ">=1.3.5"
+    "node": "^22.12.0 || ^24.0.0",
+    "homebridge": "^1.6.0 || ^2.0.0"
   },
   "main": "dist/index.js",
   "scripts": {
-    "lint": "eslint src/**.ts --max-warnings=0 --fix && eslint homebridge-ui/**.ts --max-warnings=0",
+    "lint": "eslint \"src/**/*.ts\" \"homebridge-ui/**/*.ts\" --max-warnings=0",
+    "lint:fix": "npm run lint -- --fix",
     "watch": "npm run build && npm link && nodemon",
     "prebuild": "rimraf ./dist ./homebridge-ui/server.js ./homebridge-ui/public/bundle.js",
     "build": "tsc --build && browserify --outfile ./homebridge-ui/public/bundle.js ./homebridge-ui/public/index.js",
@@ -45,15 +47,15 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^4.6.1",
-    "@types/node": "^16.18.10",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
+    "@types/node": "^22.15.3",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
     "browserify": "^17.0.0",
-    "eslint": "^8.0.1",
-    "homebridge": "^1.3.5",
+    "eslint": "^8.57.1",
+    "homebridge": "^2.0.0",
     "nodemon": "^2.0.13",
-    "rimraf": "^3.0.2",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.3.0",
-    "typescript": "^4.9.4"
+    "typescript": "^5.8.3"
   }
 }

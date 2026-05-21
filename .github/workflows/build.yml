@@ -3,96 +3,67 @@ name: Build and Lint
 on:
   push:
     branches: [ master ]
-    paths: [ src/**, .github/workflows/build.yml ] 
+    paths:
+      - src/**
+      - homebridge-ui/**
+      - package.json
+      - package-lock.json
+      - tsconfig.json
+      - .github/workflows/build.yml
   pull_request:
     branches: [ master ]
-    paths: [ src/** ]
+    paths:
+      - src/**
+      - homebridge-ui/**
+      - package.json
+      - package-lock.json
+      - tsconfig.json
+      - .github/workflows/build.yml
   workflow_dispatch:
 
-    
 jobs:
   build:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        # the Node.js versions to build on
-        node-version: [12.x, 13.x, 14.x, 15.x, 16.x]
+        node-version: [22.x, 24.x]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }} 
-        uses: actions/setup-node@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build the project
         run: npm run build
         env:
           CI: true
-        
-      - name: Commit files if necessary
-        id: commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "github-actions"
-          git add --all
-          if [ -z "$(git status --porcelain)" ]; then 
-             echo "::set-output name=push::false"
-          else
-             git commit -m "Built Project" -a
-             echo "::set-output name=push::true"
-             #git pull
-          fi
-          
-      - name: Push changes
-        if: steps.commit.outputs.push == 'true' && matrix.node-version == '16.x' && github.event_name == 'push'
-        uses: ad-m/github-push-action@master
-        with:
-           github_token: ${{ secrets.GITHUB_TOKEN }}
-           
+
   lint:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        # the Node.js versions to build on
-        node-version: [12.x, 13.x, 14.x, 15.x, 16.x]
+        node-version: [22.x, 24.x]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }} 
-        uses: actions/setup-node@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Lint the project
         run: npm run lint
-        
-      - name: Commit files if necessary
-        id: commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "github-actions"
-          git add --all
-          if [ -z "$(git status --porcelain)" ]; then 
-             echo "::set-output name=push::false"
-          else
-             git commit -m "Linted Project" -a
-             echo "::set-output name=push::true"
-             #git pull
-          fi
-          
-      - name: Push changes
-        if: steps.commit.outputs.push == 'true' && matrix.node-version == '16.x' && github.event_name == 'push'
-        uses: ad-m/github-push-action@master
-        with:
-           github_token: ${{ secrets.GITHUB_TOKEN }}
