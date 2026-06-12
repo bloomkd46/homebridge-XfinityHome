@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Xfinity Home",
   "name": "homebridge-xfinityhome",
-  "version": "3.6.2",
+  "version": "3.6.3-beta.1",
   "description": "A homebridge plugin to control your Xfinity Home security system.",
   "license": "Apache-2.0",
   "funding": {
@@ -16,17 +16,20 @@
     "url": "https://github.com/bloomkd46/homebridge-XfinityHome/issues"
   },
   "engines": {
-    "node": ">=14.18.1",
-    "homebridge": ">=1.3.5"
+    "node": "^16.0.0 || ^18.0.0 || ^20.0.0 || ^22.12.0 || ^24.0.0",
+    "homebridge": "^1.3.5"
   },
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint src/**.ts --max-warnings=0 --fix && eslint homebridge-ui/**.ts --max-warnings=0",
-    "watch": "npm run build && npm link && nodemon",
+    "watch": "yarn build && yarn link && nodemon",
     "prebuild": "rimraf ./dist ./homebridge-ui/server.js ./homebridge-ui/public/bundle.js",
     "build": "tsc --build && browserify --outfile ./homebridge-ui/public/bundle.js ./homebridge-ui/public/index.js",
     "postbuild": "rimraf ./homebridge-ui/server.d.ts ./homebridge-ui/public/index.d.ts ./homebridge-ui/public/index.js ./homebridge-ui/tsconfig.tsbuildinfo ./homebridge-ui/public/tsconfig.tsbuildinfo",
-    "prepublishOnly": "npm run lint && npm run build"
+    "prepublishOnly": "yarn build",
+    "pull-check": "ts-node ./scripts/check.ts",
+    "release": "ts-node ./scripts/release.ts",
+    "fix-version": "ts-node ./scripts/version.ts"
   },
   "keywords": [
     "homebridge",
@@ -45,7 +48,7 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^4.6.1",
-    "@types/node": "^16.18.10",
+    "@types/node": "^20.11.1",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "browserify": "^17.0.0",
@@ -53,6 +56,7 @@
     "homebridge": "^1.3.5",
     "nodemon": "^2.0.13",
     "rimraf": "^3.0.2",
+    "simple-git": "^3.36.0",
     "ts-node": "^10.3.0",
     "typescript": "^4.9.4"
   }
