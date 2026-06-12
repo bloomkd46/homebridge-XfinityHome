@@ -1,8 +1,9 @@
-import { CharacteristicChange, CharacteristicValue, HAPStatus, Perms, PlatformAccessory, Service } from 'homebridge';
+import type { CharacteristicChange, CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
+import { HAPStatus, Perms } from 'homebridge';
 import { Motion } from 'xfinityhome';
 
-import { XfinityHomePlatform } from '../platform';
-import { CONTEXT } from '../settings';
+import type { XfinityHomePlatform } from '../platform';
+import type { CONTEXT } from '../settings';
 import Accessory from './Accessory';
 
 

@@ -1,3 +1,7 @@
+## 3.7.0-beta.1
+* Added support for homebridge v2!
+  * Thanks to @jmnovak50 for the PR!
+
 ## 3.6.3-beta.4
 * Continuing to attempt to use trusted publishing
 

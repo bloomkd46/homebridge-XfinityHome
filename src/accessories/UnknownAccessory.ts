@@ -1,8 +1,8 @@
-import { PlatformAccessory } from 'homebridge';
+import type { PlatformAccessory } from 'homebridge';
 import { Unknown } from 'xfinityhome';
 
-import { XfinityHomePlatform } from '../platform';
-import { CONTEXT } from '../settings';
+import type { XfinityHomePlatform } from '../platform';
+import type { CONTEXT } from '../settings';
 import Accessory from './Accessory';
 
 

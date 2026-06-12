@@ -18,7 +18,6 @@ type CONTEXT = {
   refreshToken?: string;
 };
 
-
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor() {
     super();
@@ -57,7 +56,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/getLogs', async (payload) => {
       try {
         return readFileSync(payload.logPath).toString().replace(/\n/g, '<br>');
-      } catch (err) {
+      } catch {
         return `Failed To Load Logs From ${payload.logPath}`;
       }
     });
@@ -145,7 +144,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       // Disable debug messages from the proxy
       try {
         debug.disable();
-      } catch (err) {
+      } catch {
         //Do nothing
       }
       const ROOT = path.join(storagePath, 'XfinityHome');

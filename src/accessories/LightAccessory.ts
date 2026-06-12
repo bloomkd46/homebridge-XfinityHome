@@ -1,8 +1,8 @@
 import { CharacteristicChange, CharacteristicValue, HAPStatus, PlatformAccessory } from 'homebridge';
 import { Light } from 'xfinityhome';
 
-import { XfinityHomePlatform } from '../platform';
-import { CONTEXT } from '../settings';
+import type { XfinityHomePlatform } from '../platform';
+import type { CONTEXT } from '../settings';
 import Accessory from './Accessory';
 
 
