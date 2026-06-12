@@ -15,14 +15,14 @@ jobs:
       NODE_AUTH_TOKEN: ''
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Setup Node 20
-        uses: actions/setup-node@v4
+      - name: Setup Node 24
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
-          cache: yarn
-          cache-dependency-path: yarn.lock
+          node-version: 24
+          package-manager-cache: false
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: yarn install

@@ -1,3 +1,6 @@
+## 3.6.3-beta.4
+* Continuing to attempt to use trusted publishing
+
 ## 3.6.3-beta.3
 * Updated release workflow to hopefully force trusted publishing for npm releases
 
