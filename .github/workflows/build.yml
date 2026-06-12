@@ -37,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         # the Node.js versions to build on
         node-version: [22.12.x, 24.x]
