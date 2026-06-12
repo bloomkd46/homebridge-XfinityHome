@@ -1,3 +1,6 @@
+## 3.6.3-beta.2
+* Switched to trusted publishing for npm
+
 ## 3.6.3-beta.1
 * Restructured the deploy process
 
