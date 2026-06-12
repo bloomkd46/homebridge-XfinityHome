@@ -4,15 +4,18 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
     
 jobs:
   build:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         # the Node.js versions to build on
-        node-version: [12.x, 13.x, 14.x, 15.x, 16.x]
+        node-version: [16.x, 18.x, 20.x, 22.x, 24.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +39,7 @@ jobs:
     strategy:
       matrix:
         # the Node.js versions to build on
-        node-version: [12.x, 13.x, 14.x, 15.x, 16.x]
+        node-version: [16.x, 18.x, 20.x, 22.x, 24.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -51,4 +54,5 @@ jobs:
 
       - name: Lint the project
         run: yarn lint
-        
+        env:
+          CI: true
