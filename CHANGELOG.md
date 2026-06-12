@@ -1,3 +1,7 @@
+## 4.0.0-beta.1
+* Unfortunately, homebridge 2.0 requires breaking changes
+* This plugin now requires node v22.12.0 or higher
+
 ## 3.7.0-beta.1
 * Added support for homebridge v2!
   * Thanks to @jmnovak50 for the PR!
