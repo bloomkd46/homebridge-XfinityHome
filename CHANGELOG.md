@@ -1,3 +1,14 @@
+## 4.0.0-beta.2
+* ESLint requires node 22.13 or newer
+
+## 4.0.0-beta.1
+* Unfortunately, homebridge 2.0 requires breaking changes
+* This plugin now requires node v22.12.0 or higher
+
+## 3.7.0-beta.1
+* Added support for homebridge v2!
+  * Thanks to @jmnovak50 for the PR!
+
 ## 3.6.3-beta.4
 * Continuing to attempt to use trusted publishing
 

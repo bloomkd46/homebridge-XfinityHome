@@ -1,7 +1,8 @@
 import fs from 'fs';
-import {
-  API, APIEvent, Categories, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service,
+import type {
+  API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service,
 } from 'homebridge';
+import { APIEvent, Categories } from 'homebridge';
 import path from 'path';
 import { EventEmitter } from 'stream';
 import XHome, { Camera, DryContact, Keyfob, Keypad, LegacyMotion, Light, Motion, Panel, Smoke, Unknown, Water } from 'xfinityhome';
@@ -18,8 +19,8 @@ import PanelAccessory from './accessories/PanelAccessory';
 import SmokeAccessory from './accessories/SmokeAccessory';
 import UnknownAccessory from './accessories/UnknownAccessory';
 import CustomCharacteristics from './CustomCharacteristics';
-import { CONFIG, CONTEXT, PLATFORM_NAME, PLUGIN_NAME } from './settings';
-
+import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
+import type { CONFIG, CONTEXT } from './settings';
 
 /**
  * HomebridgePlatform
@@ -27,10 +28,10 @@ import { CONFIG, CONTEXT, PLATFORM_NAME, PLUGIN_NAME } from './settings';
  * parse the user config and discover/register accessories with Homebridge.
  */
 export class XfinityHomePlatform implements DynamicPlatformPlugin {
-  public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
-  public readonly CustomCharacteristic = CustomCharacteristics(this.api.hap);
-  public xhome!: XHome;
+  public readonly Service: typeof Service;
+  public readonly Characteristic: typeof Characteristic;
+  public readonly CustomCharacteristic: ReturnType<typeof CustomCharacteristics>;
+  public xhome!: InstanceType<typeof XHome>;
   private refreshToken?: string;
 
   /** this is used to track restored cached accessories */
@@ -49,6 +50,9 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
     public readonly api: API,
   ) {
     this.config = config as unknown as PlatformConfig & CONFIG;
+    this.Service = this.api.hap.Service;
+    this.Characteristic = this.api.hap.Characteristic;
+    this.CustomCharacteristic = CustomCharacteristics(this.api.hap);
     (this.api as unknown as EventEmitter).setMaxListeners(0);
     this.log.debug('Finished initializing platform:', this.config.name);
 
@@ -92,11 +96,11 @@ export class XfinityHomePlatform implements DynamicPlatformPlugin {
    * This function is invoked when homebridge restores cached accessories from disk at startup.
    * It should be used to setup event handlers for characteristics and update respective values.
    */
-  configureAccessory(accessory: PlatformAccessory<CONTEXT>) {
+  configureAccessory(accessory: PlatformAccessory) {
     this.log.debug('Loading accessory from cache:', accessory.displayName);
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
-    this.cachedAccessories.push(accessory);
+    this.cachedAccessories.push(accessory as PlatformAccessory<CONTEXT>);
   }
 
   /**

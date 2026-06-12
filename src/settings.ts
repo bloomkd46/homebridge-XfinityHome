@@ -1,4 +1,4 @@
-import { Device } from 'xfinityhome';
+import type { Device } from 'xfinityhome';
 
 
 /**
