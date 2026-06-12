@@ -1,12 +1,7 @@
 name: Build and Lint
 
 on:
-  push:
-    branches: [ master ]
-    paths: [ src/**, .github/workflows/build.yml ] 
   pull_request:
-    branches: [ master ]
-    paths: [ src/** ]
   workflow_dispatch:
 
     
@@ -28,33 +23,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install
 
       - name: Build the project
-        run: npm run build
+        run: yarn build
         env:
           CI: true
-        
-      - name: Commit files if necessary
-        id: commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "github-actions"
-          git add --all
-          if [ -z "$(git status --porcelain)" ]; then 
-             echo "::set-output name=push::false"
-          else
-             git commit -m "Built Project" -a
-             echo "::set-output name=push::true"
-             #git pull
-          fi
-          
-      - name: Push changes
-        if: steps.commit.outputs.push == 'true' && matrix.node-version == '16.x' && github.event_name == 'push'
-        uses: ad-m/github-push-action@master
-        with:
-           github_token: ${{ secrets.GITHUB_TOKEN }}
-           
+                   
   lint:
     runs-on: ubuntu-latest
 
@@ -72,27 +47,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install
 
       - name: Lint the project
-        run: npm run lint
+        run: yarn lint
         
-      - name: Commit files if necessary
-        id: commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "github-actions"
-          git add --all
-          if [ -z "$(git status --porcelain)" ]; then 
-             echo "::set-output name=push::false"
-          else
-             git commit -m "Linted Project" -a
-             echo "::set-output name=push::true"
-             #git pull
-          fi
-          
-      - name: Push changes
-        if: steps.commit.outputs.push == 'true' && matrix.node-version == '16.x' && github.event_name == 'push'
-        uses: ad-m/github-push-action@master
-        with:
-           github_token: ${{ secrets.GITHUB_TOKEN }}

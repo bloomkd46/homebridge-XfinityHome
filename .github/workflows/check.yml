@@ -1,0 +1,40 @@
+name: Pre Check
+
+on:
+  pull_request:
+
+# Sets permissions of the GITHUB_TOKEN to allow commenting on the pull request
+permissions:
+  contents: read
+  pull-requests:   write
+env:
+  YARN_IGNORE_ENGINES: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Fix version
+        if: github.base_ref == 'main'
+        run: yarn fix-version
+
+      - name: Run check
+        run: yarn pull-check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

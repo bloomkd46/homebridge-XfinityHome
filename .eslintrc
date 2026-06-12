@@ -11,7 +11,8 @@
   },
   "ignorePatterns": [
     "dist",
-    "*.js"
+    "*.js",
+    "scripts"
   ],
   "rules": {
     "quotes": [
